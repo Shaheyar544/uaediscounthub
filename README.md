@@ -47,6 +47,25 @@ cp .env.example .env.local
 npm run dev
 ```
 
+## 🌐 Hostinger VPS Deployment
+
+To deploy on a Hostinger VPS:
+
+1. **Build the application**:
+   ```bash
+   npm run build
+   ```
+
+2. **Start with PM2**:
+   ```bash
+   pm2 start ecosystem.config.js
+   ```
+
+3. **Save PM2 process**:
+   ```bash
+   pm2 save
+   ```
+
 ## 📂 Project Structure
 
 - `/app`: Next.js pages and routing.
