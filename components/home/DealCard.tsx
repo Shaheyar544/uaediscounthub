@@ -109,6 +109,7 @@ export function DealCard({
 
           <motion.button
             whileTap={{ scale: 0.92 }}
+            suppressHydrationWarning
             className="buy-btn shrink-0 z-10 flex items-center gap-1.5 bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground text-xs font-bold px-3 py-2 rounded-xl transition-all duration-200"
           >
             <ShoppingCart className="w-3.5 h-3.5" />

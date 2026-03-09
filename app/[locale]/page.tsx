@@ -87,12 +87,16 @@ export default async function Home({
                 type="text"
                 placeholder="Search for iPhone 15, MacBooks, Samsung TV..."
                 className="w-full pl-14 pr-36 py-4 rounded-2xl bg-transparent focus:outline-none text-base"
+                suppressHydrationWarning
               />
               <div className="absolute right-2 flex items-center gap-1">
                 <button className="p-2 text-muted-foreground hover:text-primary transition-colors" aria-label="Voice search">
                   <Mic className="w-4 h-4" />
                 </button>
-                <button className="bg-primary hover:bg-primary/90 text-primary-foreground px-5 py-2 rounded-xl font-semibold transition-colors shadow-sm text-sm">
+                <button
+                  suppressHydrationWarning
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground px-5 py-2 rounded-xl font-semibold transition-colors shadow-sm text-sm"
+                >
                   Search
                 </button>
               </div>
