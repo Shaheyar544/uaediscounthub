@@ -56,7 +56,13 @@ To deploy on a Hostinger VPS:
    npm run build
    ```
 
-2. **Start with PM2**:
+2. **Setup Environment Variables**:
+   > [!IMPORTANT]
+   > You **MUST** create a `.env` file in the root of your project on the VPS. 
+   > Copy values from your local `.env` (refer to `.env.example`).
+   > Without this, the site will return an **Internal Server Error**.
+
+3. **Start with PM2**:
    ```bash
    pm2 start ecosystem.config.js
    ```

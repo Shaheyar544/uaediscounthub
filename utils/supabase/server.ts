@@ -1,7 +1,9 @@
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
+import { validateEnv } from '../env-validation'
 
 export async function createClient() {
+    validateEnv()
     const cookieStore = await cookies()
 
     return createServerClient(
