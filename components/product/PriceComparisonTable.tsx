@@ -2,6 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Badge } from '@/components/ui/badge'
 import { CheckCircle2, TrendingDown, Truck, CreditCard, ChevronRight } from 'lucide-react'
+import { AffiliateLink } from '@/components/common/AffiliateLink'
 
 interface VendorPrice {
     store: string;
@@ -95,16 +96,18 @@ export function PriceComparisonTable({ prices }: { prices: VendorPrice[] }) {
 
                             {/* Action */}
                             <div className="text-right">
-                                <Link
+                                <AffiliateLink
                                     href={p.affiliateUrl}
+                                    productId={p.store} // Using store as ID for now if specific ID not available
+                                    storeName={p.store}
                                     className={`inline-flex items-center gap-2 h-10 px-5 rounded-full font-bold text-[13.5px] transition-all ${p.isLowest
-                                            ? 'bg-primary text-white shadow-lg shadow-primary/20 hover:bg-primary-dim hover:-translate-y-0.5'
-                                            : 'bg-secondary text-foreground hover:bg-border transition-all'
+                                        ? 'bg-primary text-white shadow-lg shadow-primary/20 hover:bg-primary-dim hover:-translate-y-0.5'
+                                        : 'bg-secondary text-foreground hover:bg-border transition-all'
                                         }`}
                                 >
                                     Go to Store
                                     <ChevronRight className="w-3.5 h-3.5" />
-                                </Link>
+                                </AffiliateLink>
                             </div>
                         </div>
                     </div>

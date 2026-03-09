@@ -14,6 +14,13 @@ const cairo = Cairo({ subsets: ['arabic'], variable: '--font-cairo' })
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://uaediscounthub.com'),
+  alternates: {
+    canonical: '/',
+    languages: {
+      'en-AE': '/en',
+      'ar-AE': '/ar',
+    },
+  },
   title: {
     default: 'UAEDISCOUNTHUB - Best Tech Deals in UAE & GCC',
     template: '%s | UAEDISCOUNTHUB'
@@ -42,7 +49,8 @@ export const metadata: Metadata = {
     title: 'UAEDISCOUNTHUB - Best Tech Deals',
     description: 'Find the best electronics deals in the GCC with AI insights.',
     images: ['/og-image.jpg'],
-  }
+  },
+  category: 'technology',
 }
 
 

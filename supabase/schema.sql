@@ -1,7 +1,7 @@
 -- ============================================
 -- USERS & PROFILES (SYNC WITH AUTH.USERS)
 -- ============================================
-CREATE TABLE profiles (
+CREATE TABLE IF NOT EXISTS profiles (
   id UUID REFERENCES auth.users ON DELETE CASCADE PRIMARY KEY,
   email TEXT UNIQUE NOT NULL,
   display_name TEXT,
@@ -25,12 +25,18 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
-CREATE OR REPLACE TRIGGER on_auth_user_created
-  AFTER INSERT ON auth.users
-  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+-- Safe creation of trigger
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'on_auth_user_created') THEN
+    CREATE TRIGGER on_auth_user_created
+      AFTER INSERT ON auth.users
+      FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+  END IF;
+END $$;
 
 
-CREATE TABLE user_badges (
+CREATE TABLE IF NOT EXISTS user_badges (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
   badge_slug TEXT NOT NULL, -- 'deal-hunter', 'top-contributor'
@@ -40,7 +46,7 @@ CREATE TABLE user_badges (
 -- ============================================
 -- STORES / MARKETPLACES
 -- ============================================
-CREATE TABLE stores (
+CREATE TABLE IF NOT EXISTS stores (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   slug TEXT UNIQUE NOT NULL, -- 'amazon-ae', 'noon', 'sharaf-dg'
   name TEXT NOT NULL,
@@ -58,7 +64,7 @@ CREATE TABLE stores (
 -- ============================================
 -- CATEGORIES
 -- ============================================
-CREATE TABLE categories (
+CREATE TABLE IF NOT EXISTS categories (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   slug TEXT UNIQUE NOT NULL,
   name_en TEXT NOT NULL,
@@ -72,7 +78,7 @@ CREATE TABLE categories (
 -- ============================================
 -- BRANDS
 -- ============================================
-CREATE TABLE brands (
+CREATE TABLE IF NOT EXISTS brands (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   slug TEXT UNIQUE NOT NULL,
   name TEXT NOT NULL,
@@ -83,7 +89,7 @@ CREATE TABLE brands (
 -- ============================================
 -- PRODUCTS (Core Table)
 -- ============================================
-CREATE TABLE products (
+CREATE TABLE IF NOT EXISTS products (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   slug TEXT UNIQUE NOT NULL,
   name_en TEXT NOT NULL,
@@ -119,14 +125,14 @@ CREATE TABLE products (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE INDEX idx_products_category ON products(category_id);
-CREATE INDEX idx_products_brand ON products(brand_id);
-CREATE INDEX idx_products_slug ON products(slug);
+CREATE INDEX IF NOT EXISTS idx_products_category ON products(category_id);
+CREATE INDEX IF NOT EXISTS idx_products_brand ON products(brand_id);
+CREATE INDEX IF NOT EXISTS idx_products_slug ON products(slug);
 
 -- ============================================
 -- PRODUCT PRICES (Per Store)
 -- ============================================
-CREATE TABLE product_prices (
+CREATE TABLE IF NOT EXISTS product_prices (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   product_id UUID REFERENCES products(id) ON DELETE CASCADE,
   store_id UUID REFERENCES stores(id) ON DELETE CASCADE,
@@ -147,7 +153,7 @@ CREATE TABLE product_prices (
 -- ============================================
 -- PRICE HISTORY (For Charts)
 -- ============================================
-CREATE TABLE price_history (
+CREATE TABLE IF NOT EXISTS price_history (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   product_id UUID REFERENCES products(id) ON DELETE CASCADE,
   store_id UUID REFERENCES stores(id) ON DELETE CASCADE,
@@ -156,12 +162,12 @@ CREATE TABLE price_history (
   recorded_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE INDEX idx_price_history_product ON price_history(product_id, store_id, recorded_at DESC);
+CREATE INDEX IF NOT EXISTS idx_price_history_product ON price_history(product_id, store_id, recorded_at DESC);
 
 -- ============================================
 -- COUPONS
 -- ============================================
-CREATE TABLE coupons (
+CREATE TABLE IF NOT EXISTS coupons (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   store_id UUID REFERENCES stores(id) ON DELETE CASCADE,
   code TEXT NOT NULL,
@@ -185,7 +191,7 @@ CREATE TABLE coupons (
 -- ============================================
 -- DEALS
 -- ============================================
-CREATE TABLE deals (
+CREATE TABLE IF NOT EXISTS deals (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   product_id UUID REFERENCES products(id),
   store_id UUID REFERENCES stores(id),
@@ -208,7 +214,7 @@ CREATE TABLE deals (
 -- ============================================
 -- AFFILIATE CLICK TRACKING
 -- ============================================
-CREATE TABLE affiliate_clicks (
+CREATE TABLE IF NOT EXISTS affiliate_clicks (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   product_id UUID REFERENCES products(id),
   store_id UUID REFERENCES stores(id),
@@ -223,12 +229,12 @@ CREATE TABLE affiliate_clicks (
   clicked_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE INDEX idx_clicks_product ON affiliate_clicks(product_id, clicked_at DESC);
+CREATE INDEX IF NOT EXISTS idx_clicks_product ON affiliate_clicks(product_id, clicked_at DESC);
 
 -- ============================================
 -- PRICE ALERTS (User Subscriptions)
 -- ============================================
-CREATE TABLE price_alerts (
+CREATE TABLE IF NOT EXISTS price_alerts (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
   product_id UUID REFERENCES products(id) ON DELETE CASCADE,
@@ -244,7 +250,7 @@ CREATE TABLE price_alerts (
 -- ============================================
 -- WISHLISTS
 -- ============================================
-CREATE TABLE wishlists (
+CREATE TABLE IF NOT EXISTS wishlists (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
   product_id UUID REFERENCES products(id) ON DELETE CASCADE,
@@ -255,7 +261,7 @@ CREATE TABLE wishlists (
 -- ============================================
 -- BLOG
 -- ============================================
-CREATE TABLE blog_posts (
+CREATE TABLE IF NOT EXISTS blog_posts (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   slug TEXT UNIQUE NOT NULL,
   title_en TEXT NOT NULL,
@@ -283,7 +289,7 @@ CREATE TABLE blog_posts (
 -- ============================================
 -- COMMUNITY DEAL REPORTS (Gamification)
 -- ============================================
-CREATE TABLE community_reports (
+CREATE TABLE IF NOT EXISTS community_reports (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   reporter_id UUID REFERENCES profiles(id),
   report_type TEXT NOT NULL, -- 'expired_deal' | 'broken_link' | 'submit_coupon'
@@ -299,7 +305,7 @@ CREATE TABLE community_reports (
 -- ============================================
 -- COMPARISON SESSIONS (Shareable URLs)
 -- ============================================
-CREATE TABLE comparisons (
+CREATE TABLE IF NOT EXISTS comparisons (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   share_hash TEXT UNIQUE NOT NULL, -- short unique hash e.g. "abc12x"
   product_ids UUID[] NOT NULL,
@@ -311,7 +317,7 @@ CREATE TABLE comparisons (
 -- ============================================
 -- NEWSLETTER SUBSCRIBERS
 -- ============================================
-CREATE TABLE newsletter_subscribers (
+CREATE TABLE IF NOT EXISTS newsletter_subscribers (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   email TEXT UNIQUE NOT NULL,
   name TEXT,
@@ -324,7 +330,7 @@ CREATE TABLE newsletter_subscribers (
 -- ============================================
 -- API SYNC LOGS (Admin Monitoring)
 -- ============================================
-CREATE TABLE api_sync_logs (
+CREATE TABLE IF NOT EXISTS api_sync_logs (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   store_id UUID REFERENCES stores(id),
   sync_type TEXT, -- 'price_update' | 'product_import'
