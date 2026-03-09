@@ -25,14 +25,14 @@ export async function addProduct(formData: FormData) {
     }
 
     const { data, error } = await supabase.from('products').insert({
-        name,
+        name_en: name,
         slug,
-        description,
+        description_en: description,
         base_price,
         image_url,
         category_id,
-        specs,
-        currency: 'AED' // Default to AED for UAE Discount Hub
+        specifications: specs,
+        currency: 'AED'
     }).select().single()
 
     if (error) {

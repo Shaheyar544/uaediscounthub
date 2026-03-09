@@ -18,7 +18,7 @@ export default async function NewProductPage({
     const supabase = await createClient()
 
     // Fetch categories so the admin can pick them in the dropdown
-    const { data: categories } = await supabase.from('categories').select('id, name').order('name')
+    const { data: categories } = await supabase.from('categories').select('id, name_en').order('name_en')
 
     return (
         <div className="max-w-2xl mx-auto space-y-8">
@@ -62,7 +62,7 @@ export default async function NewProductPage({
                         >
                             <option value="">Select Category...</option>
                             {categories?.map(c => (
-                                <option key={c.id} value={c.id}>{c.name}</option>
+                                <option key={c.id} value={c.id}>{c.name_en}</option>
                             ))}
                         </select>
                     </div>

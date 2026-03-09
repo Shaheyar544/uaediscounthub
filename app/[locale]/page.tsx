@@ -74,13 +74,9 @@ export default async function Home({
               discountPercent={15}
               store="Noon"
               badge="Trending"
+              locale={locale}
             />
           ))}
-          {(!products || products.length === 0) && (
-            <div className="col-span-full h-32 flex items-center justify-center text-muted-foreground border rounded-xl bg-muted/20 border-dashed">
-              No deals populated in the database. Head to the Admin panel to add some!
-            </div>
-          )}
         </div>
       </section>
 
@@ -101,6 +97,7 @@ export default async function Home({
               image_url={product.image_url}
               base_price={product.base_price}
               store="Amazon AE"
+              locale={locale}
             />
           ))}
         </div>

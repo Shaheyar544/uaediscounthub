@@ -92,6 +92,10 @@ CREATE TABLE products (
   view_count INTEGER DEFAULT 0,
   is_featured BOOLEAN DEFAULT FALSE,
   is_active BOOLEAN DEFAULT TRUE,
+  -- Compatibility Columns
+  name TEXT GENERATED ALWAYS AS (name_en) STORED,
+  image_url TEXT,
+  base_price NUMERIC(10,2),
   seo_title_en TEXT,
   seo_title_ar TEXT,
   seo_description_en TEXT,

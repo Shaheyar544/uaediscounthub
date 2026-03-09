@@ -28,6 +28,7 @@ export default async function AdminProductsPage({
         .select(`
       id,
       name_en,
+      name,
       base_price,
       created_at,
       categories ( name_en )
@@ -72,7 +73,7 @@ export default async function AdminProductsPage({
                             products.map((product) => (
                                 <TableRow key={product.id}>
                                     <TableCell className="font-medium text-primary">
-                                        {product.name_en}
+                                        {product.name_en || product.name}
                                     </TableCell>
                                     <TableCell>
                                         <Badge variant="outline">{(product.categories as any)?.name_en || 'Uncategorized'}</Badge>

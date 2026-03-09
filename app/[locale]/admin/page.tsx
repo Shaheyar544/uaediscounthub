@@ -11,7 +11,7 @@ export default async function AdminDashboard({
     const supabase = await createClient()
 
     // Fetch simple aggregate counts
-    const { count: usersCount } = await supabase.from('users').select('*', { count: 'exact', head: true })
+    const { count: usersCount } = await supabase.from('profiles').select('*', { count: 'exact', head: true })
     const { count: productsCount } = await supabase.from('products').select('*', { count: 'exact', head: true })
     const { count: clicksCount } = await supabase.from('affiliate_clicks').select('*', { count: 'exact', head: true })
 
@@ -29,7 +29,7 @@ export default async function AdminDashboard({
                         <DollarSign className="w-4 h-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">¥--</div>
+                        <div className="text-2xl font-bold">AED --</div>
                         <p className="text-xs text-muted-foreground">Requires API sync</p>
                     </CardContent>
                 </Card>

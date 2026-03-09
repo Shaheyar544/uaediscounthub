@@ -17,9 +17,10 @@ interface DealCardProps {
     rating?: number;
     store?: string;
     badge?: string;
+    locale: string;
 }
 
-export function DealCard({ id, name, slug, image_url, base_price, originalPrice = 0, discountPercent = 0, rating = 5.0, store = 'Amazon', badge }: DealCardProps) {
+export function DealCard({ id, name, slug, image_url, base_price, originalPrice = 0, discountPercent = 0, rating = 5.0, store = 'Amazon', badge, locale }: DealCardProps) {
     return (
         <motion.div
             whileHover={{ y: -5 }}
@@ -49,7 +50,7 @@ export function DealCard({ id, name, slug, image_url, base_price, originalPrice 
                     </div>
                 </div>
                 <h3 className="font-semibold leading-tight line-clamp-2 mb-4 group-hover:text-primary transition-colors">
-                    <Link href={`/product/${slug}`}>
+                    <Link href={`/${locale}/product/${slug}`}>
                         <span className="absolute inset-0" />
                         {name}
                     </Link>

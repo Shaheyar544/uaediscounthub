@@ -12,12 +12,12 @@ export default async function ProductPage({
 }: {
     params: Promise<{ locale: string, slug: string }>
 }) {
-    const { slug } = await params;
+    const { slug, locale } = await params;
     const supabase = await createClient()
 
     const { data: product, error } = await supabase
         .from('products')
-        .select('*, categories(name)')
+        .select('*, categories(name_en)')
         .eq('slug', slug)
         .single()
 
@@ -25,7 +25,7 @@ export default async function ProductPage({
         notFound()
     }
 
-    const categoryName = (product.categories as any)?.name || 'Uncategorized'
+    const categoryName = (product.categories as any)?.name_en || 'Uncategorized'
 
     // Convert JSONB specs object to array for UI
     const specsObject = typeof product.specs === 'object' && product.specs !== null ? product.specs as Record<string, string> : {}
@@ -33,15 +33,15 @@ export default async function ProductPage({
 
     // Mock live prices until the crawler database is populated
     const mockPrices = [
-        { store: 'Amazon AE', price: product.base_price, originalPrice: product.base_price * 1.15, discount: 15, inStock: true, hasCOD: true, hasTabby: true, isLowest: true, affiliateUrl: `/go/amazon/${product.id}` },
-        { store: 'Noon', price: product.base_price * 1.05, originalPrice: product.base_price * 1.15, discount: 10, inStock: true, hasCOD: true, hasTabby: true, affiliateUrl: `/go/noon/${product.id}` }
+        { store: 'Amazon AE', price: product.base_price, originalPrice: product.base_price * 1.15, discount: 15, inStock: true, hasCOD: true, hasTabby: true, isLowest: true, affiliateUrl: `/${locale}/go/amazon/${product.id}` },
+        { store: 'Noon', price: product.base_price * 1.05, originalPrice: product.base_price * 1.15, discount: 10, inStock: true, hasCOD: true, hasTabby: true, affiliateUrl: `/${locale}/go/noon/${product.id}` }
     ]
 
     return (
         <div className="w-full max-w-7xl mx-auto px-4 py-8">
             {/* Breadcrumbs */}
             <div className="text-sm text-muted-foreground mb-6">
-                Home / {categoryName} / <span className="text-foreground">{product.name}</span>
+                Home / {categoryName} / <span className="text-foreground">{product.name_en || product.name}</span>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-12">
@@ -59,7 +59,7 @@ export default async function ProductPage({
                 {/* Right: Details */}
                 <div className="flex flex-col">
                     <div className="flex items-start justify-between mb-4">
-                        <h1 className="text-3xl font-extrabold tracking-tight text-foreground">{product.name}</h1>
+                        <h1 className="text-3xl font-extrabold tracking-tight text-foreground">{product.name_en || product.name}</h1>
                         <div className="flex gap-2">
                             <button className="p-2 border rounded-full hover:bg-muted text-muted-foreground"><Share2 className="w-5 h-5" /></button>
                             <button className="p-2 border rounded-full hover:bg-red-50 hover:text-red-500 hover:border-red-200 text-muted-foreground"><Heart className="w-5 h-5" /></button>
