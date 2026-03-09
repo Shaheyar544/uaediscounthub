@@ -59,9 +59,16 @@ export function NewsletterSignup() {
                                 onChange={(e) => setEmail(e.target.value)}
                                 required
                                 disabled={isPending}
+                                suppressHydrationWarning
                             />
                             <motion.div whileTap={{ scale: 0.95 }}>
-                                <Button type="submit" size="lg" className="h-12 w-full sm:w-auto font-semibold" disabled={isPending}>
+                                <Button
+                                    type="submit"
+                                    size="lg"
+                                    className="h-12 w-full sm:w-auto font-semibold"
+                                    disabled={isPending}
+                                    suppressHydrationWarning
+                                >
                                     {isPending ? 'Subscribing...' : 'Subscribe'}
                                 </Button>
                             </motion.div>
