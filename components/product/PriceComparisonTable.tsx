@@ -27,9 +27,12 @@ export function PriceComparisonTable({ prices }: { prices: VendorPrice[] }) {
                     <div key={i} className={`flex flex-col sm:flex-row items-center justify-between p-6 hover:bg-muted/30 transition-colors ${p.isLowest ? 'bg-primary/5' : ''}`}>
                         {/* Store Info */}
                         <div className="flex items-center w-full sm:w-1/3 mb-4 sm:mb-0">
-                            <div className="w-12 h-12 bg-white rounded-lg border flex items-center justify-center mr-4 text-xs font-bold shrink-0">
-                                {/* Logo placeholder */}
-                                {p.store.charAt(0)}
+                            <div className="w-14 h-14 bg-white rounded-lg border flex items-center justify-center mr-4 p-1 shrink-0 overflow-hidden shadow-sm">
+                                {p.storeLogoUrl ? (
+                                    <img src={p.storeLogoUrl} alt={p.store} className="w-full h-full object-contain" />
+                                ) : (
+                                    <span className="text-xs font-bold text-muted-foreground">{p.store.charAt(0)}</span>
+                                )}
                             </div>
                             <div>
                                 <span className="font-bold block">{p.store}</span>

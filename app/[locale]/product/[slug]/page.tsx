@@ -17,7 +17,18 @@ export default async function ProductPage({
 
     const { data: product, error } = await supabase
         .from('products')
-        .select('*, categories(name_en)')
+        .select(`
+            *,
+            categories(name_en),
+            product_prices(
+                current_price,
+                original_price,
+                discount_percent,
+                affiliate_url,
+                in_stock,
+                stores(name, logo_url)
+            )
+        `)
         .eq('slug', slug)
         .single()
 
@@ -27,14 +38,34 @@ export default async function ProductPage({
 
     const categoryName = (product.categories as any)?.name_en || 'Uncategorized'
 
-    // Convert JSONB specs object to array for UI
-    const specsObject = typeof product.specs === 'object' && product.specs !== null ? product.specs as Record<string, string> : {}
+    // Convert JSONB specifications object to array for UI
+    const specsObject = typeof product.specifications === 'object' && product.specifications !== null ? product.specifications as Record<string, string> : {}
     const specsArray = Object.entries(specsObject).map(([label, value]) => ({ label, value }))
 
-    // Mock live prices until the crawler database is populated
-    const mockPrices = [
-        { store: 'Amazon AE', price: product.base_price, originalPrice: product.base_price * 1.15, discount: 15, inStock: true, hasCOD: true, hasTabby: true, isLowest: true, affiliateUrl: `/${locale}/go/amazon/${product.id}` },
-        { store: 'Noon', price: product.base_price * 1.05, originalPrice: product.base_price * 1.15, discount: 10, inStock: true, hasCOD: true, hasTabby: true, affiliateUrl: `/${locale}/go/noon/${product.id}` }
+    // Process real prices from DB
+    const dbPrices = (product.product_prices as any[])?.map(p => ({
+        store: p.stores?.name || 'Unknown Store',
+        storeLogoUrl: p.stores?.logo_url,
+        price: p.current_price,
+        originalPrice: p.original_price,
+        discount: Math.round(p.discount_percent || 0),
+        inStock: p.in_stock,
+        hasCOD: true, // Static for now as per schema
+        hasTabby: true,
+        isLowest: false, // Will calculate below
+        affiliateUrl: p.affiliate_url || `/${locale}/go/unknown/${product.id}`
+    })) || []
+
+    // Sort to find lowest
+    if (dbPrices.length > 0) {
+        dbPrices.sort((a, b) => a.price - b.price);
+        dbPrices[0].isLowest = true;
+    }
+
+    // Fallback prices if none in DB (UI test safety)
+    const finalPrices = dbPrices.length > 0 ? dbPrices : [
+        { store: 'Amazon AE', price: product.base_price, originalPrice: Math.round(product.base_price * 1.15), discount: 15, inStock: true, hasCOD: true, hasTabby: true, isLowest: true, affiliateUrl: `/${locale}/go/amazon/${product.id}` },
+        { store: 'Noon', price: Math.round(product.base_price * 1.05), originalPrice: Math.round(product.base_price * 1.15), discount: 10, inStock: true, hasCOD: true, hasTabby: true, affiliateUrl: `/${locale}/go/noon/${product.id}` }
     ]
 
     return (
@@ -71,7 +102,7 @@ export default async function ProductPage({
                         <Badge variant="outline" className="font-medium text-xs bg-green-50 text-green-700 border-green-200 dark:bg-green-900/40 dark:text-green-300">Verified Deals Active</Badge>
                     </div>
 
-                    <AISummaryBlock text={product.description || "The DeepSeek AI has not generated a summary for this product yet. It analyzes reviews across the web to give you an unbiased TL;DR."} />
+                    <AISummaryBlock text={product.ai_summary_en || product.description_en || product.description || "The DeepSeek AI has not generated a summary for this product yet. It analyzes reviews across the web to give you an unbiased TL;DR."} />
 
                     <PriceAlertTrigger productId={product.id} productName={product.name} />
 
@@ -105,7 +136,7 @@ export default async function ProductPage({
             {/* Main Pricing Table */}
             <div className="mb-16">
                 <h2 className="text-2xl font-bold mb-6">Live Price Comparison</h2>
-                <PriceComparisonTable prices={mockPrices} />
+                <PriceComparisonTable prices={finalPrices} />
             </div>
 
         </div>
