@@ -1,0 +1,17 @@
+{
+  "common": {
+    "search": "Search Products & Deals",
+    "categories": "Categories",
+    "deals": "Deals",
+    "coupons": "Coupons",
+    "compare": "Compare",
+    "account": "Account",
+    "search_results_for": "Search results for",
+    "products_found": "products found",
+    "no_products_found": "We couldn't find any products matching your search."
+  },
+  "home": {
+    "todays_best_deals": "Today's Best Deals",
+    "trending_electronics": "Trending Electronics"
+  }
+}

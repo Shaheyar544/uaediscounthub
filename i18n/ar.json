@@ -1,0 +1,17 @@
+{
+    "common": {
+        "search": "ابحث عن المنتجات والصفقات",
+        "categories": "الأقسام",
+        "deals": "عروض",
+        "coupons": "كوبونات",
+        "compare": "مقارنة",
+        "account": "حسابي",
+        "search_results_for": "نتائج البحث عن",
+        "products_found": "منتجات تم العثور عليها",
+        "no_products_found": "لم نتمكن من العثور على أي منتجات تطابق بحثك."
+    },
+    "home": {
+        "todays_best_deals": "أفضل عروض اليوم",
+        "trending_electronics": "إلكترونيات رائجة"
+    }
+}
