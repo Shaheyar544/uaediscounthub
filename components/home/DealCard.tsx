@@ -4,6 +4,7 @@ import { motion } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Star, Heart, Zap, Tag, ShoppingCart } from 'lucide-react'
+import { useHasMounted } from '@/hooks/use-has-mounted'
 
 interface DealCardProps {
   id: string
@@ -26,6 +27,7 @@ export function DealCard({
   store = 'Amazon AE', badge,
   locale = 'en'
 }: DealCardProps) {
+  const hasMounted = useHasMounted()
 
   // Mock specs for demo if not provided
   const specs = ['5G', '256GB', 'OLED']
@@ -52,8 +54,7 @@ export function DealCard({
       </div>
 
       <button
-        suppressHydrationWarning
-        className="absolute top-2.5 right-2.5 z-10 w-8 h-8 bg-white/80 backdrop-blur-md border border-border rounded-full flex items-center justify-center text-muted-foreground hover:text-red-500 hover:bg-white transition-all shadow-sm"
+        className={`absolute top-2.5 right-2.5 z-10 w-8 h-8 bg-white/80 backdrop-blur-md border border-border rounded-full flex items-center justify-center text-muted-foreground hover:text-red-500 hover:bg-white transition-all shadow-sm ${!hasMounted ? 'opacity-0' : 'opacity-100'}`}
       >
         <Heart className="w-4 h-4" />
       </button>

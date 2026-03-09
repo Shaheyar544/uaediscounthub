@@ -4,11 +4,13 @@ import { motion } from 'framer-motion'
 import { Bell, Send, CheckCircle2, ShieldCheck } from 'lucide-react'
 import { useState, useTransition } from 'react'
 import { subscribeToNewsletter } from '@/app/actions/newsletter'
+import { useHasMounted } from '@/hooks/use-has-mounted'
 
 export function NewsletterSignup() {
     const [email, setEmail] = useState('')
     const [submitted, setSubmitted] = useState(false)
     const [isPending, startTransition] = useTransition()
+    const hasMounted = useHasMounted()
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -49,20 +51,14 @@ export function NewsletterSignup() {
                     <form onSubmit={handleSubmit} className="newsletter-form w-full max-w-[500px] flex flex-col md:flex-row gap-3">
                         <div className="flex-1 relative">
                             <input
-                                suppressHydrationWarning
-                                type="email"
-                                placeholder="Enter your email address"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                className="w-full h-12 bg-white/8 border border-white/15 rounded-full px-6 font-body text-[14.5px] text-white placeholder:text-white/30 outline-none focus:border-primary focus:bg-white/12 transition-all shadow-xl"
+                                className={`w-full h-12 bg-white/8 border border-white/15 rounded-full px-6 font-body text-[14.5px] text-white placeholder:text-white/30 outline-none focus:border-primary focus:bg-white/12 transition-all shadow-xl ${!hasMounted ? 'opacity-0' : 'opacity-100'}`}
                                 required
                             />
                         </div>
                         <button
                             type="submit"
-                            suppressHydrationWarning
                             disabled={isPending}
-                            className="h-12 px-8 bg-primary rounded-full text-white font-body text-[14.5px] font-bold shadow-lg hover:bg-primary-dim hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2 whitespace-nowrap"
+                            className={`h-12 px-8 bg-primary rounded-full text-white font-body text-[14.5px] font-bold shadow-lg hover:bg-primary-dim hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2 whitespace-nowrap ${!hasMounted ? 'invisible' : 'visible'}`}
                         >
                             {isPending ? 'Joining...' : 'Get Best Deals'}
                             <Send className="w-3.5 h-3.5" />

@@ -18,8 +18,12 @@ export const metadata: Metadata = {
     default: 'UAEDISCOUNTHUB - Best Tech Deals in UAE & GCC',
     template: '%s | UAEDISCOUNTHUB'
   },
-  description: 'AI-powered affiliate marketing and price-comparison platform. Find the best electronics, gadgets, and home appliance deals in the UAE, KSA, and GCC.',
-  keywords: ['tech deals UAE', 'electronics price comparison GCC', 'discount codes Dubai', 'iPhone deals UAE', 'Noon coupons', 'Amazon UAE offers'],
+  description: 'UAE Discount Hub - The #1 AI-powered price comparison and deals platform for the UAE, KSA, and GCC. Save big on electronics, smartphones, and gadgets with real-time tracking.',
+  keywords: [
+    'online shopping UAE', 'best tech deals Dubai', 'price comparison UAE',
+    'noon discount code', 'amazon ae voucher', 'smartwatch deals Dubai',
+    'iPhone 16 price UAE', 'S24 Ultra deals GCC', 'electronics offers Riyadh'
+  ],
   authors: [{ name: 'UAEDISCOUNTHUB Team' }],
   openGraph: {
     type: 'website',
@@ -40,6 +44,7 @@ export const metadata: Metadata = {
     images: ['/og-image.jpg'],
   }
 }
+
 
 export default async function RootLayout({
   children,

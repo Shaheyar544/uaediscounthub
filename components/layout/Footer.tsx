@@ -1,8 +1,12 @@
+"use client"
+
 import Link from 'next/link'
 import { Locale } from '@/i18n/config'
 import { Twitter, Linkedin, Instagram, MessageCircle } from 'lucide-react'
+import { useHasMounted } from '@/hooks/use-has-mounted'
 
 export function Footer({ locale }: { locale: Locale }) {
+    const hasMounted = useHasMounted()
     return (
         <footer className="footer bg-card border-t border-border pt-12 pb-6">
             <div className="footer-inner max-w-[1280px] mx-auto px-6">
@@ -24,8 +28,7 @@ export function Footer({ locale }: { locale: Locale }) {
                             ].map((s, i) => (
                                 <button
                                     key={i}
-                                    suppressHydrationWarning
-                                    className="footer-social-btn w-[34px] h-[34px] border border-border rounded-sm flex items-center justify-center text-muted-foreground hover:border-primary hover:text-primary hover:bg-primary/5 transition-all"
+                                    className={`footer-social-btn w-[34px] h-[34px] border border-border rounded-sm flex items-center justify-center text-muted-foreground hover:border-primary hover:text-primary hover:bg-primary/5 transition-all ${!hasMounted ? 'invisible' : 'visible'}`}
                                 >                                    {s.icon}
                                 </button>
                             ))}
@@ -78,7 +81,7 @@ export function Footer({ locale }: { locale: Locale }) {
                 </div>
 
                 <div className="footer-bottom border-t border-border pt-5 flex flex-col md:flex-row items-center justify-between gap-4">
-                    <div className="footer-copy text-[12.5px] text-muted-foreground text-center md:text-left" suppressHydrationWarning>
+                    <div className={`footer-copy text-[12.5px] text-muted-foreground text-center md:text-left ${!hasMounted ? 'opacity-0' : 'opacity-100'}`}>
                         © {new Date().getFullYear()} UAEDiscountHub · All rights reserved · Dubai, UAE
                     </div>
                     <div className="footer-badges flex gap-2">

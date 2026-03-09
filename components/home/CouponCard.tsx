@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Copy, Check, ExternalLink, Ticket } from 'lucide-react'
 import Image from 'next/image'
+import { useHasMounted } from '@/hooks/use-has-mounted'
 
 interface CouponCardProps {
     id: string
@@ -21,6 +22,7 @@ export function CouponCard({
     description, code, expiry, color = "#0A84FF"
 }: CouponCardProps) {
     const [copied, setCopied] = useState(false)
+    const hasMounted = useHasMounted()
 
     const handleCopy = () => {
         navigator.clipboard.writeText(code)
@@ -67,8 +69,7 @@ export function CouponCard({
                         <span className="font-mono text-[14px] font-bold text-foreground tracking-widest">{code}</span>
                         <button
                             onClick={handleCopy}
-                            suppressHydrationWarning
-                            className="flex items-center gap-1.5 text-[11px] font-bold text-primary hover:text-primary-dim transition-colors"
+                            className={`flex items-center gap-1.5 text-[11px] font-bold text-primary hover:text-primary-dim transition-colors ${!hasMounted ? 'invisible' : 'visible'}`}
                         >
                             <AnimatePresence mode="wait">
                                 {copied ? (
