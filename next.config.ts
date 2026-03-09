@@ -22,6 +22,8 @@ const nextConfig: NextConfig = {
       // Supabase storage
       { protocol: 'https', hostname: '*.supabase.co' },
       { protocol: 'https', hostname: '*.supabase.in' },
+      // Wikimedia (store logos)
+      { protocol: 'https', hostname: 'upload.wikimedia.org' },
       // Placeholder
       { protocol: 'https', hostname: 'placehold.co' },
     ],

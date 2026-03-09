@@ -1,5 +1,7 @@
 {
   "common": {
+    "home": "Home",
+    "login": "Sign In",
     "search": "Search Products & Deals",
     "categories": "Categories",
     "deals": "Deals",

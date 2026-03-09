@@ -3,8 +3,7 @@
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Badge } from '@/components/ui/badge'
-import { Star, ShoppingCart, TrendingDown } from 'lucide-react'
+import { Star, Heart, Zap, Tag, ShoppingCart } from 'lucide-react'
 
 interface DealCardProps {
   id: string
@@ -28,95 +27,114 @@ export function DealCard({
   locale = 'en'
 }: DealCardProps) {
 
-  const savings = originalPrice > base_price ? (originalPrice - base_price).toFixed(0) : null
+  // Mock specs for demo if not provided
+  const specs = ['5G', '256GB', 'OLED']
 
   return (
     <motion.div
-      whileHover={{ y: -4 }}
-      transition={{ duration: 0.2, ease: 'easeOut' }}
-      className="group relative flex flex-col overflow-hidden rounded-2xl border bg-card text-card-foreground shadow-sm hover:shadow-lg transition-shadow duration-300"
+      initial={{ opacity: 0, y: 15 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      className="deal-card group relative bg-card border border-border rounded-xl overflow-hidden hover:shadow-card-hover hover:border-primary/30 transition-all duration-300"
     >
-      {/* Badges */}
-      <div className="absolute left-3 top-3 z-10 flex flex-col gap-1">
-        {badge && (
-          <Badge className="bg-destructive hover:bg-destructive text-white border-none text-[10px] px-2 py-0.5 shadow-sm">
-            {badge}
-          </Badge>
-        )}
+      {/* Top Badges & Actions */}
+      <div className="absolute top-2.5 left-2.5 z-10 flex flex-col gap-1.5">
         {discountPercent > 0 && (
-          <Badge className="bg-orange-500 hover:bg-orange-500 text-white border-none text-[10px] px-2 py-0.5 shadow-sm flex items-center gap-1">
-            <TrendingDown className="w-2.5 h-2.5" />
-            -{discountPercent}%
-          </Badge>
+          <div className="bg-[#FF6B00] text-white text-[10.5px] font-bold px-2 py-0.5 rounded-sm shadow-deal-badge flex items-center gap-1">
+            -{discountPercent}% OFF
+          </div>
+        )}
+        {badge === 'Flash' && (
+          <div className="bg-primary text-white text-[10.5px] font-bold px-2 py-0.5 rounded-sm flex items-center gap-1">
+            <Zap className="w-2.5 h-2.5 fill-current" /> FLASH
+          </div>
         )}
       </div>
 
-      {/* Image */}
-      <div className="relative aspect-square w-full overflow-hidden bg-white p-6">
+      <button
+        suppressHydrationWarning
+        className="absolute top-2.5 right-2.5 z-10 w-8 h-8 bg-white/80 backdrop-blur-md border border-border rounded-full flex items-center justify-center text-muted-foreground hover:text-red-500 hover:bg-white transition-all shadow-sm"
+      >
+        <Heart className="w-4 h-4" />
+      </button>
+
+      {/* Product Image */}
+      <div className="relative aspect-[4/3] w-full bg-white flex items-center justify-center p-6 overflow-hidden">
         {image_url ? (
           <Image
             src={image_url}
             alt={name}
             fill
-            className="object-contain p-4 transition-transform duration-300 group-hover:scale-105"
-            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 20vw"
+            className="object-contain p-4 transition-transform duration-500 group-hover:scale-110"
+            sizes="(max-width: 640px) 50vw, 25vw"
             unoptimized
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-muted rounded-xl text-muted-foreground text-xs text-center p-4 font-medium">
+          <div className="w-full h-full flex items-center justify-center bg-muted text-muted-foreground text-xs uppercase font-bold text-center p-4">
             {name}
           </div>
         )}
       </div>
 
       {/* Content */}
-      <div className="flex flex-col flex-1 p-4 gap-2">
-        {/* Store + Rating row */}
-        <div className="flex items-center justify-between">
-          <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest truncate">
-            {store}
-          </span>
-          <div className="flex items-center gap-1 text-amber-500 shrink-0">
-            <Star className="w-3 h-3 fill-current" />
-            <span className="text-[10px] font-semibold text-muted-foreground">{rating.toFixed(1)}</span>
+      <div className="p-4 flex flex-col gap-2.5">
+        <div className="flex items-center gap-2">
+          <div className="store-tag flex items-center gap-1.5 px-1.5 py-0.5 bg-secondary border border-border rounded-sm">
+            <div className="w-3 h-3 rounded-full bg-primary/20 flex items-center justify-center text-[7px] font-bold text-primary">
+              {store?.[0] || 'A'}
+            </div>
+            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{store}</span>
+          </div>
+          <div className="flex items-center gap-1 ml-auto">
+            <Star className="w-3 h-3 text-brand-gold fill-current" />
+            <span className="text-[11px] font-bold text-foreground">{rating.toFixed(1)}</span>
           </div>
         </div>
 
-        {/* Product Name */}
-        <h3 className="font-semibold text-sm leading-snug line-clamp-2 group-hover:text-primary transition-colors min-h-[2.5rem]">
-          <Link href={`/${locale}/product/${slug}`} className="after:absolute after:inset-0">
+        <h3 className="text-[14px] font-bold text-foreground leading-[1.4] line-clamp-2 h-10 group-hover:text-primary transition-colors">
+          <Link href={`/${locale}/product/${slug}`}>
             {name}
           </Link>
         </h3>
 
-        {/* Price row */}
-        <div className="mt-auto pt-2 flex items-end justify-between gap-2">
-          <div className="flex flex-col">
-            <span className="text-base font-extrabold text-foreground">
-              AED {base_price?.toLocaleString()}
+        {/* Spec Pills */}
+        <div className="flex flex-wrap gap-1.5 mt-1">
+          {specs.map((s, i) => (
+            <span key={i} className="text-[10px] font-semibold text-muted-foreground bg-secondary px-2 py-0.5 rounded-sm border border-border/50">
+              {s}
             </span>
-            {originalPrice > base_price && (
-              <span className="text-xs text-muted-foreground line-through">
-                AED {originalPrice.toLocaleString()}
+          ))}
+        </div>
+
+        {/* Price Section */}
+        <div className="flex items-end justify-between mt-2 pt-2 border-t border-border/50">
+          <div className="flex flex-col gap-0.5">
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-[18px] font-extrabold text-foreground">
+                AED {base_price?.toLocaleString()}
               </span>
-            )}
-            {savings && (
-              <span className="text-[10px] text-green-600 dark:text-green-400 font-medium">
-                Save AED {savings}
+              {originalPrice > base_price && (
+                <span className="text-[12px] text-muted-foreground line-through font-medium">
+                  {originalPrice.toLocaleString()}
+                </span>
+              )}
+            </div>
+            {originalPrice > base_price && (
+              <span className="text-[11px] font-bold text-brand-green">
+                Save AED {(originalPrice - base_price).toLocaleString()}
               </span>
             )}
           </div>
 
-          <motion.button
-            whileTap={{ scale: 0.92 }}
-            suppressHydrationWarning
-            className="buy-btn shrink-0 z-10 flex items-center gap-1.5 bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground text-xs font-bold px-3 py-2 rounded-xl transition-all duration-200"
+          <Link
+            href={`/${locale}/product/${slug}`}
+            className="w-9 h-9 bg-primary text-white rounded-lg flex items-center justify-center hover:bg-primary-dim hover:-translate-y-0.5 transition-all shadow-sm"
           >
-            <ShoppingCart className="w-3.5 h-3.5" />
-            Get Deal
-          </motion.button>
+            <ShoppingCart className="w-4.5 h-4.5" />
+          </Link>
         </div>
       </div>
     </motion.div>
   )
 }
+

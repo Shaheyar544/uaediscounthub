@@ -1,11 +1,14 @@
 import { Locale } from '@/i18n/config'
 import { AISummaryBlock } from '@/components/product/AISummaryBlock'
 import { PriceComparisonTable } from '@/components/product/PriceComparisonTable'
+import { ProsConsGrid } from '@/components/product/ProsConsGrid'
+import { PriceHistoryChart } from '@/components/product/PriceHistoryChart'
 import { Badge } from '@/components/ui/badge'
-import { Check, Info, ShieldCheck, Share2, Heart } from 'lucide-react'
+import { Check, Info, ShieldCheck, Share2, Heart, MessageCircle, ArrowRight, Zap, Star, TrendingDown } from 'lucide-react'
 import { createClient } from '@/utils/supabase/server'
 import { notFound } from 'next/navigation'
 import { PriceAlertTrigger } from '@/components/product/PriceAlertTrigger'
+import Link from 'next/link'
 
 export default async function ProductPage({
     params
@@ -37,12 +40,9 @@ export default async function ProductPage({
     }
 
     const categoryName = (product.categories as any)?.name_en || 'Uncategorized'
-
-    // Convert JSONB specifications object to array for UI
     const specsObject = typeof product.specifications === 'object' && product.specifications !== null ? product.specifications as Record<string, string> : {}
     const specsArray = Object.entries(specsObject).map(([label, value]) => ({ label, value }))
 
-    // Process real prices from DB
     const dbPrices = (product.product_prices as any[])?.map(p => ({
         store: p.stores?.name || 'Unknown Store',
         storeLogoUrl: p.stores?.logo_url,
@@ -50,95 +50,179 @@ export default async function ProductPage({
         originalPrice: p.original_price,
         discount: Math.round(p.discount_percent || 0),
         inStock: p.in_stock,
-        hasCOD: true, // Static for now as per schema
+        hasCOD: true,
         hasTabby: true,
-        isLowest: false, // Will calculate below
+        isLowest: false,
         affiliateUrl: p.affiliate_url || `/${locale}/go/unknown/${product.id}`
     })) || []
 
-    // Sort to find lowest
     if (dbPrices.length > 0) {
         dbPrices.sort((a, b) => a.price - b.price);
         dbPrices[0].isLowest = true;
     }
 
-    // Fallback prices if none in DB (UI test safety)
     const finalPrices = dbPrices.length > 0 ? dbPrices : [
-        { store: 'Amazon AE', price: product.base_price, originalPrice: Math.round(product.base_price * 1.15), discount: 15, inStock: true, hasCOD: true, hasTabby: true, isLowest: true, affiliateUrl: `/${locale}/go/amazon/${product.id}` },
-        { store: 'Noon', price: Math.round(product.base_price * 1.05), originalPrice: Math.round(product.base_price * 1.15), discount: 10, inStock: true, hasCOD: true, hasTabby: true, affiliateUrl: `/${locale}/go/noon/${product.id}` }
+        { store: 'Amazon AE', price: product.base_price, originalPrice: Math.round(product.base_price * 1.15), discount: 15, inStock: true, hasCOD: true, hasTabby: true, isLowest: true, affiliateUrl: '#' },
+        { store: 'Noon', price: Math.round(product.base_price * 1.05), originalPrice: Math.round(product.base_price * 1.15), discount: 10, inStock: true, hasCOD: true, hasTabby: true, affiliateUrl: '#' }
     ]
 
     return (
-        <div className="w-full max-w-7xl mx-auto px-4 py-8">
+        <div className="product-page-container w-full max-w-[1200px] mx-auto px-6 py-10">
             {/* Breadcrumbs */}
-            <div className="text-sm text-muted-foreground mb-6">
-                Home / {categoryName} / <span className="text-foreground">{product.name_en || product.name}</span>
+            <div className="breadcrumbs text-[13px] font-medium text-muted-foreground mb-8 flex items-center gap-2">
+                <Link href={`/${locale}`} className="hover:text-primary transition-colors">Home</Link>
+                <ChevronRight className="w-3 h-3 opacity-40" />
+                <Link href={`/${locale}/category/${categoryName.toLowerCase()}`} className="hover:text-primary transition-colors">{categoryName}</Link>
+                <ChevronRight className="w-3 h-3 opacity-40" />
+                <span className="text-foreground font-semibold truncate">{product.name_en || product.name}</span>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-12">
+            <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-12 mb-16">
                 {/* Left: Images */}
-                <div className="space-y-4">
-                    <div className="aspect-square bg-white rounded-2xl border flex items-center justify-center p-4 overflow-hidden relative">
+                <div className="product-gallery space-y-4">
+                    <div className="gallery-main aspect-square bg-white rounded-[24px] border border-border flex items-center justify-center p-12 overflow-hidden relative shadow-sm group">
                         {product.image_url ? (
-                            <img src={product.image_url} alt={product.name} className="w-full h-full object-contain mix-blend-multiply" />
+                            <img src={product.image_url} alt={product.name} className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105" />
                         ) : (
-                            <div className="text-muted-foreground/30 text-2xl font-bold tracking-widest">[No Image]</div>
+                            <div className="text-muted-foreground/30 text-2xl font-extrabold tracking-widest">[No Image]</div>
                         )}
+                        <div className="absolute top-5 left-5">
+                            <Badge className="bg-brand-accent text-white border-none px-3 py-1 font-bold text-[11px] shadow-lg shadow-brand-accent/20">
+                                🔥 TOP DEAL
+                            </Badge>
+                        </div>
                     </div>
                 </div>
 
                 {/* Right: Details */}
-                <div className="flex flex-col">
-                    <div className="flex items-start justify-between mb-4">
-                        <h1 className="text-3xl font-extrabold tracking-tight text-foreground">{product.name_en || product.name}</h1>
-                        <div className="flex gap-2">
-                            <button className="p-2 border rounded-full hover:bg-muted text-muted-foreground"><Share2 className="w-5 h-5" /></button>
-                            <button className="p-2 border rounded-full hover:bg-red-50 hover:text-red-500 hover:border-red-200 text-muted-foreground"><Heart className="w-5 h-5" /></button>
+                <div className="product-info flex flex-col pt-2">
+                    <div className="flex items-start justify-between mb-4 gap-4">
+                        <div className="space-y-1">
+                            <div className="flex items-center gap-2 text-[12px] font-bold text-primary tracking-wider uppercase mb-1">
+                                <Zap className="w-3.5 h-3.5 fill-current" /> Instant Price Compare
+                            </div>
+                            <h1 className="font-display text-[32px] md:text-[38px] font-extrabold tracking-tight text-foreground leading-[1.15]">
+                                {product.name_en || product.name}
+                            </h1>
+                        </div>
+                        <div className="flex gap-2.5 shrink-0 pt-2">
+                            <button className="w-10 h-10 border border-border rounded-full flex items-center justify-center text-muted-foreground hover:bg-secondary hover:text-foreground transition-all"><Share2 className="w-4.5 h-4.5" /></button>
+                            <button className="w-10 h-10 border border-border rounded-full flex items-center justify-center text-muted-foreground hover:bg-red-50 hover:text-red-500 hover:border-red-200 transition-all"><Heart className="w-4.5 h-4.5" /></button>
                         </div>
                     </div>
 
-                    <div className="flex flex-wrap gap-2 mb-6">
-                        <Badge variant="secondary" className="font-medium text-xs">Best in {categoryName}</Badge>
-                        <Badge variant="outline" className="font-medium text-xs bg-green-50 text-green-700 border-green-200 dark:bg-green-900/40 dark:text-green-300">Verified Deals Active</Badge>
+                    <div className="flex items-center gap-4 mb-6">
+                        <div className="flex items-center gap-1.5 px-2 py-1 bg-brand-gold/10 border border-brand-gold/20 rounded-sm">
+                            <Star className="w-3.5 h-3.5 text-brand-gold fill-current" />
+                            <span className="text-[13px] font-bold text-foreground">4.8</span>
+                            <span className="text-[11px] text-muted-foreground font-medium underline">1.2k reviews</span>
+                        </div>
+                        <Badge variant="outline" className="font-bold text-[11px] bg-brand-green/10 text-brand-green border-brand-green/20">
+                            Verified Authorized Retailers
+                        </Badge>
                     </div>
 
-                    <AISummaryBlock text={product.ai_summary_en || product.description_en || product.description || "The DeepSeek AI has not generated a summary for this product yet. It analyzes reviews across the web to give you an unbiased TL;DR."} />
-
-                    <PriceAlertTrigger productId={product.id} productName={product.name} />
-
-                    {/* Quick Specs */}
-                    {specsArray.length > 0 && (
-                        <div className="mb-8 p-4 bg-muted/30 rounded-xl border">
-                            <h3 className="font-semibold mb-3 flex items-center"><Info className="w-4 h-4 mr-2 text-muted-foreground" /> Technical Specifications</h3>
-                            <ul className="space-y-2">
-                                {specsArray.map((spec, i) => (
-                                    <li key={i} className="flex border-b border-border/50 pb-2 text-sm">
-                                        <span className="w-1/3 text-muted-foreground">{spec.label}</span>
-                                        <span className="w-2/3 font-medium text-foreground">{spec.value}</span>
-                                    </li>
-                                ))}
-                            </ul>
+                    <div className="price-highlight mb-6 p-5 bg-secondary/30 border border-border rounded-2xl">
+                        <div className="text-[12px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Estimated Lowest Price</div>
+                        <div className="flex items-baseline gap-2.5">
+                            <span className="text-[34px] font-extrabold text-foreground leading-none">AED {finalPrices[0].price?.toLocaleString()}</span>
+                            {finalPrices[0].originalPrice > finalPrices[0].price && (
+                                <span className="text-[16px] text-muted-foreground line-through font-medium">AED {finalPrices[0].originalPrice?.toLocaleString()}</span>
+                            )}
                         </div>
-                    )}
+                        <div className="mt-2 text-[12px] font-bold text-brand-green flex items-center gap-1.5">
+                            <TrendingDown className="w-3.5 h-3.5" /> Save up to AED {(finalPrices[0].originalPrice - finalPrices[0].price)?.toLocaleString()} across stores
+                        </div>
+                    </div>
 
-                    <div className="bg-muted/50 rounded-xl p-4 flex items-center gap-4 border border-primary/10 mt-auto">
-                        <div className="p-3 bg-primary/10 rounded-full text-primary">
-                            <ShieldCheck className="w-6 h-6" />
-                        </div>
-                        <div>
-                            <p className="font-semibold text-sm">UAEDISCOUNTHUB Secure Shopping</p>
-                            <p className="text-xs text-muted-foreground">All listed sellers are verified authorized retailers in the GCC.</p>
-                        </div>
+                    <AISummaryBlock text={product.ai_summary_en || product.description_en || product.description || "Synthesizing global reviews..."} />
+
+                    <div className="mt-6 flex flex-col gap-3">
+                        <PriceAlertTrigger productId={product.id} productName={product.name} />
+
+                        {/* WhatsApp Alert Strip */}
+                        <button className="whatsapp-alert-strip w-full bg-[#25D366]/10 border border-[#25D366]/20 p-3.5 rounded-xl flex items-center justify-between group hover:bg-[#25D366]/18 transition-all">
+                            <div className="flex items-center gap-3">
+                                <div className="w-9 h-9 bg-[#25D366] rounded-full flex items-center justify-center text-white shadow-lg">
+                                    <MessageCircle className="w-5 h-5 fill-current" />
+                                </div>
+                                <div className="text-left">
+                                    <p className="text-[13.5px] font-bold text-foreground">Get WhatsApp Alerts</p>
+                                    <p className="text-[11px] font-medium text-muted-foreground">Pulse price drops for {product.name.split(' ')[0]}</p>
+                                </div>
+                            </div>
+                            <ArrowRight className="w-4 h-4 text-[#25D366] group-hover:translate-x-1 transition-transform" />
+                        </button>
                     </div>
                 </div>
             </div>
 
-            {/* Main Pricing Table */}
-            <div className="mb-16">
-                <h2 className="text-2xl font-bold mb-6">Live Price Comparison</h2>
+            {/* Price Trend Chart */}
+            <PriceHistoryChart />
+
+            {/* Pros & Cons */}
+            <ProsConsGrid />
+
+            {/* Live Pricing Table */}
+            <div className="mb-16 scroll-mt-20" id="pricing">
                 <PriceComparisonTable prices={finalPrices} />
             </div>
 
+            {/* Extended Specs */}
+            {specsArray.length > 0 && (
+                <div className="mb-16">
+                    <h3 className="text-[20px] font-bold mb-6 flex items-center gap-2">
+                        <Info className="w-5 h-5 text-primary" /> Full Specifications
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4">
+                        {specsArray.map((spec, i) => (
+                            <div key={i} className="flex justify-between items-center py-3 border-b border-border/60">
+                                <span className="text-[14px] font-medium text-muted-foreground">{spec.label}</span>
+                                <span className="text-[14px] font-bold text-foreground text-right">{spec.value}</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {/* Security Badge Footer */}
+            <div className="bg-secondary/30 rounded-[20px] p-6 flex flex-col md:flex-row items-center gap-6 border border-border">
+                <div className="p-4 bg-white border border-border rounded-xl shadow-sm shrink-0">
+                    <ShieldCheck className="w-10 h-10 text-primary" />
+                </div>
+                <div className="text-center md:text-left">
+                    <h4 className="text-[17px] font-bold text-foreground mb-1">Safe Shopping Guarantee</h4>
+                    <p className="text-[13.5px] text-muted-foreground leading-relaxed">
+                        UAEDISCOUNTHUB only indexes verified authorized GCC retailers. We work directly with brands like Amazon and Noon to ensure deal authenticity and delivery safety.
+                    </p>
+                </div>
+                <div className="flex gap-3 ml-auto opacity-50 grayscale hover:grayscale-0 transition-all">
+                    {/* Security logos */}
+                    <div className="h-8 w-12 bg-muted rounded"></div>
+                    <div className="h-8 w-12 bg-muted rounded"></div>
+                    <div className="h-8 w-12 bg-muted rounded"></div>
+                </div>
+            </div>
         </div>
     )
 }
+
+function ChevronRight(props: any) {
+    return (
+        <svg
+            {...props}
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        >
+            <path d="m9 18 6-6-6-6" />
+        </svg>
+    )
+}
+

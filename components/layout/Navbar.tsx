@@ -1,56 +1,77 @@
 import Link from 'next/link'
 import { Locale } from '@/i18n/config'
 import { getDictionary } from '@/i18n/dictionaries'
-import { Search, ShoppingCart, User, Menu } from 'lucide-react'
+import { Search, Bell, Moon, Sun, Monitor } from 'lucide-react'
 import { ThemeToggle } from '@/components/theme-toggle'
-import { SearchInput } from '@/components/layout/SearchInput'
 
 export async function Navbar({ locale }: { locale: Locale }) {
     const dict = await getDictionary(locale);
 
     return (
-        <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-            <div className="container flex h-16 items-center px-4 md:px-6">
-                <div className="mr-8 hidden md:flex">
-                    <Link href={`/${locale}`} className="flex items-center space-x-2">
-                        <span className="font-bold text-xl tracking-tight text-primary">UAEDISCOUNTHUB</span>
-                    </Link>
+        <nav className="navbar sticky top-0 z-[100] bg-white/92 backdrop-blur-[16px] border-b border-border h-[60px] flex items-center">
+            <div className="navbar-inner max-w-[1280px] w-full mx-auto px-6 flex items-center gap-6">
+                <Link href={`/${locale}`} className="logo font-display font-extrabold text-[18px] tracking-tight text-foreground whitespace-nowrap flex items-center gap-2">
+                    <div className="logo-dot w-2 h-2 rounded-full bg-primary flex-shrink-0" />
+                    UAEDiscountHub
+                </Link>
+
+                <ul className="nav-links hidden lg:flex items-center gap-1 list-none">
+                    <li>
+                        <Link href={`/${locale}`} className="text-[13.5px] font-medium text-muted-foreground px-3 py-1.5 rounded-sm hover:bg-secondary hover:text-foreground transition-all">
+                            {dict.common.home}
+                        </Link>
+                    </li>
+                    <li>
+                        <Link href={`/${locale}/deals`} className="text-[13.5px] font-semibold text-[#FF6B00] bg-[#FF6B00]/10 px-3 py-1.5 rounded-sm hover:bg-[#FF6B00]/18 transition-all">
+                            🔥 {dict.common.deals}
+                        </Link>
+                    </li>
+                    <li>
+                        <Link href={`/${locale}/coupons`} className="text-[13.5px] font-medium text-muted-foreground px-3 py-1.5 rounded-sm hover:bg-secondary hover:text-foreground transition-all">
+                            {dict.common.coupons}
+                        </Link>
+                    </li>
+                    <li>
+                        <Link href={`/${locale}/compare`} className="text-[13.5px] font-medium text-muted-foreground px-3 py-1.5 rounded-sm hover:bg-secondary hover:text-foreground transition-all">
+                            {dict.common.compare}
+                        </Link>
+                    </li>
+                    <li>
+                        <Link href={`/${locale}/blog`} className="text-[13.5px] font-medium text-muted-foreground px-3 py-1.5 rounded-sm hover:bg-secondary hover:text-foreground transition-all">
+                            Blog
+                        </Link>
+                    </li>
+                </ul>
+
+                <div className="nav-search flex-1 max-w-[340px] relative">
+                    <Search className="nav-search-icon absolute left-3 top-1/2 -translate-y-1/2 w-[15px] h-[15px] text-muted-foreground" />
+                    <input
+                        type="text"
+                        placeholder="Search Products & Deals..."
+                        className="w-full h-9.5 border-1.5 border-border rounded-full pl-9.5 pr-3.5 font-body text-[13.5px] bg-secondary text-foreground outline-none transition-all focus:border-primary focus:bg-white focus:ring-3 focus:ring-primary/12"
+                    />
                 </div>
 
-                {/* Mobile menu trigger */}
-                <button className="md:hidden mr-4">
-                    <Menu className="h-6 w-6" />
-                </button>
-
-                <div className="flex md:hidden flex-1">
-                    <Link href={`/${locale}`} className="font-bold text-lg tracking-tight text-primary">
-                        UDH
-                    </Link>
-                </div>
-
-                <nav className="hidden md:flex flex-1 items-center space-x-6 text-sm font-medium">
-                    <Link href={`/${locale}/categories`} className="transition-colors hover:text-foreground/80 text-foreground/60">{dict.common.categories}</Link>
-                    <Link href={`/${locale}/deals`} className="transition-colors hover:text-foreground/80 text-foreground/60">{dict.common.deals}</Link>
-                    <Link href={`/${locale}/coupons`} className="transition-colors hover:text-foreground/80 text-foreground/60">{dict.common.coupons}</Link>
-                    <Link href={`/${locale}/compare`} className="transition-colors hover:text-foreground/80 text-foreground/60">{dict.common.compare}</Link>
-                </nav>
-
-                <div className="flex items-center space-x-4">
-                    <div className="hidden md:flex relative w-64">
-                        <SearchInput placeholder={dict.common.search} locale={locale} />
-                    </div>
-
-                    <Link href={locale === 'en' ? '/ar' : '/en'} className="text-sm font-semibold hover:text-primary transition-colors">
-                        {locale === 'en' ? 'عربي' : 'EN'}
+                <div className="nav-right ml-auto flex items-center gap-2.5">
+                    <Link
+                        href={locale === 'en' ? '/ar' : '/en'}
+                        className="nav-btn h-9 px-3.5 border-1.5 border-border rounded-full font-body text-[12px] font-medium tracking-wide flex items-center hover:border-primary hover:text-primary hover:bg-primary/5 transition-all font-mono"
+                    >
+                        {locale === 'en' ? 'عربي' : 'ENGLISH'}
                     </Link>
 
                     <ThemeToggle />
 
-                    <button className="relative">
-                        <User className="h-5 w-5" />
+                    <button className="nav-btn h-9 px-2 border-1.5 border-border rounded-full flex items-center justify-center hover:border-primary hover:text-primary hover:bg-primary/5 transition-all">
+                        <Bell className="w-4.5 h-4.5" />
+                    </button>
+
+                    <button className="nav-btn h-9 px-4 bg-primary border-1.5 border-primary rounded-full text-white font-body text-[13px] font-semibold hover:bg-primary-dim hover:border-primary-dim transition-all">
+                        {dict.common.login || 'Sign In'}
                     </button>
                 </div>
             </div>
-        </header>
+        </nav>
     )
 }
+

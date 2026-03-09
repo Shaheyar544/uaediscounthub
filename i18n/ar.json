@@ -1,13 +1,15 @@
 {
     "common": {
-        "search": "ابحث عن المنتجات والصفقات",
-        "categories": "الأقسام",
-        "deals": "عروض",
-        "coupons": "كوبونات",
+        "home": "الرئيسية",
+        "login": "تسجيل الدخول",
+        "search": "البحث عن المنتجات والعروض",
+        "categories": "الفئات",
+        "deals": "العروض",
+        "coupons": "القسائم",
         "compare": "مقارنة",
-        "account": "حسابي",
+        "account": "الحساب",
         "search_results_for": "نتائج البحث عن",
-        "products_found": "منتجات تم العثور عليها",
+        "products_found": "المنتجات التي تم العثور عليها",
         "no_products_found": "لم نتمكن من العثور على أي منتجات تطابق بحثك."
     },
     "home": {

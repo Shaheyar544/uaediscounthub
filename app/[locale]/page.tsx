@@ -1,9 +1,10 @@
 import { getDictionary } from '@/i18n/dictionaries'
 import { Locale } from '@/i18n/config'
 import { DealCard } from '@/components/home/DealCard'
+import { CouponCard } from '@/components/home/CouponCard'
 import { FeaturedStores } from '@/components/home/FeaturedStores'
 import { NewsletterSignup } from '@/components/home/NewsletterSignup'
-import { Search, Mic, Zap, Tag, ArrowRight } from 'lucide-react'
+import { Search, Mic, Zap, Tag, ArrowRight, Ticket } from 'lucide-react'
 import { createClient } from '@/utils/supabase/server'
 import Link from 'next/link'
 
@@ -57,65 +58,100 @@ export default async function Home({
     <div className="w-full max-w-7xl mx-auto space-y-16 px-4 py-8">
 
       {/* ── Hero Section ─────────────────────────────────── */}
-      <section className="relative text-center py-16 md:py-24 space-y-6 rounded-3xl overflow-hidden bg-gradient-to-b from-primary/10 via-primary/5 to-transparent border border-primary/10">
-        {/* Background decoration */}
-        <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          <div className="absolute -top-24 -right-24 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
-          <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-orange-500/5 rounded-full blur-3xl" />
+      <section className="relative overflow-hidden my-6 rounded-[28px] bg-[#0D1117] px-10 py-[72px] min-h-[420px] flex flex-col items-center justify-center text-center gap-5">
+        {/* Mesh Gradient Background (Animated via CSS classes in globals.css or inline) */}
+        <div className="absolute inset-0 pointer-events-none opacity-40">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_20%_50%,rgba(10,132,255,0.22)_0%,transparent_70%),radial-gradient(ellipse_60%_60%_at_80%_30%,rgba(255,107,0,0.14)_0%,transparent_70%),radial-gradient(ellipse_50%_50%_at_60%_80%,rgba(0,200,117,0.08)_0%,transparent_70%)] animate-[meshMove_8s_ease-in-out_infinite_alternate]" />
+          <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px]" />
         </div>
 
-        <div className="relative space-y-4 px-4">
-          <div className="inline-flex items-center gap-2 bg-orange-500/10 text-orange-600 dark:text-orange-400 text-xs font-bold px-3 py-1.5 rounded-full border border-orange-500/20">
-            <Zap className="w-3.5 h-3.5" />
-            Best Tech Deals in UAE & GCC
+        <div className="relative z-10 w-full max-w-[720px] space-y-4">
+          <div className="hero-eyebrow inline-flex items-center gap-2 bg-[#0A84FF]/18 border border-[#0A84FF]/30 text-[#60AFFF] text-[12px] font-bold tracking-[0.08em] uppercase px-3.5 py-1 rounded-full">
+            <div className="hero-eyebrow-dot w-1.5 h-1.5 bg-primary rounded-full animate-pulse" />
+            AI-Powered Price Intelligence · GCC Region
           </div>
 
-          <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-foreground">
-            {dict.common?.search || "Search Products & Deals"}
+          <h1 className="font-display text-[48px] md:text-[56px] font-extrabold leading-[1.08] tracking-[-0.03em] text-white">
+            Find the Best Tech Deals<br />in <em className="not-italic bg-gradient-to-br from-[#0A84FF] to-[#60AFFF] bg-clip-text text-transparent">UAE & GCC</em>
           </h1>
 
-          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
-            Compare prices across Amazon UAE, Noon, Sharaf DG and more.
-            <span className="text-primary font-semibold"> Never overpay again.</span>
+          <p className="text-[17px] text-white/60 max-w-[500px] mx-auto leading-relaxed">
+            Real-time price comparison across <strong className="text-white/90">Amazon UAE, Noon, Sharaf DG</strong> and more.
+            AI summaries. WhatsApp price alerts. Exclusive coupon codes.
           </p>
 
-          {/* Search Bar */}
-          <div className="flex items-center justify-center max-w-2xl mx-auto mt-8 w-full">
-            <div className="relative w-full flex items-center bg-background rounded-2xl border-2 border-border shadow-lg focus-within:ring-2 focus-within:ring-primary/30 focus-within:border-primary transition-all">
-              <Search className="absolute left-5 text-muted-foreground w-5 h-5 pointer-events-none" />
-              <input
-                type="text"
-                placeholder="Search for iPhone 15, MacBooks, Samsung TV..."
-                className="w-full pl-14 pr-36 py-4 rounded-2xl bg-transparent focus:outline-none text-base"
-                suppressHydrationWarning
-              />
-              <div className="absolute right-2 flex items-center gap-1">
-                <button className="p-2 text-muted-foreground hover:text-primary transition-colors" aria-label="Voice search">
-                  <Mic className="w-4 h-4" />
-                </button>
-                <button
-                  suppressHydrationWarning
-                  className="bg-primary hover:bg-primary/90 text-primary-foreground px-5 py-2 rounded-xl font-semibold transition-colors shadow-sm text-sm"
-                >
-                  Search
-                </button>
-              </div>
-            </div>
+          <div className="hero-search flex items-center max-w-[580px] mx-auto mt-7 bg-white/8 border-1.5 border-white/12 rounded-full p-1.5 pl-5 backdrop-blur-xl transition-all focus-within:border-primary focus-within:bg-white/12 focus-within:ring-4 focus-within:ring-primary/20 gap-3">
+            <Search className="w-[18px] h-[18px] text-white/40 shrink-0" />
+            <input
+              type="text"
+              placeholder="iPhone 15 Pro, Samsung S24 Ultra, MacBook..."
+              className="flex-1 bg-transparent border-none outline-none font-body text-[15px] text-white placeholder:text-white/40"
+            />
+            <button className="h-11 px-6 bg-primary text-white border-none rounded-full font-body text-[14px] font-bold whitespace-nowrap shrink-0 hover:bg-primary-dim hover:-translate-y-0.5 transition-all">
+              Search Deals →
+            </button>
           </div>
 
-          {/* Quick search tags */}
-          <div className="flex flex-wrap justify-center gap-2 pt-2">
-            {['iPhone 15 Pro', 'MacBook Air M3', 'Samsung S24', 'Sony XM5', 'Dyson V15'].map(tag => (
-              <button key={tag} className="text-xs px-3 py-1.5 rounded-full border border-border hover:border-primary/50 hover:bg-primary/5 hover:text-primary transition-all text-muted-foreground">
+          <div className="hero-tags flex flex-wrap justify-center gap-2 mt-4">
+            {['📱 iPhone 15 Pro', '💻 MacBook Air M3', '🎧 Sony XM5', '📺 Samsung QLED', '🧹 Dyson V15'].map(tag => (
+              <button key={tag} className="bg-white/7 border border-white/10 text-white/65 text-[12.5px] font-medium px-3.5 py-1 rounded-full hover:bg-[#0A84FF]/20 hover:border-[#0A84FF]/40 hover:text-[#60AFFF] transition-all">
                 {tag}
               </button>
             ))}
           </div>
         </div>
+
+        <div className="hero-stats absolute bottom-0 left-0 right-0 z-10 flex border-t border-white/6">
+          {[
+            { num: '50K+', label: 'Products Tracked' },
+            { num: '5', label: 'Major Stores' },
+            { num: '2hr', label: 'Price Updates' },
+            { num: 'AED', label: 'GCC Currencies' },
+            { num: '12K+', label: 'Active Coupons' }
+          ].map((s, i) => (
+            <div key={i} className="hero-stat flex-1 py-3.5 px-5 text-center border-r border-white/6 last:border-none">
+              <span className="font-display text-[20px] font-extrabold text-white block leading-tight">{s.num}</span>
+              <span className="text-[11px] text-white/40 tracking-[0.05em] uppercase">{s.label}</span>
+            </div>
+          ))}
+        </div>
       </section>
 
       {/* ── Featured Stores ───────────────────────────────── */}
       <FeaturedStores />
+
+      {/* ── Category Chips ────────────────────────────────── */}
+      <section className="category-strip relative mb-12">
+        <div className="flex items-center justify-between mb-4 px-1">
+          <h3 className="text-[15px] font-bold text-foreground flex items-center gap-2">
+            <Tag className="w-4 h-4 text-primary" />
+            Shop by Category
+          </h3>
+        </div>
+        <div className="flex items-center gap-3 overflow-x-auto pb-4 no-scrollbar -mx-4 px-4 mask-fade-right">
+          {[
+            { label: 'Smartphones', icon: '📱', color: '#0A84FF' },
+            { label: 'Laptops', icon: '💻', color: '#A855F7' },
+            { label: 'TV & Audio', icon: '📺', color: '#EF4444' },
+            { label: 'Tablets', icon: '平板', icon_raw: '📟', color: '#10B981' },
+            { label: 'Gaming', icon: '🎮', color: '#F59E0B' },
+            { label: 'Appliances', icon: '🏠', color: '#06B6D4' },
+            { label: 'Beauty', icon: '✨', color: '#EC4899' },
+            { label: 'Watches', icon: '⌚', color: '#6366F1' }
+          ].map((cat, i) => (
+            <Link
+              key={i}
+              href={`/${locale}/category/${cat.label.toLowerCase().replace(/ & /g, '-').replace(/ /g, '-')}`}
+              className="category-chip shrink-0 group flex items-center gap-2.5 px-4 py-2.5 bg-card border border-border rounded-full hover:border-primary/40 hover:shadow-card hover:-translate-y-0.5 transition-all duration-300"
+            >
+              <span className="text-[16px] group-hover:scale-110 transition-transform">{cat.icon_raw || cat.icon}</span>
+              <span className="text-[13.5px] font-semibold text-muted-foreground group-hover:text-foreground transition-colors whitespace-nowrap">
+                {cat.label}
+              </span>
+            </Link>
+          ))}
+        </div>
+      </section>
 
       {/* ── Today's Best Deals ────────────────────────────── */}
       <section>
@@ -203,6 +239,44 @@ export default async function Home({
               />
             )
           })}
+        </div>
+      </section>
+
+      {/* ── Top Coupons ─────────────────────────────────── */}
+      <section className="coupons-section">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-[#FF6B00]/10 rounded-xl">
+              <Ticket className="w-5 h-5 text-[#FF6B00]" />
+            </div>
+            <div>
+              <h2 className="text-2xl md:text-3xl font-bold tracking-tight">Top Coupons & Promo Codes</h2>
+              <p className="text-sm text-muted-foreground">Extra savings on major UAE stores</p>
+            </div>
+          </div>
+          <Link href={`/${locale}/coupons`} className="flex items-center gap-1 text-sm font-semibold text-primary hover:underline">
+            View all <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+          {[
+            { store: 'Noon', logo: '/stores/noon.png', disc: '10% OFF', code: 'NOON30', color: '#FFD100', desc: 'On all electronics & fashion' },
+            { store: 'Amazon AE', logo: '/stores/amazon-ae.png', disc: 'AED 50', code: 'MC50', color: '#0A84FF', desc: 'When using MasterCard' },
+            { store: 'Sharaf DG', logo: '/stores/sharaf-dg.png', disc: '15% OFF', code: 'SHARAF15', color: '#00C875', desc: 'On selected home appliances' },
+            { store: 'Carrefour', logo: '/stores/carrefour.png', disc: 'SAVE 20', code: 'SAVE20', color: '#EF4444', desc: 'On your first order above AED 150' }
+          ].map((c, i) => (
+            <CouponCard
+              key={i}
+              id={c.code}
+              storeName={c.store}
+              storeLogo={c.logo}
+              discount={c.disc}
+              code={c.code}
+              description={c.desc}
+              color={i === 0 ? '#FFD100' : c.color}
+            />
+          ))}
         </div>
       </section>
 

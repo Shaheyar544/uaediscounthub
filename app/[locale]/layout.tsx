@@ -1,13 +1,15 @@
 import type { Metadata } from 'next'
-import { Inter, Cairo } from 'next/font/google'
+import { Syne, DM_Sans, Cairo } from 'next/font/google'
 import '../globals.css'
 import { Locale } from '@/i18n/config'
 import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
+import { FlashBanner } from '@/components/layout/FlashBanner'
 import { ThemeProvider } from '@/components/theme-provider'
 import { AnalyticsProvider } from '@/components/analytics/AnalyticsProvider'
 
-const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
+const syne = Syne({ subsets: ['latin'], variable: '--font-syne' })
+const dmSans = DM_Sans({ subsets: ['latin'], variable: '--font-dm-sans' })
 const cairo = Cairo({ subsets: ['arabic'], variable: '--font-cairo' })
 
 export const metadata: Metadata = {
@@ -50,8 +52,8 @@ export default async function RootLayout({
   const dir = locale === 'ar' ? 'rtl' : 'ltr';
 
   return (
-    <html lang={locale} dir={dir} className={`${inter.variable} ${cairo.variable}`} suppressHydrationWarning>
-      <body className={`min-h-screen bg-background text-foreground font-sans antialiased`}>
+    <html lang={locale} dir={dir} className={`${syne.variable} ${dmSans.variable} ${cairo.variable}`} suppressHydrationWarning>
+      <body className={`min-h-screen bg-background text-foreground font-body antialiased`}>
         {/* We will add Navbar and Footer here later */}
         <ThemeProvider
           attribute="class"
@@ -60,6 +62,7 @@ export default async function RootLayout({
           disableTransitionOnChange
         >
           <AnalyticsProvider>
+            <FlashBanner />
             <Navbar locale={locale as Locale} />
             <main className="flex min-h-screen flex-col items-center justify-between">
               {children}
