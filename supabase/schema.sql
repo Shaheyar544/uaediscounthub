@@ -1,8 +1,8 @@
 -- ============================================
--- USERS & AUTH
+-- USERS & PROFILES (SYNC WITH AUTH.USERS)
 -- ============================================
-CREATE TABLE users (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE profiles (
+  id UUID REFERENCES auth.users ON DELETE CASCADE PRIMARY KEY,
   email TEXT UNIQUE NOT NULL,
   display_name TEXT,
   avatar_url TEXT,
@@ -11,13 +11,28 @@ CREATE TABLE users (
   preferred_currency TEXT DEFAULT 'AED',
   points INTEGER DEFAULT 0, -- gamification
   role TEXT DEFAULT 'user', -- 'user' | 'editor' | 'admin'
-  created_at TIMESTAMPTZ DEFAULT NOW(),
+  joined_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Trigger to sync auth.users to profiles
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS TRIGGER AS $$
+BEGIN
+  INSERT INTO public.profiles (id, email)
+  VALUES (new.id, new.email);
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE OR REPLACE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+
+
 CREATE TABLE user_badges (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
   badge_slug TEXT NOT NULL, -- 'deal-hunter', 'top-contributor'
   awarded_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -163,7 +178,7 @@ CREATE TABLE coupons (
   expires_at TIMESTAMPTZ,
   is_active BOOLEAN DEFAULT TRUE,
   click_count INTEGER DEFAULT 0,
-  submitted_by UUID REFERENCES users(id), -- community submitted
+  submitted_by UUID REFERENCES profiles(id), -- community submitted
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -199,7 +214,7 @@ CREATE TABLE affiliate_clicks (
   store_id UUID REFERENCES stores(id),
   coupon_id UUID REFERENCES coupons(id),
   deal_id UUID REFERENCES deals(id),
-  user_id UUID REFERENCES users(id),
+  user_id UUID REFERENCES profiles(id),
   session_id TEXT,
   ip_hash TEXT,           -- hashed for privacy
   user_agent TEXT,
@@ -215,7 +230,7 @@ CREATE INDEX idx_clicks_product ON affiliate_clicks(product_id, clicked_at DESC)
 -- ============================================
 CREATE TABLE price_alerts (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
   product_id UUID REFERENCES products(id) ON DELETE CASCADE,
   target_price NUMERIC(10,2) NOT NULL,
   currency TEXT DEFAULT 'AED',
@@ -231,7 +246,7 @@ CREATE TABLE price_alerts (
 -- ============================================
 CREATE TABLE wishlists (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
   product_id UUID REFERENCES products(id) ON DELETE CASCADE,
   added_at TIMESTAMPTZ DEFAULT NOW(),
   UNIQUE(user_id, product_id)
@@ -250,7 +265,7 @@ CREATE TABLE blog_posts (
   excerpt_en TEXT,
   excerpt_ar TEXT,
   featured_image TEXT,
-  author_id UUID REFERENCES users(id),
+  author_id UUID REFERENCES profiles(id),
   category_id UUID REFERENCES categories(id),
   tags TEXT[],
   post_type TEXT DEFAULT 'article', -- 'review' | 'guide' | 'comparison' | 'listicle'
@@ -270,14 +285,14 @@ CREATE TABLE blog_posts (
 -- ============================================
 CREATE TABLE community_reports (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  reporter_id UUID REFERENCES users(id),
+  reporter_id UUID REFERENCES profiles(id),
   report_type TEXT NOT NULL, -- 'expired_deal' | 'broken_link' | 'submit_coupon'
   coupon_id UUID REFERENCES coupons(id),
   deal_id UUID REFERENCES deals(id),
   submitted_code TEXT,       -- for new coupon submissions
   status TEXT DEFAULT 'pending', -- 'pending' | 'approved' | 'rejected'
   points_awarded INTEGER DEFAULT 0,
-  reviewed_by UUID REFERENCES users(id),
+  reviewed_by UUID REFERENCES profiles(id),
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -288,7 +303,7 @@ CREATE TABLE comparisons (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   share_hash TEXT UNIQUE NOT NULL, -- short unique hash e.g. "abc12x"
   product_ids UUID[] NOT NULL,
-  created_by UUID REFERENCES users(id),
+  created_by UUID REFERENCES profiles(id),
   view_count INTEGER DEFAULT 0,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
