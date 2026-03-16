@@ -3,9 +3,19 @@ import { Locale } from '@/i18n/config'
 import { getDictionary } from '@/i18n/dictionaries'
 import { Search, Bell, Moon, Sun, Monitor } from 'lucide-react'
 import { ThemeToggle } from '@/components/theme-toggle'
+import { createClient } from '@/utils/supabase/server'
 
 export async function Navbar({ locale }: { locale: Locale }) {
     const dict = await getDictionary(locale);
+    const supabase = await createClient();
+
+    const { data: headerPages } = await supabase
+        .from('pages')
+        .select('slug, title_en, title_ar')
+        .eq('placement', 'header')
+        .eq('is_visible', true)
+        .eq('status', 'published')
+        .order('sort_order', { ascending: true });
 
     return (
         <nav className="navbar sticky top-0 z-[100] bg-white/92 backdrop-blur-[16px] border-b border-border h-[60px] flex items-center">
@@ -41,6 +51,16 @@ export async function Navbar({ locale }: { locale: Locale }) {
                             Blog
                         </Link>
                     </li>
+                    {headerPages?.map((page) => (
+                        <li key={page.slug}>
+                            <Link 
+                                href={`/${locale}/${page.slug}`} 
+                                className="text-[13.5px] font-medium text-muted-foreground px-3 py-1.5 rounded-sm hover:bg-secondary hover:text-foreground transition-all"
+                            >
+                                {locale === 'ar' ? page.title_ar || page.title_en : page.title_en}
+                            </Link>
+                        </li>
+                    ))}
                 </ul>
 
                 <div className="nav-search flex-1 max-w-[340px] relative">
@@ -48,6 +68,7 @@ export async function Navbar({ locale }: { locale: Locale }) {
                     <input
                         type="text"
                         placeholder="Search Products & Deals..."
+                        suppressHydrationWarning
                         className="w-full h-9.5 border-1.5 border-border rounded-full pl-9.5 pr-3.5 font-body text-[13.5px] bg-secondary text-foreground outline-none transition-all focus:border-primary focus:bg-white focus:ring-3 focus:ring-primary/12"
                     />
                 </div>
@@ -62,11 +83,17 @@ export async function Navbar({ locale }: { locale: Locale }) {
 
                     <ThemeToggle />
 
-                    <button className="nav-btn h-9 px-2 border-1.5 border-border rounded-full flex items-center justify-center hover:border-primary hover:text-primary hover:bg-primary/5 transition-all">
+                    <button
+                        suppressHydrationWarning
+                        className="nav-btn h-9 px-2 border-1.5 border-border rounded-full flex items-center justify-center hover:border-primary hover:text-primary hover:bg-primary/5 transition-all"
+                    >
                         <Bell className="w-4.5 h-4.5" />
                     </button>
 
-                    <button className="nav-btn h-9 px-4 bg-primary border-1.5 border-primary rounded-full text-white font-body text-[13px] font-semibold hover:bg-primary-dim hover:border-primary-dim transition-all">
+                    <button
+                        suppressHydrationWarning
+                        className="nav-btn h-9 px-4 bg-primary border-1.5 border-primary rounded-full text-white font-body text-[13px] font-semibold hover:bg-primary-dim hover:border-primary-dim transition-all"
+                    >
                         {dict.common.login || 'Sign In'}
                     </button>
                 </div>
@@ -74,4 +101,3 @@ export async function Navbar({ locale }: { locale: Locale }) {
         </nav>
     )
 }
-

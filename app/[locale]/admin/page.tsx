@@ -1,7 +1,8 @@
 import { Locale } from '@/i18n/config'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { createClient } from '@/utils/supabase/server'
-import { DollarSign, Tag, Users, Activity } from 'lucide-react'
+import { DollarSign, Tag, Users, Activity, AlertTriangle } from 'lucide-react'
+import { AmazonCreatorsAPI } from '@/lib/amazon-creators-api'
 
 export default async function AdminDashboard({
     params
@@ -9,6 +10,7 @@ export default async function AdminDashboard({
     params: Promise<{ locale: string }>
 }) {
     const supabase = await createClient()
+    const isManualMode = AmazonCreatorsAPI.isManualMode()
 
     // Fetch simple aggregate counts
     const { count: usersCount } = await supabase.from('profiles').select('*', { count: 'exact', head: true })
@@ -17,9 +19,20 @@ export default async function AdminDashboard({
 
     return (
         <div className="space-y-8">
-            <div>
-                <h1 className="text-3xl font-bold tracking-tight">Dashboard Overview</h1>
-                <p className="text-muted-foreground">Monitor your GCC affiliate network performance.</p>
+            <div className="flex items-center justify-between gap-4">
+                <div>
+                    <h1 className="text-3xl font-bold tracking-tight">Dashboard Overview</h1>
+                    <p className="text-muted-foreground">Monitor your GCC affiliate network performance.</p>
+                </div>
+                {isManualMode && (
+                    <div className="flex items-center gap-3 bg-amber-50 border border-amber-200 text-amber-800 px-4 py-2.5 rounded-xl shadow-sm animate-in fade-in slide-in-from-right-4 duration-500">
+                        <AlertTriangle size={18} className="text-amber-600 animate-pulse" />
+                        <div>
+                            <div className="text-[13px] font-bold leading-tight">Automation Suspended</div>
+                            <div className="text-[11px] font-medium opacity-80">Manual Entry Mode is Active</div>
+                        </div>
+                    </div>
+                )}
             </div>
 
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">

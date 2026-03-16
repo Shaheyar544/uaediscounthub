@@ -85,16 +85,24 @@ export default async function Home({
             <input
               type="text"
               placeholder="iPhone 15 Pro, Samsung S24 Ultra, MacBook..."
+              suppressHydrationWarning
               className="flex-1 bg-transparent border-none outline-none font-body text-[15px] text-white placeholder:text-white/40"
             />
-            <button className="h-11 px-6 bg-primary text-white border-none rounded-full font-body text-[14px] font-bold whitespace-nowrap shrink-0 hover:bg-primary-dim hover:-translate-y-0.5 transition-all">
+            <button 
+              suppressHydrationWarning
+              className="h-11 px-6 bg-primary text-white border-none rounded-full font-body text-[14px] font-bold whitespace-nowrap shrink-0 hover:bg-primary-dim hover:-translate-y-0.5 transition-all"
+            >
               Search Deals →
             </button>
           </div>
 
           <div className="hero-tags flex flex-wrap justify-center gap-2 mt-4">
             {['📱 iPhone 15 Pro', '💻 MacBook Air M3', '🎧 Sony XM5', '📺 Samsung QLED', '🧹 Dyson V15'].map(tag => (
-              <button key={tag} className="bg-white/7 border border-white/10 text-white/65 text-[12.5px] font-medium px-3.5 py-1 rounded-full hover:bg-[#0A84FF]/20 hover:border-[#0A84FF]/40 hover:text-[#60AFFF] transition-all">
+              <button 
+                key={tag} 
+                suppressHydrationWarning
+                className="bg-white/7 border border-white/10 text-white/65 text-[12.5px] font-medium px-3.5 py-1 rounded-full hover:bg-[#0A84FF]/20 hover:border-[#0A84FF]/40 hover:text-[#60AFFF] transition-all"
+              >
                 {tag}
               </button>
             ))}

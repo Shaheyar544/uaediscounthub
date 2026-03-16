@@ -1,0 +1,975 @@
+================================================================================
+UAEDISCOUNTHUB — MASTER IMPLEMENTATION PROMPT FOR ANTIGRAVITY
+Complete Build & Integration Instructions · March 2026
+================================================================================
+
+READ THIS ENTIRE DOCUMENT BEFORE TOUCHING A SINGLE FILE.
+This prompt describes a Next.js 16 affiliate marketing website for UAE electronics
+deals. Every section must be implemented exactly as described.
+
+================================================================================
+SECTION 0 — PROJECT OVERVIEW & TECH STACK
+================================================================================
+
+Project: UAEDiscountHub
+Purpose: AI-powered price comparison and affiliate marketing platform for UAE/GCC
+         electronics market. Compares prices across Amazon UAE, Noon, Sharaf DG,
+         Carrefour, and Jarir.
+
+Tech stack (already installed — do NOT change versions):
+  - Next.js 16.1.6 with App Router
+  - React 19
+  - TypeScript 5
+  - Tailwind CSS v4
+  - Supabase (@supabase/ssr 0.9.0 + @supabase/supabase-js 2.98.0)
+  - Framer Motion 12
+  - Shadcn/ui (components.json already configured)
+  - Lucide React 0.577.0
+  - next-themes 0.4.6
+  - Twilio 5.12.2 (WhatsApp alerts)
+  - Resend 6.9.3 (email)
+  - PostHog (analytics)
+
+i18n: next-intl pattern with /en and /ar locales. All pages live under
+      app/[locale]/. Arabic = RTL (dir="rtl"), English = LTR.
+
+Fonts already loaded in layout.tsx:
+  - Inter (Latin) → --font-inter CSS variable
+  - Cairo (Arabic) → --font-cairo CSS variable
+
+================================================================================
+SECTION 1 — FILES YOU WILL RECEIVE (paste into project exactly as named)
+================================================================================
+
+You will be given these files to drop into the project. Place each one at the
+EXACT path shown. Do not rename them.
+
+  lib/amazon/creators-api.ts          → lib/amazon/creators-api.ts
+  lib/amazon/sync.ts                  → lib/amazon/sync.ts
+  app/api/amazon/sync/route.ts        → app/api/amazon/sync/route.ts
+  app/api/amazon/search/route.ts      → app/api/amazon/search/route.ts
+  app/api/amazon/import/route.ts      → app/api/amazon/import/route.ts
+  components/admin/AmazonImportPanel.tsx → components/admin/AmazonImportPanel.tsx
+  components/search/AmazonSearchBar.tsx  → components/search/AmazonSearchBar.tsx
+
+After placing files, run: npm install
+(No new packages needed — everything is already in package.json)
+
+================================================================================
+SECTION 2 — ENVIRONMENT VARIABLES
+================================================================================
+
+Add these to .env.local (create the file if it does not exist):
+
+  # Supabase (already have these)
+  NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+  NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+  SUPABASE_SERVICE_ROLE_KEY=your_service_role_key_from_supabase_settings
+
+  # Amazon Creators API v3.2 credentials (from the CSV screenshot)
+  AMAZON_CREDENTIAL_ID=amzn1.application-oa2-client.153a1...   ← full string from CSV column C
+  AMAZON_CREDENTIAL_SECRET=amzn1.oa2-cs.v1.54750869c6f...      ← full string from CSV column D
+  AMAZON_PARTNER_TAG=uaediscounthu-21                           ← part before first dot in Application Id
+
+  # Cron protection secret (make up any random 32+ character string)
+  CRON_SECRET=make_up_any_long_random_string_here
+
+  # DeepSeek AI (already have this if AI summaries work)
+  DEEPSEEK_API_KEY=your_deepseek_key
+
+  # Twilio WhatsApp (already have this)
+  TWILIO_ACCOUNT_SID=your_twilio_sid
+  TWILIO_AUTH_TOKEN=your_twilio_token
+  TWILIO_WHATSAPP_NUMBER=whatsapp:+14155238886
+
+IMPORTANT: SUPABASE_SERVICE_ROLE_KEY is different from the anon key.
+Find it at: Supabase Dashboard → Settings → API → service_role (secret)
+
+================================================================================
+SECTION 3 — DATABASE MIGRATION (run in Supabase SQL Editor)
+================================================================================
+
+Run this SQL in Supabase Dashboard → SQL Editor → New Query.
+This adds the ASIN column needed for Amazon sync to work.
+
+---- START SQL ----
+
+-- Add ASIN column to products for Amazon tracking
+ALTER TABLE public.products
+  ADD COLUMN IF NOT EXISTS asin TEXT;
+
+-- Unique index so duplicate ASINs are rejected
+CREATE UNIQUE INDEX IF NOT EXISTS idx_products_asin
+  ON public.products(asin)
+  WHERE asin IS NOT NULL;
+
+-- Update your existing seeded products with their real Amazon ASINs
+UPDATE products SET asin = 'B0CHX1W1XY' WHERE slug LIKE '%iphone-15-pro%';
+UPDATE products SET asin = 'B0CZBFNM6F' WHERE slug LIKE '%s24-ultra%';
+UPDATE products SET asin = 'B0CXCXKXHZ' WHERE slug LIKE '%macbook-air-m3%';
+UPDATE products SET asin = 'B0CSHRF9QY' WHERE slug LIKE '%ipad-pro-m4%';
+UPDATE products SET asin = 'B09XS7JWHH' WHERE slug LIKE '%wh-1000xm5%';
+UPDATE products SET asin = 'B0B2NWTP8X' WHERE slug LIKE '%anker-737%';
+
+---- END SQL ----
+
+================================================================================
+SECTION 4 — VERCEL CRON (create this file at project root)
+================================================================================
+
+Create file: vercel.json (at project root, same level as package.json)
+
+Content:
+{
+  "crons": [
+    {
+      "path": "/api/amazon/sync?secret=YOUR_CRON_SECRET_HERE",
+      "schedule": "0 */2 * * *"
+    }
+  ]
+}
+
+Replace YOUR_CRON_SECRET_HERE with the same value you set for CRON_SECRET
+in your .env.local. This runs price sync every 2 hours automatically.
+
+================================================================================
+SECTION 5 — MODIFY EXISTING FILES
+================================================================================
+
+You must edit these existing files. Full instructions for each below.
+
+────────────────────────────────────────────────────────────────────────────────
+5A. components/layout/Navbar.tsx  — REPLACE ENTIRELY
+────────────────────────────────────────────────────────────────────────────────
+
+The current Navbar uses a static <SearchInput> component. Replace it with the
+new <AmazonSearchBar> that calls the live Amazon API as the user types.
+
+Replace the entire file with this:
+
+----
+import Link from 'next/link'
+import { Locale } from '@/i18n/config'
+import { getDictionary } from '@/i18n/dictionaries'
+import { User, Menu } from 'lucide-react'
+import { ThemeToggle } from '@/components/theme-toggle'
+import { AmazonSearchBar } from '@/components/search/AmazonSearchBar'
+
+export async function Navbar({ locale }: { locale: Locale }) {
+    const dict = await getDictionary(locale);
+
+    return (
+        <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+            <div className="container flex h-16 items-center px-4 md:px-6 gap-4">
+                {/* Logo */}
+                <div className="mr-4 hidden md:flex flex-shrink-0">
+                    <Link href={`/${locale}`} className="flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-primary flex-shrink-0" />
+                        <span className="font-bold text-xl tracking-tight">UAEDiscountHub</span>
+                    </Link>
+                </div>
+
+                {/* Mobile menu trigger */}
+                <button className="md:hidden mr-2" aria-label="Menu">
+                    <Menu className="h-6 w-6" />
+                </button>
+
+                {/* Mobile logo */}
+                <div className="flex md:hidden flex-shrink-0">
+                    <Link href={`/${locale}`} className="font-bold text-lg tracking-tight">UDH</Link>
+                </div>
+
+                {/* Desktop nav links */}
+                <nav className="hidden md:flex items-center gap-1 text-sm font-medium flex-shrink-0">
+                    <Link href={`/${locale}/deals`} className="px-3 py-1.5 rounded-lg transition-colors hover:bg-muted text-muted-foreground hover:text-foreground">{dict.common.deals}</Link>
+                    <Link href={`/${locale}/coupons`} className="px-3 py-1.5 rounded-lg transition-colors hover:bg-muted text-muted-foreground hover:text-foreground">{dict.common.coupons}</Link>
+                    <Link href={`/${locale}/compare`} className="px-3 py-1.5 rounded-lg transition-colors hover:bg-muted text-muted-foreground hover:text-foreground">{dict.common.compare}</Link>
+                </nav>
+
+                {/* Search bar — takes available space */}
+                <div className="flex-1 max-w-xl hidden md:block">
+                    <AmazonSearchBar
+                        locale={locale}
+                        placeholder={dict.common.search || 'Search Products & Deals...'}
+                    />
+                </div>
+
+                {/* Right controls */}
+                <div className="flex items-center gap-2 ml-auto flex-shrink-0">
+                    <Link
+                        href={locale === 'en' ? '/ar' : '/en'}
+                        className="text-sm font-semibold px-3 py-1.5 rounded-lg border hover:border-primary/40 transition-colors"
+                    >
+                        {locale === 'en' ? 'عربي' : 'EN'}
+                    </Link>
+                    <ThemeToggle />
+                    <button className="p-2 rounded-lg hover:bg-muted transition-colors" aria-label="Account">
+                        <User className="h-5 w-5" />
+                    </button>
+                </div>
+            </div>
+        </header>
+    )
+}
+----
+
+────────────────────────────────────────────────────────────────────────────────
+5B. components/admin/AdminSidebar.tsx  — REPLACE ENTIRELY
+────────────────────────────────────────────────────────────────────────────────
+
+Add the Amazon PA-API menu item. Replace the navItems array and update imports.
+
+Replace the entire file with this:
+
+----
+"use client"
+
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import {
+  LayoutDashboard, Package, Tags, Users,
+  Settings, LogOut, Mail, ShoppingBag
+} from 'lucide-react'
+import { Button } from '@/components/ui/button'
+
+const navItems = [
+    { href: '',            label: 'Overview',       icon: LayoutDashboard },
+    { href: '/products',   label: 'Products',       icon: Package },
+    { href: '/coupons',    label: 'Coupons & Deals', icon: Tags },
+    { href: '/amazon',     label: 'Amazon API',      icon: ShoppingBag, badge: 'LIVE' },
+    { href: '/newsletters',label: 'Newsletter',      icon: Mail },
+    { href: '/users',      label: 'Users',           icon: Users },
+    { href: '/settings',   label: 'Settings',        icon: Settings },
+]
+
+export function AdminSidebar({ locale }: { locale: string }) {
+    const pathname = usePathname()
+
+    return (
+        <aside className="w-64 border-r bg-muted/20 min-h-screen flex flex-col">
+            <div className="h-16 flex items-center px-6 border-b">
+                <Link href={`/${locale}/admin`} className="font-bold text-lg text-primary tracking-tight">
+                    UDH Admin
+                </Link>
+            </div>
+            <nav className="flex-1 px-4 py-6 space-y-1">
+                {navItems.map((item) => {
+                    const fullHref = `/${locale}/admin${item.href}`
+                    const active = pathname === fullHref || (item.href !== '' && pathname.startsWith(fullHref))
+
+                    return (
+                        <Link
+                            key={item.href}
+                            href={fullHref}
+                            className={`flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                                active
+                                    ? 'bg-primary text-primary-foreground'
+                                    : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                            }`}
+                        >
+                            <div className="flex items-center gap-3">
+                                <item.icon className="w-4 h-4" />
+                                <span>{item.label}</span>
+                            </div>
+                            {item.badge && (
+                                <span className="text-[9px] font-bold bg-orange-500/20 text-orange-600 dark:text-orange-400 px-1.5 py-0.5 rounded-full">
+                                    {item.badge}
+                                </span>
+                            )}
+                        </Link>
+                    )
+                })}
+            </nav>
+            <div className="p-4 border-t">
+                <form action="/api/auth/signout" method="post">
+                    <Button variant="ghost" className="w-full justify-start text-muted-foreground hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/40">
+                        <LogOut className="w-4 h-4 mr-3" />
+                        Sign Out
+                    </Button>
+                </form>
+            </div>
+        </aside>
+    )
+}
+----
+
+────────────────────────────────────────────────────────────────────────────────
+5C. app/[locale]/product/[slug]/page.tsx  — EDIT (2 changes only)
+────────────────────────────────────────────────────────────────────────────────
+
+CHANGE 1: The product page currently uses mockPrices with ugly decimal math
+(product.base_price * 1.15 creates values like 4828.95). Replace the mockPrices
+block with a real Supabase query for product_prices.
+
+Find this block (around line 18-25 in the file):
+
+    // Mock live prices until the crawler database is populated
+    const mockPrices = [
+        { store: 'Amazon AE', price: product.base_price, originalPrice: product.base_price * 1.15, discount: 15, inStock: true, hasCOD: true, hasTabby: true, isLowest: true, affiliateUrl: `/${locale}/go/amazon/${product.id}` },
+        { store: 'Noon', price: product.base_price * 1.05, originalPrice: product.base_price * 1.15, discount: 10, inStock: true, hasCOD: true, hasTabby: true, affiliateUrl: `/${locale}/go/noon/${product.id}` }
+    ]
+
+Replace it with:
+
+    // Fetch real prices from product_prices table
+    const { data: priceRows } = await supabase
+        .from('product_prices')
+        .select('current_price, original_price, discount_percent, in_stock, affiliate_url, stores(name, slug, supports_cod, supports_tabby)')
+        .eq('product_id', product.id)
+        .eq('in_stock', true)
+        .order('current_price', { ascending: true })
+
+    const livePrices = priceRows?.map((row: any, i: number) => ({
+        store:       row.stores?.name ?? 'Store',
+        price:       row.current_price ?? product.base_price,
+        originalPrice: row.original_price ?? row.current_price,
+        discount:    Math.round(row.discount_percent ?? 0),
+        inStock:     row.in_stock,
+        hasCOD:      row.stores?.supports_cod ?? false,
+        hasTabby:    row.stores?.supports_tabby ?? false,
+        isLowest:    i === 0,
+        affiliateUrl: row.affiliate_url ?? `/${locale}/go/${row.stores?.slug}/${product.id}`,
+    })) ?? []
+
+    // Fallback if no prices synced yet
+    const mockPrices = livePrices.length > 0 ? livePrices : [
+        { store: 'Amazon AE', price: product.base_price, originalPrice: product.base_price, discount: 0, inStock: true, hasCOD: true, hasTabby: false, isLowest: true, affiliateUrl: `https://www.amazon.ae/dp/${product.asin ?? ''}?tag=uaediscounthu-21` }
+    ]
+
+CHANGE 2: The AISummaryBlock currently falls back to product.description.
+It should prefer ai_summary_en first. Find this line:
+
+    <AISummaryBlock text={product.description || "The DeepSeek AI has not generated a summary..."}  />
+
+Replace with:
+
+    <AISummaryBlock text={product.ai_summary_en || product.description_en || product.description || "AI summary not yet generated. Click the ✨ button in the admin panel to generate one with DeepSeek."} />
+
+────────────────────────────────────────────────────────────────────────────────
+5D. next.config.ts  — ADD one image domain
+────────────────────────────────────────────────────────────────────────────────
+
+The Amazon Creators API returns images from a different CDN. Add this to the
+remotePatterns array in next.config.ts:
+
+    // Amazon Creators API CDN (different from direct Amazon CDN)
+    { protocol: 'https', hostname: 'images-na.ssl-images-amazon.com' },
+    { protocol: 'https', hostname: 'ws-na.amazon-adsystem.com' },
+
+These should go inside the existing remotePatterns array, after the existing
+Amazon entries.
+
+────────────────────────────────────────────────────────────────────────────────
+5E. app/globals.css  — ADD design tokens (append to end of file)
+────────────────────────────────────────────────────────────────────────────────
+
+Append this entire block to the END of app/globals.css.
+Do NOT replace the existing content — append after it.
+
+----
+/* ═══════════════════════════════════════════════════
+   UAEDiscountHub Brand Tokens
+   Electric Blue primary + Emirates Orange accent
+   ═══════════════════════════════════════════════════ */
+
+:root {
+  /* Brand overrides — replace the default shadcn black/white primary */
+  --primary:            oklch(0.56 0.22 250);   /* Electric Blue #0A84FF */
+  --primary-foreground: oklch(1 0 0);            /* White */
+  --brand-accent:       oklch(0.65 0.21 40);     /* Emirates Orange #FF6B00 */
+  --brand-green:        oklch(0.72 0.18 160);    /* Success green #00C875 */
+  --brand-gold:         oklch(0.78 0.16 80);     /* Star rating gold #F5A623 */
+
+  /* Font variables (loaded in layout.tsx) */
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-arabic: var(--font-cairo), system-ui, sans-serif;
+}
+
+.dark {
+  --primary:            oklch(0.65 0.20 250);
+  --primary-foreground: oklch(0.1 0 0);
+}
+
+/* RTL font override — use Cairo for Arabic */
+[dir="rtl"] body {
+  font-family: var(--font-arabic);
+}
+
+/* Deal badge pulse animation */
+@keyframes deal-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.85; transform: scale(0.97); }
+}
+.animate-deal-pulse { animation: deal-pulse 2s ease-in-out infinite; }
+
+/* Flash sale countdown timer font */
+.font-timer {
+  font-family: var(--font-mono), monospace;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.05em;
+}
+----
+
+================================================================================
+SECTION 6 — CREATE NEW FILES (these do not exist yet)
+================================================================================
+
+────────────────────────────────────────────────────────────────────────────────
+6A. app/[locale]/admin/amazon/page.tsx  — CREATE NEW
+────────────────────────────────────────────────────────────────────────────────
+
+Create this file at: app/[locale]/admin/amazon/page.tsx
+
+----
+import { AmazonImportPanel, AmazonSyncPanel } from '@/components/admin/AmazonImportPanel'
+import { createClient } from '@/utils/supabase/server'
+import { redirect } from 'next/navigation'
+
+export default async function AmazonAdminPage({
+    params
+}: {
+    params: Promise<{ locale: string }>
+}) {
+    const { locale } = await params
+    const supabase = await createClient()
+
+    // Auth guard — redirect to login if not authenticated
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) redirect(`/${locale}/login`)
+
+    // Check credentials are set
+    const hasCredentials = !!(
+        process.env.AMAZON_CREDENTIAL_ID &&
+        process.env.AMAZON_CREDENTIAL_SECRET &&
+        process.env.AMAZON_PARTNER_TAG
+    )
+
+    return (
+        <div className="space-y-10 max-w-3xl">
+            <div>
+                <h1 className="text-3xl font-bold tracking-tight">Amazon Creators API</h1>
+                <p className="text-muted-foreground mt-1">
+                    Import products from Amazon UAE, sync live prices every 2 hours,
+                    and manage your product catalog automatically.
+                </p>
+            </div>
+
+            {/* Credential status */}
+            <div className={`p-4 rounded-xl border flex items-center gap-3 ${
+                hasCredentials
+                    ? 'bg-green-50 border-green-200 dark:bg-green-950/20 dark:border-green-900'
+                    : 'bg-red-50 border-red-200 dark:bg-red-950/20 dark:border-red-900'
+            }`}>
+                <div className={`w-2 h-2 rounded-full flex-shrink-0 ${hasCredentials ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`} />
+                <div>
+                    <div className={`text-sm font-semibold ${hasCredentials ? 'text-green-700 dark:text-green-400' : 'text-red-700 dark:text-red-400'}`}>
+                        {hasCredentials ? 'API Credentials Configured ✓' : 'Missing API Credentials'}
+                    </div>
+                    <div className={`text-xs ${hasCredentials ? 'text-green-600 dark:text-green-500' : 'text-red-600 dark:text-red-500'}`}>
+                        {hasCredentials
+                            ? 'Amazon Creators API v3.2 · EU Region (covers UAE, KSA, all Gulf) · Auto-sync every 2hrs via Vercel Cron'
+                            : 'Add AMAZON_CREDENTIAL_ID, AMAZON_CREDENTIAL_SECRET, and AMAZON_PARTNER_TAG to .env.local'
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div className="border-t pt-8">
+                <AmazonImportPanel />
+            </div>
+
+            <div className="border-t pt-8">
+                <AmazonSyncPanel />
+            </div>
+        </div>
+    )
+}
+----
+
+────────────────────────────────────────────────────────────────────────────────
+6B. app/api/amazon/search/route.ts  — CREATE NEW
+────────────────────────────────────────────────────────────────────────────────
+
+Create this file at: app/api/amazon/search/route.ts
+
+----
+import { NextResponse } from 'next/server'
+import { searchItems } from '@/lib/amazon/creators-api'
+import { upsertProductFromAmazon } from '@/lib/amazon/sync'
+import type { CreatorsConfig } from '@/lib/amazon/creators-api'
+
+function getConfig(): CreatorsConfig {
+    return {
+        credentialId:     process.env.AMAZON_CREDENTIAL_ID!,
+        credentialSecret: process.env.AMAZON_CREDENTIAL_SECRET!,
+        partnerTag:       process.env.AMAZON_PARTNER_TAG!,
+        marketplace:      'www.amazon.ae',
+    }
+}
+
+export async function GET(req: Request) {
+    const { searchParams } = new URL(req.url)
+    const query    = searchParams.get('q')?.trim()
+    const sortBy   = (searchParams.get('sort') ?? 'Relevance') as any
+    const page     = parseInt(searchParams.get('page') ?? '1')
+    const minPrice = searchParams.get('min') ? parseInt(searchParams.get('min')!) : undefined
+    const maxPrice = searchParams.get('max') ? parseInt(searchParams.get('max')!) : undefined
+
+    if (!query || query.length < 2) {
+        return NextResponse.json({ error: 'Query too short' }, { status: 400 })
+    }
+
+    const config = getConfig()
+
+    try {
+        const result = await searchItems(config, query, {
+            sortBy,
+            itemPage: page,
+            minPrice,
+            maxPrice,
+            minReviewsRating: 3,
+        })
+
+        // Background: save search results to database (fire and forget)
+        Promise.all(
+            result.products.map(p => upsertProductFromAmazon(p))
+        ).catch(err => console.error('[Search upsert background]', err))
+
+        return NextResponse.json({
+            products: result.products.map(p => ({
+                asin:            p.asin,
+                title:           p.title,
+                imageUrl:        p.imageUrl,
+                price:           p.price,
+                originalPrice:   p.originalPrice,
+                discountPercent: p.discountPercent,
+                savingsAmount:   p.savingsAmount,
+                currency:        p.currency,
+                rating:          p.rating,
+                reviewCount:     p.reviewCount,
+                isPrime:         p.isPrimeEligible,
+                isInStock:       p.isInStock,
+                brand:           p.brand,
+                badge:           p.badge,
+                affiliateUrl:    p.affiliateUrl,
+                deliveryInfo:    p.deliveryInfo,
+            })),
+            total: result.totalResults,
+            query,
+            page,
+        })
+    } catch (err: any) {
+        console.error('[Amazon Search API]', err)
+        return NextResponse.json({ error: 'Search failed', details: err.message }, { status: 500 })
+    }
+}
+----
+
+────────────────────────────────────────────────────────────────────────────────
+6C. app/api/amazon/import/route.ts  — CREATE NEW
+────────────────────────────────────────────────────────────────────────────────
+
+Create this file at: app/api/amazon/import/route.ts
+
+----
+import { NextResponse } from 'next/server'
+import { getItems, getVariations } from '@/lib/amazon/creators-api'
+import { upsertProductFromAmazon } from '@/lib/amazon/sync'
+import { createClient } from '@/utils/supabase/server'
+import type { CreatorsConfig } from '@/lib/amazon/creators-api'
+
+function getConfig(): CreatorsConfig {
+    return {
+        credentialId:     process.env.AMAZON_CREDENTIAL_ID!,
+        credentialSecret: process.env.AMAZON_CREDENTIAL_SECRET!,
+        partnerTag:       process.env.AMAZON_PARTNER_TAG!,
+        marketplace:      'www.amazon.ae',
+    }
+}
+
+export async function POST(req: Request) {
+    // Admin auth check
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+    const { asins, includeVariations = false } = await req.json()
+
+    if (!Array.isArray(asins) || !asins.length) {
+        return NextResponse.json({ error: 'asins array required' }, { status: 400 })
+    }
+    if (asins.length > 50) {
+        return NextResponse.json({ error: 'Max 50 ASINs per import' }, { status: 400 })
+    }
+
+    const config  = getConfig()
+    const results = []
+    const products = await getItems(config, asins)
+
+    for (const product of products) {
+        const syncResult = await upsertProductFromAmazon(product)
+        results.push({
+            asin:      product.asin,
+            title:     product.title,
+            price:     product.price,
+            isNew:     syncResult.isNew,
+            productId: syncResult.productId,
+            error:     syncResult.error,
+        })
+
+        if (includeVariations && product.parentAsin && !syncResult.error) {
+            const variations = await getVariations(config, product.parentAsin)
+            for (const variant of variations) {
+                if (variant.asin === product.asin) continue
+                const varResult = await upsertProductFromAmazon(variant)
+                results.push({
+                    asin:      variant.asin,
+                    title:     variant.title,
+                    price:     variant.price,
+                    isNew:     varResult.isNew,
+                    productId: varResult.productId,
+                    error:     varResult.error,
+                    variant:   true,
+                })
+                await new Promise(r => setTimeout(r, 200))
+            }
+        }
+        await new Promise(r => setTimeout(r, 150))
+    }
+
+    return NextResponse.json({
+        results,
+        succeeded: results.filter(r => !r.error).length,
+        created:   results.filter(r => r.isNew).length,
+        failed:    results.filter(r => r.error).length,
+    })
+}
+----
+
+================================================================================
+SECTION 7 — COMPLETE VISUAL REDESIGN
+================================================================================
+
+The design spec is in the file: uaediscounthub_design.html
+Open this file in a browser to see the exact visual target.
+
+Below are the specific changes required to each component to match the design.
+
+────────────────────────────────────────────────────────────────────────────────
+7A. app/[locale]/page.tsx (Homepage) — REDESIGN
+────────────────────────────────────────────────────────────────────────────────
+
+The homepage needs these visual upgrades to match the design HTML:
+
+1. HERO SECTION — Replace the current light gradient hero with a dark hero:
+   - Background: dark (#0D1117) with animated radial gradient mesh
+   - Add a grid texture overlay (CSS background-image grid lines)
+   - Add eyebrow pill: "🔥 Best Tech Deals in UAE & GCC" with animated dot
+   - Headline: "Find the Best Tech Deals in UAE & GCC" — "UAE & GCC" gradient blue
+   - Add 5 stat blocks at the bottom of the hero:
+     "50K+ Products", "5 Stores", "2hr Updates", "AED Currency", "12K+ Coupons"
+   - Search bar: dark glassmorphism style (rgba white on dark background)
+   - Quick search tags: dark transparent style
+
+2. CATEGORY CHIPS ROW — Add a horizontal scrollable row of category chips
+   between FeaturedStores and Today's Deals:
+   All Deals (🔥), Smartphones (📱), Laptops (💻), TVs (📺), Audio (🎧),
+   Wearables (⌚), Home Appliances (🏠), Gaming (🎮), Cameras (📷)
+   First chip is active/selected by default.
+
+3. SECTION HEADERS — Each section header needs an icon in a colored circle:
+   - Today's Best Deals: orange Tag icon in orange circle
+   - Trending Electronics: primary Zap icon in primary circle
+
+4. FLASH SALE BANNER — Add a thin banner ABOVE the navbar (not inside it):
+   Dark blue gradient, "⚡ Flash Sale — Up to 30% off" text, countdown timer
+   styled with monospace font blocks.
+
+────────────────────────────────────────────────────────────────────────────────
+7B. components/home/DealCard.tsx — REDESIGN
+────────────────────────────────────────────────────────────────────────────────
+
+The current DealCard is good but needs these upgrades from the design:
+
+1. Add SPEC PILLS row below product name — small monospace pills showing
+   key specs (pulled from product.spec_tags JSONB if available).
+   Example: [A17 Pro] [48MP] [256GB]
+
+2. Add WISHLIST BUTTON — heart icon in top-right corner, hidden until hover,
+   visible on hover with smooth opacity transition.
+
+3. SAVINGS text — show "Save AED X" in green below the strikethrough price.
+   This already exists in the current code but needs to be styled green.
+
+4. BADGE POSITIONING — Flash Sale badge should use 'animate-deal-pulse' class
+   for the pulsing animation (class added in globals.css in Section 5E above).
+
+5. The "Get Deal" button should show a shopping cart icon (ShoppingCart from
+   lucide-react) — this is already done in current code, keep it.
+
+────────────────────────────────────────────────────────────────────────────────
+7C. components/home/FeaturedStores.tsx — REDESIGN
+────────────────────────────────────────────────────────────────────────────────
+
+Current version shows colored circles with single letters. Upgrade to:
+
+1. Each store card should show a DEAL COUNT badge below the store name
+   (hardcode realistic numbers: Amazon UAE = "2,400+ Deals",
+   Noon = "1,800+ Deals", Sharaf DG = "940+ Deals",
+   Carrefour = "760+ Deals", Jarir = "320+ Deals")
+
+2. Add hover effect: border changes to primary color on hover with
+   translateY(-2px) lift animation.
+
+3. Remove the `py-12` section padding — it creates too much whitespace.
+   Use `mb-8` instead.
+
+────────────────────────────────────────────────────────────────────────────────
+7D. components/product/PriceComparisonTable.tsx — REDESIGN
+────────────────────────────────────────────────────────────────────────────────
+
+The current table is functional but visually plain. Upgrade to match the
+design HTML which shows a proper data grid with 5 columns.
+
+New layout: proper table structure with these columns:
+  Col 1 (2fr): Retailer (logo circle + name + stock/COD/Tabby pills)
+  Col 2 (1fr): Price in AED — large bold number + strikethrough original
+  Col 3 (1fr): Discount — "-AED X" savings amount in red
+  Col 4 (1fr): Delivery — "Free delivery" or prime delivery
+  Col 5 (1.2fr): Action button
+
+Changes:
+1. Best-price row gets a subtle green background (bg-green-50/dark:bg-green-950)
+2. "Best Price" badge next to store name (green background)
+3. COD pill: grey border, "💵 COD" text
+4. Tabby pill: purple border, "⚡ Tabby" text
+5. Stock pill: green for in-stock, red for out of stock
+6. Discount shown as red pill: "↓ 10.4% off"
+7. Installment line: "AED X/mo × 3 Tabby" in purple text below delivery
+8. The VendorPrice interface needs `savingsAmount` and `installmentPrice` fields
+
+────────────────────────────────────────────────────────────────────────────────
+7E. app/[locale]/product/[slug]/page.tsx — ADD PROS/CONS SECTION
+────────────────────────────────────────────────────────────────────────────────
+
+After the AISummaryBlock and before the PriceAlertTrigger, add a Pros/Cons grid:
+
+1. Read from product.ai_pros and product.ai_cons JSONB fields
+2. Display as a 2-column grid (Pros left, Cons right)
+3. Pros column: green header "✓ Pros", green checkmarks per item
+4. Cons column: red header "✗ Cons", red X marks per item
+5. Only render this section if either ai_pros or ai_cons has data
+
+Also add a product rating row showing stars + review count + "Authorized Retailer"
+badge, placed between the product name and the badges.
+
+Add a 30-day PRICE HISTORY section below the PriceComparisonTable.
+For now, fetch from price_history table:
+
+    const { data: priceHistory } = await supabase
+        .from('price_history')
+        .select('price, recorded_at, stores(name)')
+        .eq('product_id', product.id)
+        .order('recorded_at', { ascending: true })
+        .limit(60)
+
+Display it as a simple line chart using Recharts (already in package.json if you
+need to add it: npm install recharts). If recharts is not installed, show a
+placeholder div with "Price History Chart — Install recharts" text.
+
+================================================================================
+SECTION 8 — CRITICAL BUG FIXES (must fix before anything else works)
+================================================================================
+
+These bugs exist in the current codebase and must be fixed first:
+
+BUG 1 — AdminSidebar active state:
+  File: components/admin/AdminSidebar.tsx
+  Problem: The active detection for the admin overview route fails because
+           `item.href === ''` makes fullHref = `/${locale}/admin` and the check
+           `pathname === fullHref` works but the startsWith check fires for all
+           routes when href is empty string.
+  Fix: Change the active logic to:
+    const active = item.href === ''
+        ? pathname === `/${locale}/admin`
+        : pathname.startsWith(`/${locale}/admin${item.href}`)
+
+  This is already included in the replacement code in Section 5B above.
+
+BUG 2 — AISummaryBlock uses wrong field:
+  File: app/[locale]/product/[slug]/page.tsx
+  Problem: Falls back to `product.description` which maps to description_en
+           generated column but ignores ai_summary_en entirely.
+  Fix: Use ai_summary_en first (see Section 5C change 2 above).
+
+BUG 3 — Product page prices use floating point multiplication:
+  File: app/[locale]/product/[slug]/page.tsx
+  Problem: `product.base_price * 1.15` = ugly decimals like 4828.95 AED
+  Fix: Replace with real database query (see Section 5C change 1 above).
+
+BUG 4 — PriceAlertTrigger sends wrong field name:
+  File: components/product/PriceAlertTrigger.tsx
+  Problem: Sends `to:` field but the WhatsApp route expects `phone:`
+  Fix: Change `to: phone` to `phone: phone` in the fetch body:
+    body: JSON.stringify({
+        phone: phone,           // ← was 'to: phone'
+        productName: productName,
+        oldPrice: "Current",
+        newPrice: targetPrice
+    })
+
+BUG 5 — Supabase middleware cookie options dropped:
+  File: utils/supabase/middleware.ts
+  Problem: Line ~20 drops cookie options when setting:
+    cookiesToSet.forEach(({ name, value, options }) => request.cookies.set(name, value))
+  This breaks auth cookie persistence on some requests.
+  Fix: Add options parameter:
+    cookiesToSet.forEach(({ name, value, options }) =>
+        request.cookies.set(name, value, options)
+    )
+
+================================================================================
+SECTION 9 — IMPLEMENTATION ORDER
+================================================================================
+
+Do things in this exact order to avoid build errors:
+
+  STEP 1:  Fix the 5 bugs listed in Section 8
+  STEP 2:  Run the SQL migration from Section 3 in Supabase
+  STEP 3:  Add all env variables from Section 2 to .env.local
+  STEP 4:  Create vercel.json from Section 4
+  STEP 5:  Drop in the provided files (lib/amazon/*, app/api/amazon/*, components/)
+  STEP 6:  Modify existing files per Section 5 (Navbar, AdminSidebar, product page,
+           next.config.ts, globals.css)
+  STEP 7:  Create new files from Section 6 (admin/amazon/page.tsx, API routes)
+  STEP 8:  Run `npm run dev` and verify no TypeScript errors
+  STEP 9:  Apply visual redesign from Section 7
+  STEP 10: Test the full flow: search → product → price comparison
+
+================================================================================
+SECTION 10 — TESTING CHECKLIST
+================================================================================
+
+After implementation, verify each of these works:
+
+  □ Homepage loads with products from Supabase
+  □ Search bar shows live Amazon results as you type (400ms debounce)
+  □ Clicking a search result opens the correct product page
+  □ Product page shows real prices from product_prices table (not mock)
+  □ Product page shows AI summary from ai_summary_en field
+  □ Product page shows pros/cons from ai_pros/ai_cons fields
+  □ Price alert form submits without console errors
+  □ Admin panel → Amazon API page loads
+  □ Admin → Amazon → paste an ASIN → Import Products works
+  □ Admin → Amazon → Start Sync runs without errors
+  □ Dark mode toggle works on all pages
+  □ Arabic /ar route shows RTL layout
+  □ /en route shows LTR layout
+  □ Middleware redirects / to /en correctly
+
+================================================================================
+SECTION 11 — DO NOT TOUCH (leave unchanged)
+================================================================================
+
+These files are working correctly and must NOT be modified:
+
+  middleware.ts                              (after fixing Bug 5 above, do not touch again)
+  utils/supabase/client.ts
+  utils/supabase/server.ts
+  app/api/auth/callback/route.ts
+  app/api/auth/signout/route.ts
+  app/api/alerts/trigger-whatsapp/route.ts  (after fixing Bug 4 above)
+  app/[locale]/login/page.tsx
+  app/[locale]/login/actions.ts
+  app/[locale]/admin/products/actions.ts    (DeepSeek AI summary works correctly)
+  app/[locale]/admin/coupons/actions.ts
+  components/admin/GenerateSummaryButton.tsx
+  i18n/config.ts
+  i18n/dictionaries.ts
+  i18n/en.json
+  i18n/ar.json
+  tsconfig.json
+  postcss.config.mjs
+  components.json
+
+================================================================================
+SECTION 12 — ARCHITECTURE REFERENCE
+================================================================================
+
+How the Amazon integration flows:
+
+  User types in search bar
+       ↓
+  AmazonSearchBar (debounced 400ms)
+       ↓
+  GET /api/amazon/search?q=...
+       ↓
+  lib/amazon/creators-api.ts → OAuth token (cached 1hr) → Amazon API call
+       ↓
+  Results returned to UI as dropdown instantly
+       ↓  (background, non-blocking)
+  lib/amazon/sync.ts → upsertProductFromAmazon() → Supabase tables updated
+  (products, product_prices, price_history, deals auto-created if >10% off)
+
+  Vercel Cron (every 2hrs) → GET /api/amazon/sync
+       ↓
+  refreshPrices() → reads all products with ASIN from DB → getItems() batch
+       ↓
+  Price drops detected → checkAndFirePriceAlerts() → Twilio WhatsApp sent
+
+  Admin imports ASIN manually → POST /api/amazon/import
+       ↓
+  AmazonImportPanel shows result table with new/updated/error status
+
+================================================================================
+SECTION 13 — KNOWN LIMITATIONS / NOTES FOR DEVELOPER
+================================================================================
+
+1. Amazon Creators API v3.2 is region-based. The EU region credentials (which
+   you have) work for amazon.ae, amazon.sa, amazon.co.uk etc. — all from one
+   credential set.
+
+2. Rate limit is 1 TPS (1 request per second). The sync.ts file already handles
+   this with 1100ms delays between batch calls. Do not remove these delays.
+
+3. OAuth tokens expire after 1 hour. The creators-api.ts module caches the token
+   in module memory and auto-refreshes. On Vercel serverless functions, the cache
+   resets between cold starts — this is fine, just adds one extra auth call.
+
+4. The SUPABASE_SERVICE_ROLE_KEY bypasses Row Level Security. It is only used in
+   lib/amazon/sync.ts which runs server-side only. Never expose it to the client.
+
+5. Vercel free tier supports cron jobs. The vercel.json cron will run every 2
+   hours when deployed. For local dev, trigger manually via admin panel.
+
+6. If Amazon returns no results for a search query, the search bar will show
+   "No products found" — this is correct behaviour, not a bug.
+
+7. The `asin` column added in Section 3 uses a partial unique index
+   (WHERE asin IS NOT NULL) so rows without ASINs (manually added products)
+   don't conflict with each other.
+
+================================================================================
+END OF PROMPT
+================================================================================
+
+Summary of what you are building:
+  - A Next.js 16 affiliate marketing site for UAE electronics
+  - Integrated with Amazon Creators API v3.2 for live product data
+  - Auto price sync every 2hrs via Vercel Cron
+  - WhatsApp price drop alerts via Twilio
+  - AI product summaries via DeepSeek
+  - English + Arabic (RTL) support
+  - Admin panel with ASIN import + category sync controls
+  - Complete visual redesign matching the uaediscounthub_design.html spec
+
+Files you received to drop in: creators-api.ts, sync.ts, route files,
+AmazonImportPanel.tsx, AmazonSearchBar.tsx.
+
+Files you edit: Navbar.tsx, AdminSidebar.tsx, product page, next.config.ts,
+globals.css.
+
+Files you create: admin/amazon/page.tsx, api routes.
+
+Files you must not touch: auth routes, login, i18n, middleware (except Bug 5 fix).
+================================================================================

@@ -66,7 +66,7 @@ export default async function RootLayout({
 
   return (
     <html lang={locale} dir={dir} className={`${syne.variable} ${dmSans.variable} ${cairo.variable}`} suppressHydrationWarning>
-      <body className={`min-h-screen bg-background text-foreground font-body antialiased`}>
+      <body className={`min-h-screen bg-background text-foreground font-body antialiased`} suppressHydrationWarning>
         {/* We will add Navbar and Footer here later */}
         <ThemeProvider
           attribute="class"

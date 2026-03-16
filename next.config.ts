@@ -3,6 +3,9 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
+      // Cloudflare R2
+      { protocol: 'https', hostname: 'media.uaediscounthub.com' },
+      { protocol: 'https', hostname: '*.r2.dev' },
       // Apple
       { protocol: 'https', hostname: 'store.storeimages.cdn-apple.com' },
       { protocol: 'https', hostname: '*.apple.com' },
@@ -26,6 +29,8 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 'upload.wikimedia.org' },
       // Placeholder
       { protocol: 'https', hostname: 'placehold.co' },
+      // Unsplash (demo images)
+      { protocol: 'https', hostname: 'images.unsplash.com' },
     ],
     formats: ['image/avif', 'image/webp'],
     minimumCacheTTL: 3600,

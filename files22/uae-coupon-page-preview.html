@@ -1,0 +1,1478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>UAE Discount Hub — Coupon Codes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800;900&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@500;600&display=swap" rel="stylesheet" />
+<style>
+  /* ── Reset & Base ───────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --blue: #0A84FF;
+    --blue-dim: #0060CC;
+    --orange: #FF6B00;
+    --green: #00C875;
+    --gold: #F5A623;
+    --red: #FF3B30;
+    --bg: #F4F6F9;
+    --card: #FFFFFF;
+    --border: #E5E8EF;
+    --text: #0D1117;
+    --muted: #6B7280;
+    --dark: #0D1117;
+    --radius: 16px;
+    --font-display: 'Syne', sans-serif;
+    --font-body: 'DM Sans', sans-serif;
+    --font-mono: 'DM Mono', monospace;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--font-body);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── Scrollbar ──────────────────────────────────────── */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+
+  /* ── Nav ────────────────────────────────────────────── */
+  .nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(244,246,249,0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    height: 60px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .nav-logo {
+    font-family: var(--font-display);
+    font-size: 18px; font-weight: 800;
+    color: var(--text); text-decoration: none;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .nav-logo-dot {
+    width: 8px; height: 8px;
+    background: var(--blue);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+  .nav-links { display: flex; align-items: center; gap: 4px; }
+  .nav-link {
+    font-size: 13.5px; font-weight: 600; color: var(--muted);
+    text-decoration: none; padding: 6px 12px; border-radius: 8px;
+    transition: all 0.15s;
+  }
+  .nav-link:hover { color: var(--text); background: white; }
+  .nav-link.active { color: var(--blue); background: rgba(10,132,255,0.08); }
+  .nav-cta {
+    font-size: 13px; font-weight: 700; color: white;
+    background: var(--blue); padding: 7px 16px; border-radius: 99px;
+    text-decoration: none; transition: all 0.2s;
+  }
+  .nav-cta:hover { background: var(--blue-dim); transform: translateY(-1px); }
+
+  /* ── Page wrapper ───────────────────────────────────── */
+  .page { max-width: 1200px; margin: 0 auto; padding: 40px 24px 80px; }
+
+  /* ── Store Header Banner ────────────────────────────── */
+  .store-banner {
+    position: relative; overflow: hidden;
+    background: var(--dark);
+    border-radius: 24px;
+    padding: 40px 44px;
+    margin-bottom: 40px;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+  .store-banner::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 55% 80% at 2% 50%, rgba(10,132,255,0.22) 0%, transparent 65%),
+                radial-gradient(ellipse 40% 60% at 95% 20%, rgba(0,200,117,0.1) 0%, transparent 65%);
+    pointer-events: none;
+  }
+  .store-banner-grid {
+    position: absolute; inset: 0;
+    background-image: linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size: 36px 36px;
+    pointer-events: none;
+  }
+  .store-banner-inner {
+    position: relative; z-index: 1;
+    display: flex; align-items: center; gap: 28px; flex-wrap: wrap;
+  }
+  .store-logo-wrap {
+    width: 72px; height: 72px;
+    background: white; border-radius: 20px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px; box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    flex-shrink: 0;
+  }
+  .store-meta { flex: 1; min-width: 200px; }
+  .store-eyebrow {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
+    color: rgba(255,255,255,0.4); text-transform: uppercase; margin-bottom: 6px;
+  }
+  .store-title {
+    font-family: var(--font-display);
+    font-size: 28px; font-weight: 800; color: white;
+    line-height: 1.15; letter-spacing: -0.02em;
+  }
+  .store-subtitle { font-size: 13px; color: rgba(255,255,255,0.45); margin-top: 6px; }
+
+  /* Trust gauge */
+  .trust-gauge {
+    flex-shrink: 0;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px;
+    padding: 20px 28px;
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+  }
+  .gauge-ring { position: relative; width: 72px; height: 72px; }
+  .gauge-ring svg { transform: rotate(-90deg); }
+  .gauge-ring circle { transition: stroke-dashoffset 1.5s cubic-bezier(0.22,1,0.36,1); }
+  .gauge-value {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 800; color: var(--green);
+    font-family: var(--font-display);
+  }
+  .gauge-label { text-align: center; }
+  .gauge-label-top { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.07em; }
+  .gauge-label-bottom { font-size: 11px; font-weight: 700; color: var(--green); margin-top: 2px; }
+
+  /* Banner stats */
+  .banner-stats {
+    position: relative; z-index: 1;
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    border-top: 1px solid rgba(255,255,255,0.07);
+    margin-top: 28px;
+    padding-top: 22px;
+  }
+  .banner-stat { display: flex; align-items: center; gap: 10px; }
+  .banner-stat-icon {
+    width: 32px; height: 32px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; flex-shrink: 0;
+  }
+  .banner-stat-val {
+    font-size: 17px; font-weight: 800; font-family: var(--font-display);
+    line-height: 1;
+  }
+  .banner-stat-key {
+    font-size: 10px; color: rgba(255,255,255,0.4); font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.06em; margin-top: 2px;
+  }
+
+  /* ── Page Header ────────────────────────────────────── */
+  .page-header { margin-bottom: 28px; }
+  .page-header h1 {
+    font-family: var(--font-display);
+    font-size: 32px; font-weight: 800;
+    letter-spacing: -0.025em; line-height: 1.1;
+  }
+  .page-header p { font-size: 14px; color: var(--muted); margin-top: 6px; font-weight: 500; }
+
+  /* ── Store Pill Filters ─────────────────────────────── */
+  .store-pills {
+    display: flex; align-items: center; gap: 8px;
+    overflow-x: auto; padding-bottom: 4px;
+    margin-bottom: 20px;
+    scrollbar-width: none;
+  }
+  .store-pills::-webkit-scrollbar { display: none; }
+  .store-pill {
+    flex-shrink: 0; display: flex; align-items: center; gap: 7px;
+    padding: 7px 14px; border-radius: 99px;
+    font-size: 13px; font-weight: 600;
+    border: 1.5px solid var(--border);
+    background: var(--card); color: var(--muted);
+    cursor: pointer; transition: all 0.2s; white-space: nowrap;
+  }
+  .store-pill:hover { border-color: var(--blue); color: var(--text); background: rgba(10,132,255,0.04); }
+  .store-pill.active { background: var(--blue); color: white; border-color: var(--blue); box-shadow: 0 4px 16px rgba(10,132,255,0.28); }
+  .store-pill-logo { font-size: 15px; }
+  .store-pill-pct {
+    font-size: 10px; font-weight: 800; padding: 1px 6px;
+    border-radius: 99px; background: rgba(255,255,255,0.18);
+  }
+  .store-pill:not(.active) .store-pill-pct { background: var(--bg); color: var(--muted); }
+
+  /* ── Search & Filter Bar ────────────────────────────── */
+  .filter-bar { display: flex; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+  .search-wrap {
+    position: relative; flex: 1; min-width: 220px;
+  }
+  .search-icon {
+    position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+    color: var(--muted); font-size: 15px; pointer-events: none;
+  }
+  .search-input {
+    width: 100%; height: 44px;
+    padding: 0 14px 0 40px;
+    background: var(--card); border: 1.5px solid var(--border);
+    border-radius: 12px; font-family: var(--font-body);
+    font-size: 14px; font-weight: 500; color: var(--text);
+    outline: none; transition: all 0.2s;
+  }
+  .search-input::placeholder { color: var(--muted); }
+  .search-input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(10,132,255,0.12); }
+
+  .filter-btn {
+    height: 44px; padding: 0 16px;
+    background: var(--card); border: 1.5px solid var(--border);
+    border-radius: 12px; font-family: var(--font-body);
+    font-size: 13px; font-weight: 700; color: var(--muted);
+    cursor: pointer; display: flex; align-items: center; gap: 7px;
+    transition: all 0.2s; white-space: nowrap;
+  }
+  .filter-btn:hover { border-color: var(--blue); color: var(--text); }
+  .filter-btn.open { background: var(--blue); color: white; border-color: var(--blue); }
+  .filter-badge {
+    width: 18px; height: 18px; border-radius: 50%;
+    background: rgba(255,255,255,0.25); font-size: 10px; font-weight: 800;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .sort-select {
+    height: 44px; padding: 0 14px;
+    background: var(--card); border: 1.5px solid var(--border);
+    border-radius: 12px; font-family: var(--font-body);
+    font-size: 13px; font-weight: 700; color: var(--text);
+    cursor: pointer; outline: none; transition: all 0.2s;
+    appearance: none; padding-right: 30px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 10px center;
+  }
+
+  /* Filter panel */
+  .filter-panel {
+    background: var(--card); border: 1.5px solid var(--border);
+    border-radius: 16px; padding: 20px 24px;
+    margin-bottom: 16px;
+    display: none; align-items: center; gap: 24px; flex-wrap: wrap;
+  }
+  .filter-panel.open { display: flex; }
+  .toggle-row { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+  .toggle-track {
+    width: 40px; height: 22px; border-radius: 99px;
+    background: var(--border); position: relative;
+    transition: background 0.2s; cursor: pointer; flex-shrink: 0;
+  }
+  .toggle-track.on { background: var(--blue); }
+  .toggle-track.on.green { background: var(--green); }
+  .toggle-thumb {
+    position: absolute; top: 3px; left: 3px;
+    width: 16px; height: 16px; border-radius: 50%;
+    background: white; box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    transition: transform 0.2s;
+  }
+  .toggle-track.on .toggle-thumb { transform: translateX(18px); }
+  .toggle-label { font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+
+  .type-btns { display: flex; align-items: center; gap: 6px; }
+  .type-btn {
+    padding: 5px 12px; border-radius: 99px;
+    font-size: 12px; font-weight: 700; cursor: pointer;
+    border: none; transition: all 0.15s;
+    background: var(--bg); color: var(--muted);
+  }
+  .type-btn.active { background: var(--blue); color: white; }
+
+  /* Active chips */
+  .active-chips { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 16px; align-items: center; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 12px; font-weight: 700;
+    background: rgba(10,132,255,0.08);
+    color: var(--blue); border: 1px solid rgba(10,132,255,0.22);
+    padding: 4px 10px; border-radius: 99px; cursor: pointer;
+    transition: all 0.15s;
+  }
+  .chip:hover { background: rgba(10,132,255,0.14); }
+  .chip-x { opacity: 0.6; font-size: 13px; line-height: 1; }
+  .clear-all {
+    font-size: 12px; font-weight: 600; color: var(--muted);
+    background: none; border: none; cursor: pointer;
+    text-decoration: underline; text-underline-offset: 2px;
+  }
+
+  /* Count line */
+  .result-count { font-size: 13px; color: var(--muted); font-weight: 500; margin-bottom: 20px; }
+  .result-count strong { color: var(--text); font-weight: 700; }
+
+  /* ── Coupon Grid ────────────────────────────────────── */
+  .coupon-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+  }
+
+  /* ── Coupon Card ────────────────────────────────────── */
+  .coupon-card {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 20px;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.22,1,0.36,1);
+    animation: fadeSlideUp 0.4s cubic-bezier(0.22,1,0.36,1) both;
+    position: relative;
+    display: flex; flex-direction: column;
+  }
+  .coupon-card:hover {
+    border-color: rgba(10,132,255,0.3);
+    box-shadow: 0 12px 48px -12px rgba(10,132,255,0.18), 0 2px 8px rgba(0,0,0,0.06);
+    transform: translateY(-2px);
+  }
+  @keyframes fadeSlideUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Exclusive ribbon */
+  .exclusive-ribbon {
+    position: absolute; top: 14px; right: 14px; z-index: 5;
+    background: var(--orange); color: white;
+    font-size: 9.5px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase;
+    padding: 3px 9px; border-radius: 99px;
+    display: flex; align-items: center; gap: 4px;
+    box-shadow: 0 2px 8px rgba(255,107,0,0.35);
+  }
+
+  .card-body { padding: 20px; display: flex; flex-direction: column; gap: 14px; flex: 1; }
+
+  /* Card header */
+  .card-header { display: flex; align-items: flex-start; gap: 12px; }
+  .card-store-logo {
+    width: 44px; height: 44px; border-radius: 12px;
+    background: var(--bg); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; flex-shrink: 0;
+  }
+  .card-store-name {
+    font-size: 10px; font-weight: 800; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 3px;
+  }
+  .card-title {
+    font-size: 14.5px; font-weight: 700; color: var(--text);
+    line-height: 1.35; transition: color 0.15s;
+  }
+  .coupon-card:hover .card-title { color: var(--blue); }
+
+  /* Discount value */
+  .discount-row { display: flex; align-items: center; justify-content: space-between; }
+  .discount-val {
+    font-family: var(--font-display);
+    font-size: 30px; font-weight: 800; color: var(--blue);
+    line-height: 1; letter-spacing: -0.02em;
+  }
+  .verified-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 11px; font-weight: 700;
+    padding: 4px 10px; border-radius: 99px;
+  }
+  .verified-badge.verified { color: var(--green); background: rgba(0,200,117,0.1); border: 1px solid rgba(0,200,117,0.22); }
+  .verified-badge.unverified { color: var(--muted); background: var(--bg); border: 1px solid var(--border); }
+
+  /* Reveal button area */
+  .reveal-area { position: relative; }
+  .reveal-btn {
+    width: 100%; height: 52px;
+    background: var(--blue); color: white;
+    border: none; border-radius: 14px;
+    font-family: var(--font-body); font-size: 14px; font-weight: 800;
+    cursor: pointer; position: relative; overflow: hidden;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: all 0.2s;
+    box-shadow: 0 4px 20px -6px rgba(10,132,255,0.5);
+  }
+  .reveal-btn::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.18), transparent);
+    transform: translateX(-100%);
+    transition: transform 0.6s ease;
+  }
+  .reveal-btn:hover { background: var(--blue-dim); transform: translateY(-1px); box-shadow: 0 8px 28px -6px rgba(10,132,255,0.55); }
+  .reveal-btn:hover::after { transform: translateX(100%); }
+  .reveal-btn:active { transform: scale(0.98); }
+
+  /* Revealed code */
+  .code-revealed {
+    display: none;
+    flex-direction: column; gap: 8px;
+  }
+  .code-box {
+    display: flex; align-items: center; gap: 8px;
+    background: rgba(10,132,255,0.06);
+    border: 2px dashed rgba(10,132,255,0.35);
+    border-radius: 14px; padding: 12px 14px;
+    animation: popIn 0.25s cubic-bezier(0.22,1,0.36,1);
+  }
+  @keyframes popIn {
+    from { opacity: 0; transform: scale(0.94); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+  .code-text {
+    flex: 1; font-family: var(--font-mono);
+    font-size: 18px; font-weight: 600; color: var(--blue);
+    letter-spacing: 0.12em; user-select: all;
+  }
+  .copy-btn {
+    display: flex; align-items: center; gap: 5px;
+    background: var(--blue); color: white;
+    border: none; border-radius: 9px;
+    font-family: var(--font-body); font-size: 12px; font-weight: 800;
+    padding: 6px 12px; cursor: pointer;
+    transition: all 0.15s; flex-shrink: 0;
+  }
+  .copy-btn:hover { background: var(--blue-dim); }
+  .copy-btn.copied { background: var(--green); }
+  .store-link {
+    display: flex; align-items: center; justify-content: center; gap: 5px;
+    font-size: 12px; font-weight: 700; color: var(--blue);
+    text-decoration: none; transition: opacity 0.15s;
+  }
+  .store-link:hover { opacity: 0.75; }
+
+  /* Terms */
+  .terms-toggle {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 12px; font-weight: 600; color: var(--muted);
+    background: none; border: none; cursor: pointer;
+    padding: 0; transition: color 0.15s; font-family: var(--font-body);
+  }
+  .terms-toggle:hover { color: var(--text); }
+  .terms-content {
+    overflow: hidden; max-height: 0;
+    transition: max-height 0.25s ease, opacity 0.2s;
+    opacity: 0;
+  }
+  .terms-content.open { max-height: 200px; opacity: 1; }
+  .terms-list { list-style: none; margin-top: 8px; display: flex; flex-direction: column; gap: 4px; }
+  .terms-list li {
+    font-size: 12px; color: var(--muted); line-height: 1.5;
+    padding-left: 10px; border-left: 2px solid var(--border);
+  }
+
+  /* Social proof */
+  .social-proof {
+    display: flex; align-items: center; justify-content: space-between;
+    padding-top: 12px; border-top: 1px solid var(--border);
+    font-size: 11.5px; color: var(--muted); font-weight: 500;
+  }
+  .proof-left { display: flex; align-items: center; gap: 12px; }
+  .proof-item { display: flex; align-items: center; gap: 4px; }
+  .proof-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; }
+  .expiry-badge { font-size: 11px; font-weight: 600; display: flex; align-items: center; gap: 4px; }
+
+  /* Feedback */
+  .feedback-row {
+    display: none; align-items: center; gap: 8px;
+    padding-top: 10px; border-top: 1px solid var(--border);
+    animation: fadeIn 0.3s 0.8s both;
+  }
+  .feedback-row.visible { display: flex; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .feedback-label { font-size: 12px; color: var(--muted); font-weight: 500; flex: 1; }
+  .feedback-btn {
+    font-size: 11px; font-weight: 800; padding: 4px 10px;
+    border-radius: 8px; border: none; cursor: pointer;
+    font-family: var(--font-body); transition: all 0.15s;
+  }
+  .feedback-btn.yes { color: var(--green); background: rgba(0,200,117,0.1); }
+  .feedback-btn.yes:hover { background: rgba(0,200,117,0.2); }
+  .feedback-btn.no  { color: var(--red);   background: rgba(255,59,48,0.08); }
+  .feedback-btn.no:hover  { background: rgba(255,59,48,0.15); }
+  .feedback-sent { font-size: 12px; color: var(--muted); text-align: center; display: none; }
+
+  /* ── Toast ──────────────────────────────────────────── */
+  .toast {
+    position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(80px);
+    background: #111827; color: white;
+    font-size: 13px; font-weight: 700; font-family: var(--font-body);
+    padding: 12px 20px; border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+    display: flex; align-items: center; gap: 8px;
+    transition: transform 0.4s cubic-bezier(0.22,1,0.36,1), opacity 0.3s;
+    opacity: 0; z-index: 9999; white-space: nowrap;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+  .toast-icon { font-size: 16px; }
+
+  /* ── Admin Section ──────────────────────────────────── */
+  .admin-section {
+    background: var(--dark);
+    border-radius: 24px;
+    padding: 48px;
+    margin-top: 80px;
+    border: 1px solid rgba(255,255,255,0.06);
+    position: relative; overflow: hidden;
+  }
+  .admin-section::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 50% 70% at 90% 10%, rgba(10,132,255,0.12), transparent 60%);
+    pointer-events: none;
+  }
+  .admin-eyebrow {
+    display: inline-flex; align-items: center; gap: 7px;
+    background: rgba(10,132,255,0.15); border: 1px solid rgba(10,132,255,0.25);
+    color: rgba(10,132,255,0.9); font-size: 11px; font-weight: 800;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    padding: 4px 12px; border-radius: 99px; margin-bottom: 20px;
+  }
+  .admin-title {
+    font-family: var(--font-display); font-size: 28px; font-weight: 800;
+    color: white; letter-spacing: -0.02em; margin-bottom: 8px;
+  }
+  .admin-sub { font-size: 14px; color: rgba(255,255,255,0.45); margin-bottom: 36px; }
+
+  /* Stats grid */
+  .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 36px; }
+  .stat-card {
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px; padding: 20px;
+    display: flex; align-items: center; gap: 14px;
+    transition: background 0.2s;
+  }
+  .stat-card:hover { background: rgba(255,255,255,0.07); }
+  .stat-icon {
+    width: 42px; height: 42px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; flex-shrink: 0;
+  }
+  .stat-num { font-family: var(--font-display); font-size: 26px; font-weight: 800; line-height: 1; }
+  .stat-key { font-size: 11px; color: rgba(255,255,255,0.4); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; margin-top: 3px; }
+
+  /* Admin table */
+  .admin-table-wrap {
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px; overflow: hidden;
+  }
+  .admin-table { width: 100%; border-collapse: collapse; }
+  .admin-table th {
+    font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.35);
+    text-transform: uppercase; letter-spacing: 0.08em;
+    padding: 14px 18px; text-align: left;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+  }
+  .admin-table td {
+    padding: 14px 18px; font-size: 13.5px; color: rgba(255,255,255,0.8);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    vertical-align: middle;
+  }
+  .admin-table tr:last-child td { border-bottom: none; }
+  .admin-table tr:hover td { background: rgba(255,255,255,0.03); }
+  .code-cell { font-family: var(--font-mono); font-weight: 600; color: var(--blue); letter-spacing: 0.08em; }
+  .excl-tag {
+    display: inline-flex; align-items: center; gap: 3px;
+    font-size: 9px; font-weight: 800; color: var(--orange);
+    background: rgba(255,107,0,0.12); padding: 2px 7px; border-radius: 99px;
+    text-transform: uppercase; letter-spacing: 0.05em; margin-left: 6px;
+  }
+  .badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 99px;
+  }
+  .badge.active { background: rgba(10,132,255,0.15); color: #60AFFF; }
+  .badge.inactive { background: rgba(255,59,48,0.12); color: #FF6B6B; }
+  .badge.verified { background: rgba(0,200,117,0.12); color: var(--green); border: 1px solid rgba(0,200,117,0.2); }
+  .badge.expired { background: rgba(255,59,48,0.08); color: rgba(255,255,255,0.35); }
+  .admin-actions { display: flex; align-items: center; justify-content: flex-end; gap: 4px; }
+  .action-btn {
+    font-size: 11.5px; font-weight: 800; padding: 5px 10px;
+    border-radius: 8px; border: none; cursor: pointer;
+    font-family: var(--font-body); transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .action-btn.verify { color: var(--green); background: rgba(0,200,117,0.1); }
+  .action-btn.verify:hover { background: rgba(0,200,117,0.2); }
+  .action-btn.disable { color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.07); }
+  .action-btn.disable:hover { background: rgba(255,255,255,0.12); }
+  .action-btn.delete { color: var(--red); background: rgba(255,59,48,0.08); width: 30px; height: 30px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-size: 14px; }
+  .action-btn.delete:hover { background: rgba(255,59,48,0.15); }
+
+  /* Animations */
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+
+  /* Staggered card entrance */
+  .coupon-card:nth-child(1) { animation-delay: 0.05s; }
+  .coupon-card:nth-child(2) { animation-delay: 0.10s; }
+  .coupon-card:nth-child(3) { animation-delay: 0.15s; }
+  .coupon-card:nth-child(4) { animation-delay: 0.20s; }
+  .coupon-card:nth-child(5) { animation-delay: 0.25s; }
+  .coupon-card:nth-child(6) { animation-delay: 0.30s; }
+  .coupon-card:nth-child(7) { animation-delay: 0.35s; }
+  .coupon-card:nth-child(8) { animation-delay: 0.40s; }
+
+  /* ── Responsive ─────────────────────────────────────── */
+  @media (max-width: 768px) {
+    .nav-links { display: none; }
+    .store-banner { padding: 28px 24px; }
+    .store-banner-inner { flex-direction: column; gap: 20px; }
+    .trust-gauge { flex-direction: row; padding: 16px 20px; gap: 16px; width: 100%; }
+    .banner-stats { grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .admin-section { padding: 28px 20px; }
+    .coupon-grid { grid-template-columns: 1fr; }
+    .filter-bar { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── Navigation ──────────────────────────────────────── -->
+<nav class="nav">
+  <a href="#" class="nav-logo">
+    <div class="nav-logo-dot"></div>
+    UAE Discount Hub
+  </a>
+  <div class="nav-links">
+    <a href="#" class="nav-link">Deals</a>
+    <a href="#" class="nav-link active">Coupons</a>
+    <a href="#" class="nav-link">Compare</a>
+    <a href="#" class="nav-link">Stores</a>
+  </div>
+  <a href="#" class="nav-cta">Get Alerts →</a>
+</nav>
+
+<!-- ── Page ────────────────────────────────────────────── -->
+<div class="page">
+
+  <!-- ── Store Banner ──────────────────────────────────── -->
+  <div class="store-banner">
+    <div class="store-banner-grid"></div>
+    <div class="store-banner-inner">
+      <div class="store-store-logo" style="width:72px;height:72px;background:white;border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:28px;box-shadow:0 8px 32px rgba(0,0,0,0.4);flex-shrink:0;">🛒</div>
+
+      <div class="store-meta">
+        <div class="store-eyebrow">Official Coupon Hub</div>
+        <div class="store-title">UAE Promo Codes & Coupons</div>
+        <div class="store-subtitle">148 active codes · Verified daily across 12 major UAE stores</div>
+      </div>
+
+      <div class="trust-gauge">
+        <div class="gauge-ring">
+          <svg width="72" height="72" viewBox="0 0 72 72">
+            <circle cx="36" cy="36" r="30" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="5"/>
+            <circle cx="36" cy="36" r="30" fill="none" stroke="#00C875" stroke-width="5"
+              stroke-linecap="round"
+              stroke-dasharray="188.5"
+              stroke-dashoffset="28.3"
+              id="gauge-circle"
+              style="transition: stroke-dashoffset 1.5s cubic-bezier(0.22,1,0.36,1)"/>
+          </svg>
+          <div class="gauge-value" id="gauge-value" style="color:#00C875;">85%</div>
+        </div>
+        <div class="gauge-label">
+          <div class="gauge-label-top">Trust Score</div>
+          <div class="gauge-label-bottom" id="gauge-label-bottom">Highly Reliable</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="banner-stats">
+      <div class="banner-stat">
+        <div class="banner-stat-icon" style="background:rgba(10,132,255,0.15);">🏷️</div>
+        <div>
+          <div class="banner-stat-val" style="color:#60AFFF;">148</div>
+          <div class="banner-stat-key">Active Codes</div>
+        </div>
+      </div>
+      <div class="banner-stat">
+        <div class="banner-stat-icon" style="background:rgba(0,200,117,0.15);">✅</div>
+        <div>
+          <div class="banner-stat-val" style="color:#00C875;">126</div>
+          <div class="banner-stat-key">Verified Today</div>
+        </div>
+      </div>
+      <div class="banner-stat">
+        <div class="banner-stat-icon" style="background:rgba(0,200,117,0.15);">📈</div>
+        <div>
+          <div class="banner-stat-val" style="color:#00C875;">85%</div>
+          <div class="banner-stat-key">Success Rate</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Store Pill Filters ─────────────────────────────── -->
+  <div class="store-pills">
+    <div class="store-pill active" onclick="filterStore(this, 'all')">All Stores</div>
+    <div class="store-pill" onclick="filterStore(this, 'noon')"><span class="store-pill-logo">🟡</span> Noon <span class="store-pill-pct">92%</span></div>
+    <div class="store-pill" onclick="filterStore(this, 'amazon')"><span class="store-pill-logo">📦</span> Amazon AE <span class="store-pill-pct">88%</span></div>
+    <div class="store-pill" onclick="filterStore(this, 'sharaf')"><span class="store-pill-logo">🟢</span> Sharaf DG <span class="store-pill-pct">79%</span></div>
+    <div class="store-pill" onclick="filterStore(this, 'carrefour')"><span class="store-pill-logo">🔴</span> Carrefour <span class="store-pill-pct">74%</span></div>
+    <div class="store-pill" onclick="filterStore(this, 'namshi')"><span class="store-pill-logo">👗</span> Namshi <span class="store-pill-pct">83%</span></div>
+    <div class="store-pill" onclick="filterStore(this, 'talabat')"><span class="store-pill-logo">🍔</span> Talabat <span class="store-pill-pct">91%</span></div>
+  </div>
+
+  <!-- ── Search + Filter Bar ─────────────────────────────── -->
+  <div class="filter-bar">
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input class="search-input" type="text" placeholder="Search coupon codes, stores..." oninput="liveSearch(this.value)" />
+    </div>
+    <button class="filter-btn" id="filter-toggle-btn" onclick="toggleFilters()">
+      <span>⚙️</span> Filters
+      <span class="filter-badge" id="filter-badge" style="display:none;">2</span>
+      <span id="filter-chevron">▾</span>
+    </button>
+    <select class="sort-select" onchange="sortCards(this.value)">
+      <option value="popular">Most Popular</option>
+      <option value="newest">Newest First</option>
+      <option value="discount">Highest Discount</option>
+    </select>
+  </div>
+
+  <!-- ── Filter Panel ─────────────────────────────────────── -->
+  <div class="filter-panel" id="filter-panel">
+    <div class="toggle-row" onclick="toggleFilter('verified')">
+      <div class="toggle-track" id="toggle-verified">
+        <div class="toggle-thumb"></div>
+      </div>
+      <span class="toggle-label">✅ Verified only</span>
+    </div>
+    <div class="toggle-row" onclick="toggleFilter('exclusive')">
+      <div class="toggle-track" id="toggle-exclusive">
+        <div class="toggle-thumb"></div>
+      </div>
+      <span class="toggle-label" style="color:#FF6B00;">⚡ Exclusive codes</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <span style="font-size:13px;font-weight:600;color:var(--muted);">Type:</span>
+      <div class="type-btns">
+        <button class="type-btn active" onclick="setType(this,'all')">All</button>
+        <button class="type-btn" onclick="setType(this,'percent')">% Off</button>
+        <button class="type-btn" onclick="setType(this,'fixed')">AED Off</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Active Chips ─────────────────────────────────────── -->
+  <div class="active-chips" id="active-chips" style="display:none;">
+    <span class="chip">"NOON10" <span class="chip-x" onclick="removeChip()">×</span></span>
+    <span class="chip">Verified only <span class="chip-x">×</span></span>
+    <button class="clear-all" onclick="clearAll()">Clear all</button>
+  </div>
+
+  <!-- ── Results Count ──────────────────────────────────── -->
+  <div class="result-count" id="result-count">Showing <strong>8</strong> coupons</div>
+
+  <!-- ── Coupon Grid ─────────────────────────────────────── -->
+  <div class="coupon-grid" id="coupon-grid">
+
+    <!-- Card 1: Noon, Exclusive, Verified -->
+    <div class="coupon-card" data-store="noon" data-type="percent" data-verified="true" data-exclusive="true">
+      <div class="exclusive-ribbon">⚡ Exclusive</div>
+      <div class="card-body">
+        <div class="card-header">
+          <div class="card-store-logo">🟡</div>
+          <div>
+            <div class="card-store-name">Noon</div>
+            <div class="card-title">Extra 10% off Everything — Electronics & Fashion</div>
+          </div>
+        </div>
+        <div class="discount-row">
+          <div class="discount-val">10% OFF</div>
+          <div class="verified-badge verified">✓ Verified</div>
+        </div>
+        <div class="reveal-area">
+          <button class="reveal-btn" onclick="revealCode(this, 'NOON10UAE', 'https://noon.com')">
+            🏷️ Show Coupon Code
+          </button>
+          <div class="code-revealed">
+            <div class="code-box">
+              <span class="code-text">NOON10UAE</span>
+              <button class="copy-btn" onclick="copyCode(this, 'NOON10UAE')">📋 Copy</button>
+            </div>
+            <a href="https://noon.com" target="_blank" rel="noopener" class="store-link">↗ Go to Noon</a>
+          </div>
+        </div>
+        <div>
+          <button class="terms-toggle" onclick="toggleTerms(this)">▾ Terms & Conditions</button>
+          <div class="terms-content">
+            <ul class="terms-list">
+              <li>Valid on all products storewide.</li>
+              <li>Minimum order value: AED 150.</li>
+              <li>One use per customer account.</li>
+              <li>Cannot be combined with other offers.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="social-proof">
+          <div class="proof-left">
+            <div class="proof-item"><div class="proof-dot"></div><span>2,340 used</span></div>
+            <div class="proof-item" style="color:var(--green);font-weight:600;">⭐ Verified today</div>
+          </div>
+          <div class="expiry-badge">⏱ Expires in 3 days</div>
+        </div>
+        <div class="feedback-row" id="fb-1">
+          <span class="feedback-label">Did it work?</span>
+          <button class="feedback-btn yes" onclick="sendFeedback('fb-1', true)">👍 Yes</button>
+          <button class="feedback-btn no" onclick="sendFeedback('fb-1', false)">👎 No</button>
+        </div>
+        <div class="feedback-sent" id="fs-1"></div>
+      </div>
+    </div>
+
+    <!-- Card 2: Amazon, Fixed, Verified -->
+    <div class="coupon-card" data-store="amazon" data-type="fixed" data-verified="true" data-exclusive="false">
+      <div class="card-body">
+        <div class="card-header">
+          <div class="card-store-logo">📦</div>
+          <div>
+            <div class="card-store-name">Amazon AE</div>
+            <div class="card-title">AED 50 Off with MasterCard on First Order</div>
+          </div>
+        </div>
+        <div class="discount-row">
+          <div class="discount-val" style="color:#FF6B00;">AED 50 OFF</div>
+          <div class="verified-badge verified">✓ Verified</div>
+        </div>
+        <div class="reveal-area">
+          <button class="reveal-btn" style="background:var(--orange);box-shadow:0 4px 20px -6px rgba(255,107,0,0.45);" onclick="revealCode(this, 'MC50AE', 'https://amazon.ae')">
+            🏷️ Show Coupon Code
+          </button>
+          <div class="code-revealed">
+            <div class="code-box" style="background:rgba(255,107,0,0.06);border-color:rgba(255,107,0,0.35);">
+              <span class="code-text" style="color:var(--orange);">MC50AE</span>
+              <button class="copy-btn" style="background:var(--orange);" onclick="copyCode(this, 'MC50AE')">📋 Copy</button>
+            </div>
+            <a href="https://amazon.ae" target="_blank" rel="noopener" class="store-link" style="color:var(--orange);">↗ Go to Amazon AE</a>
+          </div>
+        </div>
+        <div>
+          <button class="terms-toggle" onclick="toggleTerms(this)">▾ Terms & Conditions</button>
+          <div class="terms-content">
+            <ul class="terms-list">
+              <li>Valid on first-time orders only.</li>
+              <li>Must pay with Mastercard.</li>
+              <li>Minimum order: AED 200.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="social-proof">
+          <div class="proof-left">
+            <div class="proof-item"><div class="proof-dot"></div><span>891 used</span></div>
+            <div class="proof-item" style="color:var(--green);font-weight:600;">⭐ Verified today</div>
+          </div>
+          <div class="expiry-badge">⏱ 12 days left</div>
+        </div>
+        <div class="feedback-row" id="fb-2">
+          <span class="feedback-label">Did it work?</span>
+          <button class="feedback-btn yes" onclick="sendFeedback('fb-2', true)">👍 Yes</button>
+          <button class="feedback-btn no" onclick="sendFeedback('fb-2', false)">👎 No</button>
+        </div>
+        <div class="feedback-sent" id="fs-2"></div>
+      </div>
+    </div>
+
+    <!-- Card 3: Sharaf DG -->
+    <div class="coupon-card" data-store="sharaf" data-type="percent" data-verified="true" data-exclusive="false">
+      <div class="card-body">
+        <div class="card-header">
+          <div class="card-store-logo">🟢</div>
+          <div>
+            <div class="card-store-name">Sharaf DG</div>
+            <div class="card-title">15% Off Selected Home Appliances & Cooling</div>
+          </div>
+        </div>
+        <div class="discount-row">
+          <div class="discount-val" style="color:var(--green);">15% OFF</div>
+          <div class="verified-badge verified">✓ Verified</div>
+        </div>
+        <div class="reveal-area">
+          <button class="reveal-btn" style="background:var(--green);box-shadow:0 4px 20px -6px rgba(0,200,117,0.45);" onclick="revealCode(this, 'SHARAF15', 'https://sharafdg.com')">
+            🏷️ Show Coupon Code
+          </button>
+          <div class="code-revealed">
+            <div class="code-box" style="background:rgba(0,200,117,0.06);border-color:rgba(0,200,117,0.35);">
+              <span class="code-text" style="color:var(--green);">SHARAF15</span>
+              <button class="copy-btn" style="background:var(--green);" onclick="copyCode(this, 'SHARAF15')">📋 Copy</button>
+            </div>
+            <a href="https://sharafdg.com" target="_blank" rel="noopener" class="store-link" style="color:var(--green);">↗ Go to Sharaf DG</a>
+          </div>
+        </div>
+        <div>
+          <button class="terms-toggle" onclick="toggleTerms(this)">▾ Terms & Conditions</button>
+          <div class="terms-content">
+            <ul class="terms-list">
+              <li>Valid on home appliances, AC & cooling only.</li>
+              <li>Minimum purchase: AED 500.</li>
+              <li>Not valid on already discounted items.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="social-proof">
+          <div class="proof-left">
+            <div class="proof-item"><div class="proof-dot"></div><span>1.2k used</span></div>
+            <div class="proof-item" style="color:var(--green);font-weight:600;">⭐ Verified today</div>
+          </div>
+          <div class="expiry-badge" style="color:var(--red);">⚠️ 1 day left</div>
+        </div>
+        <div class="feedback-row" id="fb-3">
+          <span class="feedback-label">Did it work?</span>
+          <button class="feedback-btn yes" onclick="sendFeedback('fb-3', true)">👍 Yes</button>
+          <button class="feedback-btn no" onclick="sendFeedback('fb-3', false)">👎 No</button>
+        </div>
+        <div class="feedback-sent" id="fs-3"></div>
+      </div>
+    </div>
+
+    <!-- Card 4: Carrefour, Exclusive -->
+    <div class="coupon-card" data-store="carrefour" data-type="percent" data-verified="false" data-exclusive="true">
+      <div class="exclusive-ribbon">⚡ Exclusive</div>
+      <div class="card-body">
+        <div class="card-header">
+          <div class="card-store-logo">🔴</div>
+          <div>
+            <div class="card-store-name">Carrefour UAE</div>
+            <div class="card-title">20% Off Your First Grocery Order Above AED 150</div>
+          </div>
+        </div>
+        <div class="discount-row">
+          <div class="discount-val" style="color:var(--red);">20% OFF</div>
+          <div class="verified-badge unverified">◎ Unverified</div>
+        </div>
+        <div class="reveal-area">
+          <button class="reveal-btn" style="background:#E53935;box-shadow:0 4px 20px -6px rgba(229,57,53,0.45);" onclick="revealCode(this, 'SAVE20', 'https://carrefouruae.com')">
+            🏷️ Show Coupon Code
+          </button>
+          <div class="code-revealed">
+            <div class="code-box" style="background:rgba(229,57,53,0.05);border-color:rgba(229,57,53,0.3);">
+              <span class="code-text" style="color:#E53935;">SAVE20</span>
+              <button class="copy-btn" style="background:#E53935;" onclick="copyCode(this, 'SAVE20')">📋 Copy</button>
+            </div>
+            <a href="https://carrefouruae.com" target="_blank" rel="noopener" class="store-link" style="color:#E53935;">↗ Go to Carrefour</a>
+          </div>
+        </div>
+        <div>
+          <button class="terms-toggle" onclick="toggleTerms(this)">▾ Terms & Conditions</button>
+          <div class="terms-content">
+            <ul class="terms-list">
+              <li>First order only, minimum AED 150.</li>
+              <li>Excludes alcohol, tobacco & gift cards.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="social-proof">
+          <div class="proof-left">
+            <div class="proof-item"><div class="proof-dot" style="background:var(--muted);animation:none;"></div><span>43 used</span></div>
+          </div>
+          <div class="expiry-badge">⏱ 30 days left</div>
+        </div>
+        <div class="feedback-row" id="fb-4">
+          <span class="feedback-label">Did it work?</span>
+          <button class="feedback-btn yes" onclick="sendFeedback('fb-4', true)">👍 Yes</button>
+          <button class="feedback-btn no" onclick="sendFeedback('fb-4', false)">👎 No</button>
+        </div>
+        <div class="feedback-sent" id="fs-4"></div>
+      </div>
+    </div>
+
+    <!-- Card 5: Namshi, Percent -->
+    <div class="coupon-card" data-store="namshi" data-type="percent" data-verified="true" data-exclusive="false">
+      <div class="card-body">
+        <div class="card-header">
+          <div class="card-store-logo">👗</div>
+          <div>
+            <div class="card-store-name">Namshi</div>
+            <div class="card-title">12% Off Fashion & Footwear — Summer Collection</div>
+          </div>
+        </div>
+        <div class="discount-row">
+          <div class="discount-val" style="color:#A855F7;">12% OFF</div>
+          <div class="verified-badge verified">✓ Verified</div>
+        </div>
+        <div class="reveal-area">
+          <button class="reveal-btn" style="background:#A855F7;box-shadow:0 4px 20px -6px rgba(168,85,247,0.45);" onclick="revealCode(this, 'NAMSHI12', 'https://namshi.com')">
+            🏷️ Show Coupon Code
+          </button>
+          <div class="code-revealed">
+            <div class="code-box" style="background:rgba(168,85,247,0.06);border-color:rgba(168,85,247,0.35);">
+              <span class="code-text" style="color:#A855F7;">NAMSHI12</span>
+              <button class="copy-btn" style="background:#A855F7;" onclick="copyCode(this, 'NAMSHI12')">📋 Copy</button>
+            </div>
+            <a href="https://namshi.com" target="_blank" rel="noopener" class="store-link" style="color:#A855F7;">↗ Go to Namshi</a>
+          </div>
+        </div>
+        <div>
+          <button class="terms-toggle" onclick="toggleTerms(this)">▾ Terms & Conditions</button>
+          <div class="terms-content">
+            <ul class="terms-list">
+              <li>Valid on fashion and footwear only.</li>
+              <li>Excludes sale items and luxury brands.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="social-proof">
+          <div class="proof-left">
+            <div class="proof-item"><div class="proof-dot"></div><span>560 used</span></div>
+            <div class="proof-item" style="color:var(--green);font-weight:600;">⭐ Verified today</div>
+          </div>
+          <div class="expiry-badge">⏱ 7 days left</div>
+        </div>
+        <div class="feedback-row" id="fb-5">
+          <span class="feedback-label">Did it work?</span>
+          <button class="feedback-btn yes" onclick="sendFeedback('fb-5', true)">👍 Yes</button>
+          <button class="feedback-btn no" onclick="sendFeedback('fb-5', false)">👎 No</button>
+        </div>
+        <div class="feedback-sent" id="fs-5"></div>
+      </div>
+    </div>
+
+    <!-- Card 6: Talabat, Fixed -->
+    <div class="coupon-card" data-store="talabat" data-type="fixed" data-verified="true" data-exclusive="true">
+      <div class="exclusive-ribbon">⚡ Exclusive</div>
+      <div class="card-body">
+        <div class="card-header">
+          <div class="card-store-logo">🍔</div>
+          <div>
+            <div class="card-store-name">Talabat</div>
+            <div class="card-title">Free Delivery + AED 25 Off Your Next 3 Orders</div>
+          </div>
+        </div>
+        <div class="discount-row">
+          <div class="discount-val" style="color:#FF6B00;">AED 25 OFF</div>
+          <div class="verified-badge verified">✓ Verified</div>
+        </div>
+        <div class="reveal-area">
+          <button class="reveal-btn" style="background:var(--orange);box-shadow:0 4px 20px -6px rgba(255,107,0,0.45);" onclick="revealCode(this, 'TALAB25', 'https://talabat.com')">
+            🏷️ Show Coupon Code
+          </button>
+          <div class="code-revealed">
+            <div class="code-box" style="background:rgba(255,107,0,0.06);border-color:rgba(255,107,0,0.35);">
+              <span class="code-text" style="color:var(--orange);">TALAB25</span>
+              <button class="copy-btn" style="background:var(--orange);" onclick="copyCode(this, 'TALAB25')">📋 Copy</button>
+            </div>
+            <a href="https://talabat.com" target="_blank" rel="noopener" class="store-link" style="color:var(--orange);">↗ Go to Talabat</a>
+          </div>
+        </div>
+        <div>
+          <button class="terms-toggle" onclick="toggleTerms(this)">▾ Terms & Conditions</button>
+          <div class="terms-content">
+            <ul class="terms-list">
+              <li>Valid on 3 consecutive orders.</li>
+              <li>Minimum order: AED 70 per order.</li>
+              <li>Offer runs until end of month.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="social-proof">
+          <div class="proof-left">
+            <div class="proof-item"><div class="proof-dot"></div><span>4.1k used</span></div>
+            <div class="proof-item" style="color:var(--green);font-weight:600;">⭐ Verified today</div>
+          </div>
+          <div class="expiry-badge">⏱ 18 days left</div>
+        </div>
+        <div class="feedback-row" id="fb-6">
+          <span class="feedback-label">Did it work?</span>
+          <button class="feedback-btn yes" onclick="sendFeedback('fb-6', true)">👍 Yes</button>
+          <button class="feedback-btn no" onclick="sendFeedback('fb-6', false)">👎 No</button>
+        </div>
+        <div class="feedback-sent" id="fs-6"></div>
+      </div>
+    </div>
+
+    <!-- Card 7: Noon, Fixed -->
+    <div class="coupon-card" data-store="noon" data-type="fixed" data-verified="true" data-exclusive="false">
+      <div class="card-body">
+        <div class="card-header">
+          <div class="card-store-logo">🟡</div>
+          <div>
+            <div class="card-store-name">Noon</div>
+            <div class="card-title">AED 75 Off Beauty & Skincare Above AED 300</div>
+          </div>
+        </div>
+        <div class="discount-row">
+          <div class="discount-val" style="color:#F5A623;">AED 75 OFF</div>
+          <div class="verified-badge verified">✓ Verified</div>
+        </div>
+        <div class="reveal-area">
+          <button class="reveal-btn" style="background:#D4900D;box-shadow:0 4px 20px -6px rgba(213,144,13,0.45);" onclick="revealCode(this, 'BEAUTY75', 'https://noon.com')">
+            🏷️ Show Coupon Code
+          </button>
+          <div class="code-revealed">
+            <div class="code-box" style="background:rgba(245,166,35,0.06);border-color:rgba(245,166,35,0.35);">
+              <span class="code-text" style="color:#D4900D;">BEAUTY75</span>
+              <button class="copy-btn" style="background:#D4900D;" onclick="copyCode(this, 'BEAUTY75')">📋 Copy</button>
+            </div>
+            <a href="https://noon.com" target="_blank" rel="noopener" class="store-link" style="color:#D4900D;">↗ Go to Noon</a>
+          </div>
+        </div>
+        <div>
+          <button class="terms-toggle" onclick="toggleTerms(this)">▾ Terms & Conditions</button>
+          <div class="terms-content">
+            <ul class="terms-list">
+              <li>Valid on beauty & skincare category only.</li>
+              <li>Minimum spend: AED 300.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="social-proof">
+          <div class="proof-left">
+            <div class="proof-item"><div class="proof-dot"></div><span>228 used</span></div>
+            <div class="proof-item" style="color:var(--green);font-weight:600;">⭐ Verified today</div>
+          </div>
+          <div class="expiry-badge">⏱ 5 days left</div>
+        </div>
+        <div class="feedback-row" id="fb-7">
+          <span class="feedback-label">Did it work?</span>
+          <button class="feedback-btn yes" onclick="sendFeedback('fb-7', true)">👍 Yes</button>
+          <button class="feedback-btn no" onclick="sendFeedback('fb-7', false)">👎 No</button>
+        </div>
+        <div class="feedback-sent" id="fs-7"></div>
+      </div>
+    </div>
+
+    <!-- Card 8: Amazon, Percent, Exclusive -->
+    <div class="coupon-card" data-store="amazon" data-type="percent" data-verified="false" data-exclusive="true">
+      <div class="exclusive-ribbon">⚡ Exclusive</div>
+      <div class="card-body">
+        <div class="card-header">
+          <div class="card-store-logo">📦</div>
+          <div>
+            <div class="card-store-name">Amazon AE</div>
+            <div class="card-title">5% Cashback on All Orders with Amazon Pay</div>
+          </div>
+        </div>
+        <div class="discount-row">
+          <div class="discount-val">5% OFF</div>
+          <div class="verified-badge unverified">◎ Unverified</div>
+        </div>
+        <div class="reveal-area">
+          <button class="reveal-btn" onclick="revealCode(this, 'APAY5UAE', 'https://amazon.ae')">
+            🏷️ Show Coupon Code
+          </button>
+          <div class="code-revealed">
+            <div class="code-box">
+              <span class="code-text">APAY5UAE</span>
+              <button class="copy-btn" onclick="copyCode(this, 'APAY5UAE')">📋 Copy</button>
+            </div>
+            <a href="https://amazon.ae" target="_blank" rel="noopener" class="store-link">↗ Go to Amazon AE</a>
+          </div>
+        </div>
+        <div>
+          <button class="terms-toggle" onclick="toggleTerms(this)">▾ Terms & Conditions</button>
+          <div class="terms-content">
+            <ul class="terms-list">
+              <li>Must pay with Amazon Pay balance.</li>
+              <li>Applies as wallet credit within 3 days.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="social-proof">
+          <div class="proof-left">
+            <div class="proof-item"><div class="proof-dot" style="background:var(--muted);animation:none;"></div><span>12 used</span></div>
+          </div>
+          <div class="expiry-badge">⏱ 60 days left</div>
+        </div>
+        <div class="feedback-row" id="fb-8">
+          <span class="feedback-label">Did it work?</span>
+          <button class="feedback-btn yes" onclick="sendFeedback('fb-8', true)">👍 Yes</button>
+          <button class="feedback-btn no" onclick="sendFeedback('fb-8', false)">👎 No</button>
+        </div>
+        <div class="feedback-sent" id="fs-8"></div>
+      </div>
+    </div>
+
+  </div><!-- /coupon-grid -->
+
+
+  <!-- ═══════════════════════════════════════════════════ -->
+  <!-- ── Admin Panel Preview ──────────────────────────── -->
+  <!-- ═══════════════════════════════════════════════════ -->
+  <div class="admin-section">
+    <div style="position:relative;z-index:1;">
+      <div class="admin-eyebrow">⚙️ Admin Panel — /admin/coupons</div>
+      <div class="admin-title">Coupons Registry</div>
+      <div class="admin-sub">Manage promo codes, track performance, and verify community submissions.</div>
+
+      <!-- Stats -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon" style="background:rgba(10,132,255,0.15);">🏷️</div>
+          <div>
+            <div class="stat-num" style="color:#60AFFF;">148</div>
+            <div class="stat-key">Active Coupons</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:rgba(0,200,117,0.15);">✅</div>
+          <div>
+            <div class="stat-num" style="color:var(--green);">126</div>
+            <div class="stat-key">Verified</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:rgba(168,85,247,0.15);">📈</div>
+          <div>
+            <div class="stat-num" style="color:#C084FC;">24.8k</div>
+            <div class="stat-key">Total Clicks</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:rgba(255,107,0,0.15);">⏰</div>
+          <div>
+            <div class="stat-num" style="color:var(--orange);">4</div>
+            <div class="stat-key">Expiring in 3 days</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="admin-table-wrap">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Code</th>
+              <th>Store</th>
+              <th>Title</th>
+              <th>Discount</th>
+              <th>Clicks</th>
+              <th>Expires</th>
+              <th>Status</th>
+              <th style="text-align:right;">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="code-cell">NOON10UAE</span><span class="excl-tag">⚡ EXCL</span></td>
+              <td>Noon</td>
+              <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Extra 10% off Everything</td>
+              <td><span class="badge active">10% OFF</span></td>
+              <td style="font-weight:700;">8,240</td>
+              <td>in 3 days</td>
+              <td><span class="badge active">Active</span> <span class="badge verified">✓ Verified</span></td>
+              <td><div class="admin-actions"><button class="action-btn disable">Disable</button><button class="action-btn delete">🗑</button></div></td>
+            </tr>
+            <tr>
+              <td><span class="code-cell">MC50AE</span></td>
+              <td>Amazon AE</td>
+              <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">AED 50 Off with MasterCard</td>
+              <td><span class="badge active">AED 50 OFF</span></td>
+              <td style="font-weight:700;">3,110</td>
+              <td>in 12 days</td>
+              <td><span class="badge active">Active</span> <span class="badge verified">✓ Verified</span></td>
+              <td><div class="admin-actions"><button class="action-btn disable">Disable</button><button class="action-btn delete">🗑</button></div></td>
+            </tr>
+            <tr>
+              <td><span class="code-cell">SAVE20</span><span class="excl-tag">⚡ EXCL</span></td>
+              <td>Carrefour</td>
+              <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">20% Off First Grocery Order</td>
+              <td><span class="badge active">20% OFF</span></td>
+              <td style="font-weight:700;">43</td>
+              <td>in 30 days</td>
+              <td><span class="badge active">Active</span></td>
+              <td><div class="admin-actions"><button class="action-btn verify">✓ Verify</button><button class="action-btn disable">Disable</button><button class="action-btn delete">🗑</button></div></td>
+            </tr>
+            <tr style="opacity:0.5;">
+              <td><span class="code-cell">OLDCODE5</span></td>
+              <td>Noon</td>
+              <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">5% Off Tech Products</td>
+              <td><span class="badge expired">5% OFF</span></td>
+              <td style="font-weight:700;">312</td>
+              <td style="color:var(--red);">Expired</td>
+              <td><span class="badge inactive">Inactive</span></td>
+              <td><div class="admin-actions"><button class="action-btn disable">Enable</button><button class="action-btn delete">🗑</button></div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /page -->
+
+<!-- ── Toast ─────────────────────────────────────────────── -->
+<div class="toast" id="toast">
+  <span class="toast-icon">✅</span>
+  <span id="toast-msg">Code copied to clipboard!</span>
+</div>
+
+<script>
+// ── Reveal Code ──────────────────────────────────────────
+function revealCode(btn, code, affiliateUrl) {
+  const revealArea = btn.closest('.reveal-area');
+  const codeRevealed = revealArea.querySelector('.code-revealed');
+  const card = btn.closest('.coupon-card');
+
+  // Hide button, show code box
+  btn.style.display = 'none';
+  codeRevealed.style.display = 'flex';
+
+  // Copy to clipboard
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(code).then(() => showToast('✅', `"${code}" copied to clipboard!`));
+  }
+
+  // Show feedback row after delay
+  const fbRow = card.querySelector('.feedback-row');
+  if (fbRow) {
+    setTimeout(() => { fbRow.classList.add('visible'); }, 1200);
+  }
+
+  // Pop-under: open affiliate link
+  setTimeout(() => {
+    const newTab = window.open(affiliateUrl, '_blank', 'noopener,noreferrer');
+    if (!newTab) {
+      // Popup blocked — user still sees the fallback store link
+    }
+  }, 300);
+}
+
+// ── Copy Code ────────────────────────────────────────────
+function copyCode(btn, code) {
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(code);
+  }
+  const orig = btn.innerHTML;
+  btn.innerHTML = '✅ Copied!';
+  btn.classList.add('copied');
+  showToast('✅', `"${code}" copied to clipboard!`);
+  setTimeout(() => { btn.innerHTML = orig; btn.classList.remove('copied'); }, 2500);
+}
+
+// ── Terms toggle ─────────────────────────────────────────
+function toggleTerms(btn) {
+  const content = btn.nextElementSibling;
+  content.classList.toggle('open');
+  btn.textContent = content.classList.contains('open')
+    ? '▴ Terms & Conditions'
+    : '▾ Terms & Conditions';
+}
+
+// ── Filter store ─────────────────────────────────────────
+function filterStore(el, store) {
+  document.querySelectorAll('.store-pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  const cards = document.querySelectorAll('.coupon-card');
+  let shown = 0;
+  cards.forEach(card => {
+    const match = store === 'all' || card.dataset.store === store;
+    card.style.display = match ? '' : 'none';
+    if (match) shown++;
+  });
+  document.getElementById('result-count').innerHTML = `Showing <strong>${shown}</strong> coupon${shown!==1?'s':''}`;
+}
+
+// ── Live search ───────────────────────────────────────────
+function liveSearch(q) {
+  const cards = document.querySelectorAll('.coupon-card');
+  let shown = 0;
+  cards.forEach(card => {
+    const text = card.textContent.toLowerCase();
+    const match = text.includes(q.toLowerCase());
+    card.style.display = match ? '' : 'none';
+    if (match) shown++;
+  });
+  document.getElementById('result-count').innerHTML = `Showing <strong>${shown}</strong> coupon${shown!==1?'s':''}`;
+}
+
+// ── Filter panel toggle ───────────────────────────────────
+function toggleFilters() {
+  const panel = document.getElementById('filter-panel');
+  const btn = document.getElementById('filter-toggle-btn');
+  const chevron = document.getElementById('filter-chevron');
+  panel.classList.toggle('open');
+  btn.classList.toggle('open');
+  chevron.textContent = panel.classList.contains('open') ? '▴' : '▾';
+}
+
+// ── Toggle filters ────────────────────────────────────────
+const activeFiltersMap = {};
+function toggleFilter(name) {
+  const track = document.getElementById('toggle-' + name);
+  const isOn = !track.classList.contains('on');
+  track.classList.toggle('on', isOn);
+  if (name === 'exclusive') track.classList.toggle('green', false);
+  activeFiltersMap[name] = isOn;
+  applyFilters();
+}
+
+function setType(btn, type) {
+  document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  activeFiltersMap.type = type;
+  applyFilters();
+}
+
+function applyFilters() {
+  const cards = document.querySelectorAll('.coupon-card');
+  let shown = 0;
+  cards.forEach(card => {
+    let show = true;
+    if (activeFiltersMap.verified && card.dataset.verified !== 'true') show = false;
+    if (activeFiltersMap.exclusive && card.dataset.exclusive !== 'true') show = false;
+    if (activeFiltersMap.type && activeFiltersMap.type !== 'all' && card.dataset.type !== activeFiltersMap.type) show = false;
+    card.style.display = show ? '' : 'none';
+    if (show) shown++;
+  });
+  document.getElementById('result-count').innerHTML = `Showing <strong>${shown}</strong> coupon${shown!==1?'s':''}`;
+}
+
+// ── Sort ──────────────────────────────────────────────────
+function sortCards(val) {
+  // Visual only for demo — real sort happens server-side
+  showToast('🔄', 'Sorting by ' + val + '...');
+}
+
+// ── Feedback ──────────────────────────────────────────────
+function sendFeedback(fbId, worked) {
+  const row = document.getElementById(fbId);
+  const sent = document.getElementById(fbId.replace('fb-', 'fs-'));
+  row.style.display = 'none';
+  sent.style.display = 'block';
+  sent.textContent = worked ? '✅ Thanks! Marked as working.' : "🔄 Sorry to hear that — we'll investigate.";
+  // In production: POST /api/coupons/verify
+}
+
+// ── Clear chips ───────────────────────────────────────────
+function removeChip() {
+  // demo
+}
+function clearAll() {
+  document.getElementById('active-chips').style.display = 'none';
+}
+
+// ── Toast ─────────────────────────────────────────────────
+function showToast(icon, msg) {
+  const toast = document.getElementById('toast');
+  document.querySelector('.toast-icon').textContent = icon;
+  document.getElementById('toast-msg').textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+// ── Gauge animation on load ───────────────────────────────
+window.addEventListener('load', () => {
+  const circle = document.getElementById('gauge-circle');
+  if (circle) {
+    const r = 30;
+    const circumference = 2 * Math.PI * r;
+    const score = 85;
+    const offset = circumference * (1 - score / 100);
+    circle.style.strokeDashoffset = offset;
+  }
+});
+</script>
+</body>
+</html>

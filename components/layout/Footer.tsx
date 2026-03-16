@@ -1,12 +1,23 @@
-"use client"
-
 import Link from 'next/link'
 import { Locale } from '@/i18n/config'
-import { Twitter, Linkedin, Instagram, MessageCircle } from 'lucide-react'
-import { useHasMounted } from '@/hooks/use-has-mounted'
+import { createClient } from '@/utils/supabase/server'
+import { SocialButtons } from './SocialButtons'
 
-export function Footer({ locale }: { locale: Locale }) {
-    const hasMounted = useHasMounted()
+export async function Footer({ locale }: { locale: Locale }) {
+    const supabase = await createClient();
+
+    const { data: footerPages } = await supabase
+        .from('pages')
+        .select('slug, title_en, title_ar, placement')
+        .in('placement', ['footer_c1', 'footer_c2', 'footer_c3'])
+        .eq('is_visible', true)
+        .eq('status', 'published')
+        .order('sort_order', { ascending: true });
+
+    const quickLinks = footerPages?.filter(p => p.placement === 'footer_c1') || [];
+    const storesPages = footerPages?.filter(p => p.placement === 'footer_c2') || [];
+    const connectPages = footerPages?.filter(p => p.placement === 'footer_c3') || [];
+
     return (
         <footer className="footer bg-card border-t border-border pt-12 pb-6">
             <div className="footer-inner max-w-[1280px] mx-auto px-6">
@@ -19,69 +30,71 @@ export function Footer({ locale }: { locale: Locale }) {
                         <div className="footer-brand-desc text-[13.5px] text-muted-foreground leading-relaxed max-w-[240px]">
                             AI-powered price comparison and deals platform for the UAE, KSA, and GCC. Find the best tech deals before anyone else.
                         </div>
-                        <div className="footer-socials flex gap-2 mt-1">
-                            {[
-                                { icon: <Twitter className="w-3.5 h-3.5" />, label: 'X' },
-                                { icon: <Linkedin className="w-3.5 h-3.5" />, label: 'LinkedIn' },
-                                { icon: <Instagram className="w-3.5 h-3.5" />, label: 'Instagram' },
-                                { icon: <MessageCircle className="w-3.5 h-3.5" />, label: 'WhatsApp' }
-                            ].map((s, i) => (
-                                <button
-                                    key={i}
-                                    className={`footer-social-btn w-[34px] h-[34px] border border-border rounded-sm flex items-center justify-center text-muted-foreground hover:border-primary hover:text-primary hover:bg-primary/5 transition-all ${!hasMounted ? 'invisible' : 'visible'}`}
-                                >                                    {s.icon}
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-
-                    <div>
-                        <div className="footer-col-title text-[13px] font-bold text-foreground mb-3.5 tracking-wide">Categories</div>
-                        <ul className="footer-links list-none flex flex-col gap-2.5">
-                            <li><Link href={`/${locale}/category/smartphones`} className="text-[13.5px] text-muted-foreground hover:text-primary transition-all">Smartphones</Link></li>
-                            <li><Link href={`/${locale}/category/laptops`} className="text-[13.5px] text-muted-foreground hover:text-primary transition-all">Laptops</Link></li>
-                            <li><Link href={`/${locale}/category/audio`} className="text-[13.5px] text-muted-foreground hover:text-primary transition-all">TVs & Audio</Link></li>
-                            <li><Link href={`/${locale}/category/home-appliances`} className="text-[13.5px] text-muted-foreground hover:text-primary transition-all">Home Appliances</Link></li>
-                            <li><Link href={`/${locale}/category-smarthome`} className="text-[13.5px] text-muted-foreground hover:text-primary transition-all">Smart Home</Link></li>
-                        </ul>
+                        <SocialButtons />
                     </div>
 
                     <div>
                         <div className="footer-col-title text-[13px] font-bold text-foreground mb-3.5 tracking-wide">Quick Links</div>
                         <ul className="footer-links list-none flex flex-col gap-2.5">
-                            <li><Link href={`/${locale}/deals`} className="text-[13.5px] text-muted-foreground hover:text-primary transition-all">Today's Deals</Link></li>
-                            <li><Link href={`/${locale}/coupons`} className="text-[13.5px] text-muted-foreground hover:text-primary transition-all">Promo Codes</Link></li>
-                            <li><Link href={`/${locale}/compare`} className="text-[13.5px] text-muted-foreground hover:text-primary transition-all">Price Comparison</Link></li>
-                            <li><Link href={`/${locale}/history`} className="text-[13.5px] text-muted-foreground hover:text-primary transition-all">Price History</Link></li>
-                            <li><Link href={`/${locale}/blog`} className="text-[13.5px] text-muted-foreground hover:text-primary transition-all">Tech Blog</Link></li>
+                            {quickLinks.map(page => (
+                                <li key={page.slug}>
+                                    <Link href={`/${locale}/${page.slug}`} className="text-[13.5px] text-muted-foreground hover:text-primary transition-all">
+                                        {locale === 'ar' ? page.title_ar || page.title_en : page.title_en}
+                                    </Link>
+                                </li>
+                            ))}
+                            {/* Static defaults if empty */}
+                            {quickLinks.length === 0 && (
+                                <>
+                                    <li><Link href={`/${locale}/deals`} className="text-[13.5px] text-muted-foreground hover:text-primary transition-all">Today's Deals</Link></li>
+                                    <li><Link href={`/${locale}/blog`} className="text-[13.5px] text-muted-foreground hover:text-primary transition-all">Tech Blog</Link></li>
+                                </>
+                            )}
                         </ul>
                     </div>
 
                     <div>
                         <div className="footer-col-title text-[13px] font-bold text-foreground mb-3.5 tracking-wide">Stores</div>
                         <ul className="footer-links list-none flex flex-col gap-2.5">
-                            <li><Link href={`/${locale}/coupons/amazon-ae`} className="text-[13.5px] text-muted-foreground hover:text-primary transition-all">Amazon UAE</Link></li>
-                            <li><Link href={`/${locale}/coupons/noon`} className="text-[13.5px] text-muted-foreground hover:text-primary transition-all">Noon</Link></li>
-                            <li><Link href={`/${locale}/coupons/sharaf-dg`} className="text-[13.5px] text-muted-foreground hover:text-primary transition-all">Sharaf DG</Link></li>
-                            <li><Link href={`/${locale}/coupons/carrefour`} className="text-[13.5px] text-muted-foreground hover:text-primary transition-all">Carrefour</Link></li>
-                            <li><Link href={`/${locale}/coupons/jarir`} className="text-[13.5px] text-muted-foreground hover:text-primary transition-all">Jarir</Link></li>
+                            {storesPages.map(page => (
+                                <li key={page.slug}>
+                                    <Link href={`/${locale}/${page.slug}`} className="text-[13.5px] text-muted-foreground hover:text-primary transition-all">
+                                        {locale === 'ar' ? page.title_ar || page.title_en : page.title_en}
+                                    </Link>
+                                </li>
+                            ))}
+                            {storesPages.length === 0 && (
+                                <>
+                                    <li><Link href={`/${locale}/coupons/amazon-ae`} className="text-[13.5px] text-muted-foreground hover:text-primary transition-all">Amazon UAE</Link></li>
+                                    <li><Link href={`/${locale}/coupons/noon`} className="text-[13.5px] text-muted-foreground hover:text-primary transition-all">Noon</Link></li>
+                                    <li><Link href={`/${locale}/coupons/sharaf-dg`} className="text-[13.5px] text-muted-foreground hover:text-primary transition-all">Sharaf DG</Link></li>
+                                </>
+                            )}
                         </ul>
                     </div>
 
                     <div>
                         <div className="footer-col-title text-[13px] font-bold text-foreground mb-3.5 tracking-wide">Connect</div>
                         <ul className="footer-links list-none flex flex-col gap-2.5">
-                            <li><Link href={`/${locale}/whatsapp`} className="text-[13.5px] text-muted-foreground hover:text-primary transition-all">WhatsApp Alerts</Link></li>
+                            {connectPages.map(page => (
+                                <li key={page.slug}>
+                                    <Link href={`/${locale}/${page.slug}`} className="text-[13.5px] text-muted-foreground hover:text-primary transition-all">
+                                        {locale === 'ar' ? page.title_ar || page.title_en : page.title_en}
+                                    </Link>
+                                </li>
+                            ))}
                             <li><Link href={`/${locale}/contact`} className="text-[13.5px] text-muted-foreground hover:text-primary transition-all">Contact Us</Link></li>
                             <li><Link href={`/${locale}/privacy`} className="text-[13.5px] text-muted-foreground hover:text-primary transition-all">Privacy Policy</Link></li>
-                            <li><Link href={`/${locale}/terms`} className="text-[13.5px] text-muted-foreground hover:text-primary transition-all">Terms of Use</Link></li>
-                            <li><Link href={`/${locale}/affiliate`} className="text-[13.5px] text-muted-foreground hover:text-primary transition-all">Affiliate Info</Link></li>
                         </ul>
+                    </div>
+
+                    <div>
+                         {/* Optional 5th column if needed, or keep empty for grid balance */}
                     </div>
                 </div>
 
                 <div className="footer-bottom border-t border-border pt-5 flex flex-col md:flex-row items-center justify-between gap-4">
-                    <div className={`footer-copy text-[12.5px] text-muted-foreground text-center md:text-left ${!hasMounted ? 'opacity-0' : 'opacity-100'}`}>
+                    <div className="footer-copy text-[12.5px] text-muted-foreground text-center md:text-left">
                         © {new Date().getFullYear()} UAEDiscountHub · All rights reserved · Dubai, UAE
                     </div>
                     <div className="footer-badges flex gap-2">
@@ -96,4 +109,3 @@ export function Footer({ locale }: { locale: Locale }) {
         </footer>
     )
 }
-

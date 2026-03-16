@@ -1,0 +1,6 @@
+Token value : 6J4XFilPsz-nrj23mAMEyERCe8HVyl0OIDwAW5vS
+
+Access Key ID  : 60e95281bb6729f8b97fd01773464e0d
+Secret Access Key  :  b2c38f116d770076ee4e886390b19ecbac9e464a6cde763f43f528be5b70fa7d
+
+Use jurisdiction-specific endpoints for S3 clients:  :  https://e6326498322d895572eb37bab2b99483.r2.cloudflarestorage.com
