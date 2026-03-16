@@ -6,14 +6,15 @@ import { notFound } from 'next/navigation'
 /**
  * Admin: Edit Blog Post Page
  */
-export default async function AdminEditPostPage({ params }: { params: { id: string } }) {
+export default async function AdminEditPostPage(props: { params: Promise<{ id: string, locale: string }> }) {
+  const { id } = await props.params
   const supabase = await createClient()
 
   // Fetch the post
   const { data: post, error } = await supabase
     .from('blog_posts')
     .select('*, author:author_id(full_name,avatar_url,role), category:category_id(*), tags:blog_post_tags(tag:blog_tags(*))')
-    .eq('id', params.id)
+    .eq('id', id)
     .single()
 
   if (!post || error) {

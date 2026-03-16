@@ -6,8 +6,8 @@ import { BlogPost, BlogCategory, BlogTag } from '@/types/blog'
 import Link from 'next/link'
 import { Metadata } from 'next'
 
-export async function generateMetadata({ params }: { params: { locale: string } }): Promise<Metadata> {
-  const { locale } = params
+export async function generateMetadata(props: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await props.params
   return {
     title: locale === 'ar' ? 'المدونة - أدلة التسوق ونصائح الصفقات | UAEDiscountHub' : 'Blog — Shopping Guides & Deal Tips | UAEDiscountHub',
     description: locale === 'ar' ? 'أدلة تسوق الخبراء في الإمارات، تفاصيل الصفقات، استراتيجيات الكوبونات ومراجعات المنتجات.' : 'Expert UAE shopping guides, deal breakdowns, coupon strategies and product reviews.',
@@ -25,15 +25,12 @@ export const revalidate = 3600 // Revalidate every hour
  * Features a hero section with category filters, a featured post, and a grid of latest posts.
  * Matches the 'BLOG LISTING PAGE' in UAEDiscountHub-Blog-System.html.
  */
-export default async function BlogListingPage({ 
-  params, 
-  searchParams 
-}: { 
-  params: { locale: string },
+export default async function BlogListingPage(props: { 
+  params: Promise<{ locale: string }>, 
   searchParams: Promise<{ category?: string; tag?: string; q?: string; page?: string }>
 }) {
-  const { locale } = params
-  const sp = await searchParams
+  const { locale } = await props.params
+  const sp = await props.searchParams
   const supabase = await createClient()
   
   const page = parseInt(sp.page || '1')

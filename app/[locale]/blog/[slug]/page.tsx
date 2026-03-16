@@ -11,12 +11,13 @@ import { BlogPost } from '@/types/blog'
 import { Metadata } from 'next'
 import { Clock, Calendar, Eye, MessageCircle, ChevronRight, User } from 'lucide-react'
 
-export async function generateMetadata({ params }: { params: { slug: string, locale: string } }): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ slug: string, locale: string }> }): Promise<Metadata> {
+  const { slug, locale } = await params
   const supabase = await createClient()
   const { data: post } = await supabase
     .from('blog_posts')
     .select('*')
-    .eq('slug', params.slug)
+    .eq('slug', slug)
     .single()
 
   if (!post) return {}
@@ -42,7 +43,7 @@ export async function generateMetadata({ params }: { params: { slug: string, loc
       images: [post.og_image || post.featured_image],
     },
     alternates: {
-      canonical: post.canonical_url || `https://uaediscounthub.com/${params.locale}/blog/${params.slug}`,
+      canonical: post.canonical_url || `https://uaediscounthub.com/${locale}/blog/${slug}`,
     }
   }
 }
@@ -52,8 +53,8 @@ export async function generateMetadata({ params }: { params: { slug: string, loc
  * Features a reading progress bar, breadcrumbs, social share bar, and a sticky sidebar.
  * Matches the 'SINGLE BLOG POST' design in UAEDiscountHub-Blog-System.html.
  */
-export default async function BlogPostPage({ params }: { params: { slug: string, locale: string } }) {
-  const { slug, locale } = params
+export default async function BlogPostPage({ params }: { params: Promise<{ slug: string, locale: string }> }) {
+  const { slug, locale } = await params
   const supabase = await createClient()
 
   // Fetch the post with relations

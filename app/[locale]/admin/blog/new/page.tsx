@@ -5,7 +5,12 @@ import { PostEditor } from '@/components/admin/blog/PostEditor'
 /**
  * Admin: New Blog Post Page
  */
-export default async function AdminNewPostPage() {
+export default async function AdminNewPostPage({
+  params
+}: {
+  params: Promise<{ locale: string }>
+}) {
+  const { locale } = await params
   const supabase = await createClient()
 
   // Fetch categories for the selector

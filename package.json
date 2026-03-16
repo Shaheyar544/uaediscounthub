@@ -36,7 +36,7 @@
     "dompurify": "^3.3.3",
     "framer-motion": "^12.35.1",
     "lucide-react": "^0.577.0",
-    "next": "15.1.7",
+    "next": "15.2.0",
     "next-themes": "^0.4.6",
     "posthog-js": "^1.360.0",
     "react": "19.0.0",
@@ -54,7 +54,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
-    "eslint-config-next": "15.1.7",
+    "eslint-config-next": "15.2.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

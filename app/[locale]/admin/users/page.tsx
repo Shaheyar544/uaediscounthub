@@ -4,7 +4,12 @@ import { Badge } from '@/components/ui/badge'
 import { Users as UsersIcon, Mail, Shield, Calendar } from 'lucide-react'
 import { format } from 'date-fns'
 
-export default async function AdminUsersPage() {
+export default async function AdminUsersPage({
+    params
+}: {
+    params: Promise<{ locale: string }>
+}) {
+    const { locale } = await params
     const supabase = await createClient()
 
     const { data: users, error } = await supabase
