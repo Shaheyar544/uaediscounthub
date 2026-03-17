@@ -4,7 +4,7 @@ import { PriceComparisonTable } from '@/components/product/PriceComparisonTable'
 import { ProsConsGrid } from '@/components/product/ProsConsGrid'
 import { PriceHistoryChart } from '@/components/product/PriceHistoryChart'
 import { Badge } from '@/components/ui/badge'
-import { Check, Info, ShieldCheck, Share2, Heart, MessageCircle, ArrowRight, Zap, Star, TrendingDown } from 'lucide-react'
+import { Check, Info, ShieldCheck, Share2, Heart, MessageCircle, ArrowRight, Zap, Star, TrendingDown, Tag } from 'lucide-react'
 import { createClient } from '@/utils/supabase/server'
 import { notFound } from 'next/navigation'
 import { PriceAlertTrigger } from '@/components/product/PriceAlertTrigger'
@@ -39,32 +39,95 @@ export default async function ProductPage({
         notFound()
     }
 
+    // Fetch multi-store prices from new table
+    const { data: pspData } = await supabase
+        .from('product_store_prices')
+        .select(`
+            price,
+            original_price,
+            discount_percent,
+            affiliate_url,
+            coupon_code,
+            coupon_discount,
+            in_stock,
+            is_best_price,
+            stores(name, logo_url)
+        `)
+        .eq('product_id', product.id)
+        .order('price', { ascending: true })
+
     const categoryName = (product.categories as any)?.name_en || 'Uncategorized'
     const specsObject = typeof product.specifications === 'object' && product.specifications !== null ? product.specifications as Record<string, string> : {}
     const specsArray = Object.entries(specsObject).map(([label, value]) => ({ label, value }))
 
-    const dbPrices = (product.product_prices as any[])?.map(p => ({
-        store: p.stores?.name || 'Unknown Store',
-        storeLogoUrl: p.stores?.logo_url,
-        price: p.current_price,
-        originalPrice: p.original_price,
-        discount: Math.round(p.discount_percent || 0),
-        inStock: p.in_stock,
-        hasCOD: true,
-        hasTabby: true,
-        isLowest: false,
-        affiliateUrl: p.affiliate_url || `/${locale}/go/unknown/${product.id}`
-    })) || []
+    // Build price list: prefer new product_store_prices, fall back to product_prices
+    let finalPrices: {
+        store: string
+        storeLogoUrl?: string
+        price: number
+        originalPrice: number
+        discount: number
+        inStock: boolean
+        hasCOD: boolean
+        hasTabby: boolean
+        isLowest?: boolean
+        affiliateUrl: string
+        couponCode?: string
+        couponDiscount?: string
+    }[] = []
 
-    if (dbPrices.length > 0) {
-        dbPrices.sort((a, b) => a.price - b.price);
-        dbPrices[0].isLowest = true;
+    if (pspData && pspData.length > 0) {
+        finalPrices = pspData.map((p, i) => {
+            const store = (p.stores as any)
+            const originalPrice = p.original_price ?? p.price
+            const discount = originalPrice > p.price
+                ? Math.round(((originalPrice - p.price) / originalPrice) * 100)
+                : 0
+            return {
+                store: store?.name ?? 'Unknown Store',
+                storeLogoUrl: store?.logo_url,
+                price: p.price,
+                originalPrice,
+                discount,
+                inStock: p.in_stock ?? true,
+                hasCOD: true,
+                hasTabby: true,
+                isLowest: p.is_best_price || i === 0,
+                affiliateUrl: p.affiliate_url || '#',
+                couponCode: p.coupon_code || undefined,
+                couponDiscount: p.coupon_discount || undefined,
+            }
+        })
+    } else {
+        // Fall back to legacy product_prices
+        const dbPrices = (product.product_prices as any[])?.map(p => ({
+            store: p.stores?.name || 'Unknown Store',
+            storeLogoUrl: p.stores?.logo_url,
+            price: p.current_price,
+            originalPrice: p.original_price ?? p.current_price,
+            discount: Math.round(p.discount_percent || 0),
+            inStock: p.in_stock,
+            hasCOD: true,
+            hasTabby: true,
+            isLowest: false,
+            affiliateUrl: p.affiliate_url || '#',
+        })) || []
+
+        if (dbPrices.length > 0) {
+            dbPrices.sort((a, b) => a.price - b.price)
+            dbPrices[0].isLowest = true
+            finalPrices = dbPrices
+        } else {
+            // Absolute fallback — no price data yet
+            finalPrices = [
+                { store: 'Amazon AE', price: product.base_price, originalPrice: Math.round(product.base_price * 1.15), discount: 15, inStock: true, hasCOD: true, hasTabby: true, isLowest: true, affiliateUrl: '#' },
+                { store: 'Noon', price: Math.round(product.base_price * 1.05), originalPrice: Math.round(product.base_price * 1.15), discount: 10, inStock: true, hasCOD: true, hasTabby: true, affiliateUrl: '#' },
+            ]
+        }
     }
 
-    const finalPrices = dbPrices.length > 0 ? dbPrices : [
-        { store: 'Amazon AE', price: product.base_price, originalPrice: Math.round(product.base_price * 1.15), discount: 15, inStock: true, hasCOD: true, hasTabby: true, isLowest: true, affiliateUrl: '#' },
-        { store: 'Noon', price: Math.round(product.base_price * 1.05), originalPrice: Math.round(product.base_price * 1.15), discount: 10, inStock: true, hasCOD: true, hasTabby: true, affiliateUrl: '#' }
-    ]
+    // Coupons to display separately
+    const coupons = finalPrices.filter(p => p.couponCode)
 
     return (
         <div className="product-page-container w-full max-w-[1200px] mx-auto px-6 py-10">
@@ -164,9 +227,51 @@ export default async function ProductPage({
             <ProsConsGrid />
 
             {/* Live Pricing Table */}
-            <div className="mb-16 scroll-mt-20" id="pricing">
+            <div className="mb-8 scroll-mt-20" id="pricing">
                 <PriceComparisonTable prices={finalPrices} />
             </div>
+
+            {/* Coupon Codes Section */}
+            {coupons.length > 0 && (
+                <div className="mb-16">
+                    <h3 className="text-[18px] font-bold mb-4 flex items-center gap-2">
+                        <Tag className="w-5 h-5 text-primary" /> Exclusive Coupon Codes
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {coupons.map((c, i) => (
+                            <div
+                                key={i}
+                                className="flex items-center justify-between p-4 bg-primary/5 border border-primary/20 rounded-2xl gap-4"
+                            >
+                                <div className="flex items-center gap-3">
+                                    {c.storeLogoUrl ? (
+                                        <img
+                                            src={c.storeLogoUrl}
+                                            alt={c.store}
+                                            className="w-10 h-10 object-contain rounded-lg border border-border bg-white p-1"
+                                        />
+                                    ) : (
+                                        <div className="w-10 h-10 rounded-lg border border-border bg-white flex items-center justify-center text-primary font-bold text-[15px]">
+                                            {c.store[0]}
+                                        </div>
+                                    )}
+                                    <div>
+                                        <div className="text-[13px] font-bold text-foreground">{c.store}</div>
+                                        {c.couponDiscount && (
+                                            <div className="text-[11px] font-medium text-primary">{c.couponDiscount} off</div>
+                                        )}
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <code className="px-3 py-1.5 bg-white border border-dashed border-primary/40 rounded-lg text-[13px] font-bold text-primary tracking-widest select-all">
+                                        {c.couponCode}
+                                    </code>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
 
             {/* Extended Specs */}
             {specsArray.length > 0 && (
@@ -197,7 +302,6 @@ export default async function ProductPage({
                     </p>
                 </div>
                 <div className="flex gap-3 ml-auto opacity-50 grayscale hover:grayscale-0 transition-all">
-                    {/* Security logos */}
                     <div className="h-8 w-12 bg-muted rounded"></div>
                     <div className="h-8 w-12 bg-muted rounded"></div>
                     <div className="h-8 w-12 bg-muted rounded"></div>
@@ -225,4 +329,3 @@ function ChevronRight(props: any) {
         </svg>
     )
 }
-
