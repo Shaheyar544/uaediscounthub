@@ -23,7 +23,7 @@ export async function POST(request: Request) {
       return Response.json({ error: 'Maximum source file size is 10MB' }, { status: 400 });
     }
 
-    let buffer = Buffer.from(await file.arrayBuffer());
+    let buffer: any = Buffer.from(await file.arrayBuffer());
     
     // Step 1: Optimize and Convert to WebP using sharp
     try {

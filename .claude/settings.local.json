@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -E \"^\\\\-.*\\\\.\\(md|ts|js|mjs|json\\)$\")",
+      "Bash(npm run:*)",
+      "Bash(curl:*)",
+      "Bash(node -e \"console.log\\(require\\(''./node_modules/next/package.json''\\).version\\)\")"
+    ]
+  }
+}

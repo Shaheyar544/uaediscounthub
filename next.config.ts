@@ -3,11 +3,19 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
-      // Cloudflare R2
-      { protocol: 'https', hostname: 'media.uaediscounthub.com' },
-      { protocol: 'https', hostname: '*.r2.dev' },
-      // Apple
-      { protocol: 'https', hostname: 'store.storeimages.cdn-apple.com' },
+      {
+        protocol: 'https',
+        hostname: 'media.uaediscounthub.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.supabase.co',
+        port: '',
+        pathname: '/**',
+      },
+      { protocol: 'https', hostname: 'store.storeimages.cdn-apple.com', port: '', pathname: '/**' },
       { protocol: 'https', hostname: '*.apple.com' },
       // Samsung
       { protocol: 'https', hostname: 'images.samsung.com' },

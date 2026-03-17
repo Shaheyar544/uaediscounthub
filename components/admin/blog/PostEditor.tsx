@@ -232,7 +232,7 @@ export function PostEditor({ initialPost, categories }: PostEditorProps) {
         if (action === 'improve') {
           editor.chain().focus().insertContent(data.result).run()
         } else {
-          editor.chain().focus().appendContent(data.result).run()
+          editor.chain().focus().insertContent(data.result).run()
         }
       }
     } catch (error) {

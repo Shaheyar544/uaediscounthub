@@ -188,13 +188,11 @@ export function CouponCardV2({
         <div className="flex items-center gap-3">
           <div className="w-11 h-11 bg-secondary rounded-xl border border-border flex items-center justify-center shrink-0 overflow-hidden">
             {store.logo_url ? (
-              <Image
+              <img
                 src={store.logo_url}
                 alt={store.name}
-                width={36}
-                height={36}
-                className="object-contain"
-                unoptimized
+                className="w-9 h-9 object-contain"
+                onError={(e) => { e.currentTarget.src = '/placeholder-store.png' }}
               />
             ) : (
               <Tag className="w-5 h-5 text-muted-foreground" />

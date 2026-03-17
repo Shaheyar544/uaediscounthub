@@ -62,24 +62,37 @@ export default function CategoriesClient({ locale }: { locale: string }) {
 
     setSaving(true)
     try {
+      const categoryData = {
+        name_en: editingCategory.name_en,
+        name_ar: editingCategory.name_ar || '',
+        slug: editingCategory.slug,
+        description_en: editingCategory.description_en || '',
+        description_ar: editingCategory.description_ar || '',
+        icon_url: editingCategory.icon_url || null,
+        is_active: editingCategory.is_active ?? true,
+        parent_id: editingCategory.parent_id || null,
+        display_order: Number(editingCategory.display_order) || 0,
+      }
+
       if (editingCategory.id) {
         const { error } = await supabase
           .from('categories')
-          .update(editingCategory)
+          .update(categoryData)
           .eq('id', editingCategory.id)
         if (error) throw error
       } else {
         const { error } = await supabase
           .from('categories')
-          .insert([editingCategory])
+          .insert([categoryData])
         if (error) throw error
       }
       
       await fetchCategories()
       setIsModalOpen(false)
-    } catch (error) {
-      console.error('Error saving category:', error)
-      alert('Failed to save category')
+    } catch (err: any) {
+      console.error('Error saving category:', err)
+      const errorMessage = err?.message || err?.details || 'Unknown database error'
+      alert(`Failed to save category: ${errorMessage}`)
     } finally {
       setSaving(false)
     }

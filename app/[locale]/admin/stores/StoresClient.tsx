@@ -113,39 +113,90 @@ export default function StoresClient({ locale }: { locale: string }) {
     }
 
     setSaving(true)
-    try {
-      const { _count, ...storeData } = editingStore as any
-      
-      console.log('[DEBUG] Saving store with logo_url:', storeData.logo_url)
+    console.log('[DEBUG] --- START SAVE PROCESS ---')
+    
+    // Check Auth State
+    const { data: { user } } = await supabase.auth.getUser()
+    console.log('[DEBUG] Auth User ID:', user?.id || 'NOT LOGGED IN')
+    
+    if (user) {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single()
+      console.log('[DEBUG] Profile Role:', profile?.role || 'NO PROFILE FOUND')
+    }
 
-      if (editingStore.id) {
-        const { error } = await supabase
+    console.log('[DEBUG] Supabase URL:', process.env.NEXT_PUBLIC_SUPABASE_URL ? 'PRESENT' : 'MISSING')
+    
+    try {
+      const storeData: any = {
+        name: editingStore?.name || '',
+        slug: editingStore?.slug || '',
+        logo_url: editingStore?.logo_url || null,
+        base_url: editingStore?.base_url || '',
+        affiliate_base_url: editingStore?.affiliate_base_url || null,
+        is_active: editingStore?.is_active === true,
+        is_featured: editingStore?.is_featured === true,
+        display_order: parseInt(String(editingStore?.display_order)) || 0,
+      }
+      
+      console.log('[DEBUG] Store Data Payload:', JSON.stringify(storeData, null, 2))
+
+      let result: any = null
+
+      if (editingStore?.id) {
+        console.log('[DEBUG] Mode: UPDATE, ID:', editingStore.id)
+        result = await supabase
           .from('stores')
           .update(storeData)
           .eq('id', editingStore.id)
-        if (error) throw error
-
-        // ✅ Immediately update local state
-        setStores(prev => prev.map(s =>
-          s.id === editingStore.id
-            ? { ...s, ...storeData }
-            : s
-        ))
-        setLastUpdated(Date.now())
       } else {
-        const { error } = await supabase
+        console.log('[DEBUG] Mode: INSERT')
+        result = await supabase
           .from('stores')
           .insert([storeData])
-        if (error) throw error
       }
       
+      console.log('[DEBUG] Raw Supabase Response:', JSON.stringify(result, null, 2))
+      
+      if (result.error) {
+        const err = result.error
+        console.error('[DEBUG] Supabase Error Detected:')
+        console.error('  - Message:', err.message)
+        console.error('  - Details:', err.details)
+        console.error('  - Code:', err.code)
+        console.error('  - Hint:', err.hint)
+        console.error('  - Keys:', Object.keys(err))
+        throw err
+      }
+
+      console.log('[DEBUG] Save logic completed successfully')
+      
+      // ✅ Trigger on-demand revalidation for public pages
+      try {
+        await fetch('/api/revalidate', { method: 'POST' })
+        console.log('[DEBUG] Revalidation triggered')
+      } catch (err) {
+        console.error('[DEBUG] Revalidation call failed:', err)
+      }
+
       await fetchStores()
       setIsModalOpen(false)
-    } catch (error) {
-      console.error('Error saving store:', error)
-      alert('Failed to save store')
+      setLastUpdated(Date.now())
+    } catch (err: any) {
+      console.error('[DEBUG] Caught error in handleSave:', err)
+      
+      // Attempt to extract as much info as possible
+      const msg = err?.message || 'No message'
+      const code = err?.code || 'No code'
+      const details = err?.details || 'No details'
+      
+      alert(`CRITICAL ERROR\n\nMsg: ${msg}\nCode: ${code}\nDetails: ${details}\n\nCheck browser console for JSON logs.`)
     } finally {
       setSaving(false)
+      console.log('[DEBUG] --- END SAVE PROCESS ---')
     }
   }
 

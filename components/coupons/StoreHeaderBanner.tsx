@@ -57,13 +57,11 @@ export function StoreHeaderBanner({
         {/* Logo */}
         <div className="w-16 h-16 bg-white rounded-2xl border border-white/10 flex items-center justify-center shrink-0 shadow-xl overflow-hidden">
           {store.logo_url ? (
-            <Image
+            <img
               src={store.logo_url}
               alt={store.name}
-              width={48}
-              height={48}
-              className="object-contain p-1"
-              unoptimized
+              className="w-12 h-12 object-contain p-1"
+              onError={(e) => { e.currentTarget.src = '/placeholder-store.png' }}
             />
           ) : (
             <Tag className="w-7 h-7 text-primary" />

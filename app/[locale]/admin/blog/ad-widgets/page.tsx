@@ -13,7 +13,7 @@ import Image from 'next/image'
  * Admin: Ad Widgets Management Page
  * Handles CRUD operations for blog advertisements and banners.
  */
-export default function AdWidgetsPage({ params }: { params: { locale: string } }) {
+export default function AdWidgetsPage({ params }: { params: Promise<{ locale: string }> }) {
   const supabase = createClient()
   const [widgets, setWidgets] = useState<BlogAdWidget[]>([])
   const [loading, setLoading] = useState(true)
@@ -23,8 +23,12 @@ export default function AdWidgetsPage({ params }: { params: { locale: string } }
 
   // Fetch widgets on mount
   useEffect(() => {
-    fetchWidgets()
-  }, [])
+    const init = async () => {
+      await params;
+      fetchWidgets()
+    }
+    init()
+  }, [params])
 
   const fetchWidgets = async () => {
     setLoading(true)

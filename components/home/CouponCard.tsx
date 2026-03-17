@@ -42,7 +42,12 @@ export function CouponCard({
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                         <div className="w-8 h-8 bg-white border border-border rounded-lg flex items-center justify-center p-1.5 shadow-sm">
-                            <Image src={storeLogo} alt={storeName} width={24} height={24} className="object-contain" />
+                            <img 
+                                src={storeLogo || '/placeholder-store.png'} 
+                                alt={storeName} 
+                                className="w-full h-full object-contain" 
+                                onError={(e) => { e.currentTarget.src = '/placeholder-store.png' }}
+                            />
                         </div>
                         <span className="text-[12px] font-bold text-muted-foreground uppercase tracking-wider">{storeName}</span>
                     </div>
