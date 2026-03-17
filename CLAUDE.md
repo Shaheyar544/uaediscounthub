@@ -127,6 +127,31 @@ Optional: `OPENAI_API_KEY` (fallback AI), `ANTHROPIC_API_KEY` (blog AI).
 - All 29 routes verified working after upgrade
 - First build after deleting `.next` may show a transient `PageNotFoundError (ENOENT)` from Turbopack cold-start — re-running `npm run build` resolves it
 
+## Session Summary — March 17, 2026
+
+### Completed Today
+- Next.js upgraded 15.2.0 → 16.1.7 ✅
+- React upgraded 19.0.0 → 19.2.4 ✅
+- Turbopack enabled by default for dev + build ✅
+- Featured Stores logos fixed on homepage ✅
+- Product Admin completely rebuilt (6-section form) ✅
+- `product_store_prices` table created via migration ✅
+- Multi-store price comparison on public product page ✅
+- Store price errors surfaced in UI (amber warning banner) ✅
+- Supabase CLI installed (v2.79.0) and linked to project ✅
+- Migration system set up (`supabase/migrations/`) ✅
+- `currency` column added via `db:push` — confirmed applied ✅
+
+### Pending for Next Session
+- Test saving a product end-to-end (PS5 or similar)
+- Verify public product page shows price comparison from `product_store_prices`
+- Test affiliate links clicking through correctly
+- Reload Supabase schema cache if any "column not found" errors appear:
+  Dashboard → Settings → API → Reload Schema Cache
+
+### How to Resume Next Session
+Tell Claude Code: "Read CLAUDE.md and continue from where we left off. Check pending items."
+
 ## Current Issues & Recent History
 
 ### Fixed Issues
@@ -135,11 +160,11 @@ Optional: `OPENAI_API_KEY` (fallback AI), `ANTHROPIC_API_KEY` (blog AI).
 - Next.js 15 async params migration → completed across all pages
 - Supabase RLS infinite recursion on profiles table → fixed
 - Assets table created for Cloudflare R2 sync → done
+- Store logos broken on public homepage → fixed (conditional render with letter fallback)
+- `CREATE POLICY IF NOT EXISTS` invalid PostgreSQL syntax → fixed with DO block in migration
 
 ### Known Pending Issues
-- Store logos not showing on public homepage (broken img src)
-- Homepage fetches stores but logo_url displays broken
-- next.config.ts may be missing media.uaediscounthub.com domain
+- next.config.ts may be missing media.uaediscounthub.com in image remotePatterns (check if R2 images load)
 
 ### Claude Code Rules (Token Saving)
 - Use /compact when context gets long
@@ -149,6 +174,5 @@ Optional: `OPENAI_API_KEY` (fallback AI), `ANTHROPIC_API_KEY` (blog AI).
 - Check CLAUDE.md before starting any session
 - Use admin client for all admin panel DB operations
 - Use server client inside server actions only
-```
 
 ---
