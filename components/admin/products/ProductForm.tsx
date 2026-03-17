@@ -193,6 +193,7 @@ export function ProductForm({ initialData, stores, categories, locale }: Product
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
+  const [storeWarning, setStoreWarning] = useState<string | null>(null)
   const [deleting, setDeleting] = useState(false)
 
   // ── Handlers ─────────────────────────────────────────────────────────────
@@ -303,8 +304,16 @@ export function ProductForm({ initialData, stores, categories, locale }: Product
     if (result.error) {
       setError(result.error)
     } else {
-      setSuccess(true)
-      setTimeout(() => router.push(`/${locale}/admin/products`), 900)
+      if (result.storeErrors && result.storeErrors.length > 0) {
+        setStoreWarning(
+          `Product saved, but ${result.storeErrors.length} store price(s) failed: ${result.storeErrors.join(' | ')}`
+        )
+        // Still navigate after a longer delay so the warning is visible
+        setTimeout(() => router.push(`/${locale}/admin/products`), 4000)
+      } else {
+        setSuccess(true)
+        setTimeout(() => router.push(`/${locale}/admin/products`), 900)
+      }
     }
   }
 
@@ -354,6 +363,12 @@ export function ProductForm({ initialData, stores, categories, locale }: Product
         <div className="flex items-center gap-2.5 p-4 bg-green-50 border border-green-200 rounded-[10px] mb-5 text-green-700 text-[13px] font-medium">
           <CheckCircle2 size={16} className="shrink-0" />
           Saved! Redirecting to products list...
+        </div>
+      )}
+      {storeWarning && (
+        <div className="flex items-start gap-2.5 p-4 bg-amber-50 border border-amber-200 rounded-[10px] mb-5 text-amber-800 text-[13px] font-medium">
+          <AlertCircle size={16} className="shrink-0 mt-0.5 text-amber-500" />
+          <span>{storeWarning}</span>
         </div>
       )}
 

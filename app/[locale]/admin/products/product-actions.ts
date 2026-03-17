@@ -51,6 +51,7 @@ export interface SaveResult {
   productId?: string
   slug?: string
   error?: string
+  storeErrors?: string[]   // non-fatal: product saved but some store prices failed
 }
 
 // ── Save Product ──────────────────────────────────────────────────────────────
@@ -126,7 +127,8 @@ export async function saveProduct(payload: ProductPayload): Promise<SaveResult> 
       .in('id', payload.removed_price_ids)
   }
 
-  // Upsert each store price row
+  // Upsert each store price row — collect errors instead of swallowing them
+  const storeErrors: string[] = []
   for (const sp of validPrices) {
     const isBest = sp.price === minPrice
     const { error } = await supabase
@@ -147,7 +149,10 @@ export async function saveProduct(payload: ProductPayload): Promise<SaveResult> 
         },
         { onConflict: 'product_id,store_id' }
       )
-    if (error) console.error('[product_store_prices upsert]', sp.store_id, error.message)
+    if (error) {
+      console.error('[product_store_prices upsert]', sp.store_id, error.message)
+      storeErrors.push(`Store ${sp.store_id}: ${error.message}`)
+    }
   }
 
   // Revalidate all affected pages
@@ -158,7 +163,12 @@ export async function saveProduct(payload: ProductPayload): Promise<SaveResult> 
   revalidatePath('/en/admin/products')
   revalidatePath('/ar/admin/products')
 
-  return { success: true, productId, slug: payload.slug }
+  return {
+    success: true,
+    productId,
+    slug: payload.slug,
+    ...(storeErrors.length > 0 && { storeErrors }),
+  }
 }
 
 // ── Delete Product ────────────────────────────────────────────────────────────

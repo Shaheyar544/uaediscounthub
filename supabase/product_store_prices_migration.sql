@@ -18,6 +18,10 @@ ADD COLUMN IF NOT EXISTS is_trending BOOLEAN DEFAULT false,
 ADD COLUMN IF NOT EXISTS rating DECIMAL(3,2) DEFAULT 0,
 ADD COLUMN IF NOT EXISTS rating_count INTEGER DEFAULT 0;
 
+-- Add currency column (required by insert logic, may already exist)
+ALTER TABLE products
+ADD COLUMN IF NOT EXISTS currency TEXT DEFAULT 'AED';
+
 -- Note: images, is_featured, view_count, name_ar, description_ar already exist
 
 -- Step 2: Create product_store_prices table for multi-store comparison
