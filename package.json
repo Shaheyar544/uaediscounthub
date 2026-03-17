@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "db:push": "supabase db push",
+    "db:new": "supabase migration new",
+    "db:status": "supabase migration list"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.78.0",
@@ -55,6 +58,7 @@
     "@types/react-dom": "19.2.3",
     "eslint": "^9",
     "eslint-config-next": "16.1.7",
+    "supabase": "^2.79.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   },

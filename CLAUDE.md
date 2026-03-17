@@ -13,6 +13,26 @@ npm run lint     # Run ESLint
 
 No test suite is configured. There is no test command.
 
+### Database Migrations (Supabase CLI)
+
+Supabase CLI v2.79.0 is installed as a dev dependency. Project is linked to the remote Supabase instance.
+
+```bash
+# Create a new migration
+npm run db:new -- <migration_name>
+# → creates supabase/migrations/YYYYMMDDHHMMSS_migration_name.sql
+# → add your SQL to that file, then push
+
+# Apply all pending migrations to remote DB
+npm run db:push
+
+# Check which migrations have been applied
+npm run db:status
+```
+
+All future schema changes MUST go through migrations — never use raw SQL Editor for new changes.
+Migration files live in `supabase/migrations/`. Existing reference SQL in `supabase/*.sql` is historical docs only.
+
 **Production deployment** uses PM2:
 ```bash
 pm2 start ecosystem.config.js   # Start with cluster mode
