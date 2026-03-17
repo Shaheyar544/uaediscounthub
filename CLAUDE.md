@@ -21,7 +21,7 @@ pm2 save                         # Persist process list
 
 ## Architecture Overview
 
-**UAE Discount Hub** is a Next.js 15 App Router price-comparison/coupon platform targeting GCC markets (UAE, KSA, Qatar). All routes are namespaced under `app/[locale]/` to support English and Arabic.
+**UAE Discount Hub** is a Next.js 16 App Router price-comparison/coupon platform targeting GCC markets (UAE, KSA, Qatar). All routes are namespaced under `app/[locale]/` to support English and Arabic.
 
 ### Routing & i18n
 
@@ -98,6 +98,14 @@ Optional: `OPENAI_API_KEY` (fallback AI), `ANTHROPIC_API_KEY` (blog AI).
 - Images are stored in Cloudflare R2 and served via `NEXT_PUBLIC_MEDIA_URL`; use Next.js `<Image>` with the allowed remote patterns in `next.config.ts`
 - Security headers are set globally in `next.config.ts`; do not bypass them
 - Blog content is sanitized with DOMPurify before rendering
+
+## Upgrade History
+
+- **Next.js 15.2.0 → 16.1.7** ✅ (March 2026) via `npx @next/codemod@canary upgrade latest`
+- **React 19.0.0 → 19.2.4** ✅
+- Turbopack is now default for both `dev` and `build` — shown as `▲ Next.js 16.1.7 (Turbopack)` in output
+- All 29 routes verified working after upgrade
+- First build after deleting `.next` may show a transient `PageNotFoundError (ENOENT)` from Turbopack cold-start — re-running `npm run build` resolves it
 
 ## Current Issues & Recent History
 
