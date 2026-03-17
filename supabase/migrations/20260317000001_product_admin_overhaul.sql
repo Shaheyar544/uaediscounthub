@@ -47,15 +47,33 @@ CREATE TABLE IF NOT EXISTS product_store_prices (
 -- Enable RLS
 ALTER TABLE product_store_prices ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY IF NOT EXISTS "Public can read prices"
-ON product_store_prices FOR SELECT
-USING (true);
+-- PostgreSQL does not support CREATE POLICY IF NOT EXISTS — use DO block instead
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies
+    WHERE schemaname = 'public'
+      AND tablename  = 'product_store_prices'
+      AND policyname = 'Public can read prices'
+  ) THEN
+    CREATE POLICY "Public can read prices"
+    ON product_store_prices FOR SELECT
+    USING (true);
+  END IF;
 
-CREATE POLICY IF NOT EXISTS "Authenticated full access prices"
-ON product_store_prices FOR ALL
-TO authenticated
-USING (true)
-WITH CHECK (true);
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies
+    WHERE schemaname = 'public'
+      AND tablename  = 'product_store_prices'
+      AND policyname = 'Authenticated full access prices'
+  ) THEN
+    CREATE POLICY "Authenticated full access prices"
+    ON product_store_prices FOR ALL
+    TO authenticated
+    USING (true)
+    WITH CHECK (true);
+  END IF;
+END $$;
 
 -- Performance indexes
 CREATE INDEX IF NOT EXISTS idx_psp_product ON product_store_prices(product_id);
