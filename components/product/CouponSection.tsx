@@ -89,7 +89,7 @@ export function CouponSection({ prices, teaserOnly }: CouponSectionProps) {
               {/* Coupon code box + copy button */}
               <div className="flex items-center gap-2 mb-3">
                 <div className="flex-1 bg-white border-2 border-dashed border-amber-400 rounded-xl px-4 py-3 text-center">
-                  <span className="font-mono font-extrabold text-[20px] text-amber-700 tracking-[0.3em] select-all">
+                  <span className="font-mono font-extrabold text-[16px] md:text-[20px] text-amber-700 tracking-[0.15em] md:tracking-[0.3em] select-all break-all">
                     {c.couponCode}
                   </span>
                 </div>
