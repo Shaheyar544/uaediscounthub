@@ -4,9 +4,10 @@ import { ProsConsGrid }         from '@/components/product/ProsConsGrid'
 import { PriceHistoryChart }    from '@/components/product/PriceHistoryChart'
 import { ProductGallery }       from '@/components/product/ProductGallery'
 import { CouponSection }        from '@/components/product/CouponSection'
+import { ShareButton }          from '@/components/product/ShareButton'
 import { Badge }                from '@/components/ui/badge'
 import {
-  Check, Info, ShieldCheck, Share2, Heart,
+  Check, Info, ShieldCheck, Heart,
   MessageCircle, ArrowRight, Star, TrendingDown,
 } from 'lucide-react'
 import { createClient } from '@/utils/supabase/server'
@@ -199,9 +200,10 @@ export default async function ProductPage({
               )}
             </div>
             <div className="flex gap-2.5 shrink-0 pt-2">
-              <button className="w-10 h-10 border border-border rounded-full flex items-center justify-center text-muted-foreground hover:bg-secondary transition-all">
-                <Share2 className="w-4 h-4" />
-              </button>
+              <ShareButton
+                title={product.name_en || product.name || ''}
+                price={bestPrice.price}
+              />
               <button className="w-10 h-10 border border-border rounded-full flex items-center justify-center text-muted-foreground hover:bg-red-50 hover:text-red-500 hover:border-red-200 transition-all">
                 <Heart className="w-4 h-4" />
               </button>
