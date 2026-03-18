@@ -4,11 +4,10 @@ import { ProsConsGrid }         from '@/components/product/ProsConsGrid'
 import { PriceHistoryChart }    from '@/components/product/PriceHistoryChart'
 import { ProductGallery }       from '@/components/product/ProductGallery'
 import { CouponSection }        from '@/components/product/CouponSection'
-import { ExpandableTitle }      from '@/components/product/ExpandableTitle'
 import { Badge }                from '@/components/ui/badge'
 import {
   Check, Info, ShieldCheck, Share2, Heart,
-  MessageCircle, ArrowRight, Zap, Star, TrendingDown, Tag,
+  MessageCircle, ArrowRight, Star, TrendingDown,
 } from 'lucide-react'
 import { createClient } from '@/utils/supabase/server'
 import { notFound }     from 'next/navigation'
@@ -28,7 +27,7 @@ export default async function ProductPage({
     .from('products')
     .select(`
       *,
-      categories(name_en),
+      categories(name_en, slug),
       product_prices(
         current_price, original_price, discount_percent,
         affiliate_url, in_stock,
@@ -67,6 +66,7 @@ export default async function ProductPage({
 
   // ── Build price list ─────────────────────────────────────────────────────
   const categoryName  = (product.categories as any)?.name_en || 'Uncategorized'
+  const categorySlug  = (product.categories as any)?.slug   || categoryName.toLowerCase()
   const specsObject   = typeof product.specifications === 'object' && product.specifications !== null
     ? product.specifications as Record<string, string> : {}
   const specsArray    = Object.entries(specsObject).map(([label, value]) => ({ label, value }))
@@ -152,15 +152,17 @@ export default async function ProductPage({
     <div className="product-page-container w-full max-w-[1200px] mx-auto px-6 py-10">
 
       {/* Breadcrumbs */}
-      <div className="text-[13px] font-medium text-muted-foreground mb-8 flex items-center gap-2">
-        <Link href={`/${locale}`} className="hover:text-primary transition-colors">Home</Link>
-        <ChevronRight className="w-3 h-3 opacity-40" />
-        <Link href={`/${locale}/category/${categoryName.toLowerCase()}`} className="hover:text-primary transition-colors">
+      <nav className="flex items-center gap-1.5 text-sm text-gray-500 mb-4">
+        <Link href={`/${locale}`} className="hover:text-blue-600 transition-colors">Home</Link>
+        <span className="text-gray-300">/</span>
+        <Link href={`/${locale}/category/${categorySlug}`} className="hover:text-blue-600 transition-colors">
           {categoryName}
         </Link>
-        <ChevronRight className="w-3 h-3 opacity-40" />
-        <span className="text-foreground font-semibold truncate">{product.name_en || product.name}</span>
-      </div>
+        <span className="text-gray-300">/</span>
+        <span className="text-gray-800 font-medium truncate max-w-[200px]">
+          {product.name_en || product.name}
+        </span>
+      </nav>
 
       <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-12 mb-16">
 
@@ -176,10 +178,25 @@ export default async function ProductPage({
         <div className="product-info flex flex-col pt-2">
           <div className="flex items-start justify-between mb-4 gap-4">
             <div className="space-y-1">
-              <div className="flex items-center gap-2 text-[12px] font-bold text-primary tracking-wider uppercase mb-1">
-                <Zap className="w-3.5 h-3.5 fill-current" /> Instant Price Compare
+              {/* Category badge + brand */}
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full uppercase tracking-wide">
+                  {categoryName}
+                </span>
+                {product.brand && (
+                  <span className="text-xs text-gray-500">by {product.brand}</span>
+                )}
               </div>
-              <ExpandableTitle title={product.name_en || product.name || ''} />
+
+              {/* Main title */}
+              <h1 className="text-[22px] md:text-[26px] font-bold text-gray-900 leading-snug tracking-tight">
+                {product.name_en || product.name || ''}
+              </h1>
+
+              {/* Model number */}
+              {product.model && (
+                <p className="text-sm text-gray-500 font-medium">Model: {product.model}</p>
+              )}
             </div>
             <div className="flex gap-2.5 shrink-0 pt-2">
               <button className="w-10 h-10 border border-border rounded-full flex items-center justify-center text-muted-foreground hover:bg-secondary transition-all">
