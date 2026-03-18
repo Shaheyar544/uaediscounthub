@@ -142,10 +142,28 @@ Optional: `OPENAI_API_KEY` (fallback AI), `ANTHROPIC_API_KEY` (blog AI).
 - Migration system set up (`supabase/migrations/`) ✅
 - `currency` column added via `db:push` — confirmed applied ✅
 
+## Session Summary — March 18, 2026
+
+### Completed Today
+- Chrome Extension (Manifest V3) built for Amazon.ae product scraping → admin import ✅
+- Fixed middleware blocking `/api/admin/...` routes (added `!pathname.startsWith('/api/')`) ✅
+- Chrome extension slug generation + coupon code scraping improvements ✅
+- Product page improvements: title typography, AI summary dedup fix, ShareButton (Web Share API + clipboard fallback) ✅
+- Mobile responsiveness audit (375px): gallery thumbnails, PriceComparisonTable dual layout, badge visibility ✅
+- Price history chart fixed: RLS SELECT policy migration, `source` column added, admin client for page queries, silent error capture ✅
+- Complete homepage premium redesign — 8 sections: HeroSection, FeaturedStores, CategoryBrowsing, DealCard, CouponCard, NewsletterSignup, PriceAlertBanner, TrustBar ✅
+- Homepage follow-up fixes: hero bottom fade, store logo React state fallback, real DB category counts, MobileBottomNav, FlashBanner gradient, RecentlyViewed (localStorage), ISR revalidate=300 ✅
+- Build passes cleanly, all 5 URLs return correct HTTP status ✅
+- Pushed to GitHub origin/main ✅
+
 ### Pending for Next Session
-- Test saving a product end-to-end (PS5 or similar)
-- Verify public product page shows price comparison from `product_store_prices`
-- Test affiliate links clicking through correctly
+- Deploy to Hostinger: `git pull && npm run build && pm2 restart all`
+- Lighthouse performance audit (target 70+ on mobile)
+- Arabic (RTL) layout testing
+- SEO meta tags audit per-page (product, category, blog)
+- Sitemap generation / submission to Google Search Console
+- SendPulse domain verification completion
+- Test affiliate link click-through on product page
 - Reload Supabase schema cache if any "column not found" errors appear:
   Dashboard → Settings → API → Reload Schema Cache
 
@@ -162,9 +180,18 @@ Tell Claude Code: "Read CLAUDE.md and continue from where we left off. Check pen
 - Assets table created for Cloudflare R2 sync → done
 - Store logos broken on public homepage → fixed (conditional render with letter fallback)
 - `CREATE POLICY IF NOT EXISTS` invalid PostgreSQL syntax → fixed with DO block in migration
+- Price history RLS blocking anon SELECT → fixed with public SELECT policy migration
+- `source` column missing from price_history → added via migration
+- Price history chart empty despite DB data → fixed (admin client + RLS + source column)
+- AI summary showing duplicate content → fixed (conditional render only when ai_summary_en exists)
+- Share button not using Web Share API → rebuilt with native share + clipboard fallback
+- Mobile layout broken at 375px → fixed gallery, PriceComparisonTable, badges
+- Middleware blocking Chrome extension API calls → fixed with `!pathname.startsWith('/api/')` guard
+- Homepage using hardcoded category counts → replaced with real DB counts
 
 ### Known Pending Issues
-- next.config.ts may be missing media.uaediscounthub.com in image remotePatterns (check if R2 images load)
+- Hostinger production not yet updated (needs git pull + rebuild + pm2 restart)
+- Lighthouse score not yet measured (target: 70+ mobile)
 
 ### Claude Code Rules (Token Saving)
 - Use /compact when context gets long
