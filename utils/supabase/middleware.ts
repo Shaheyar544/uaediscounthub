@@ -31,7 +31,9 @@ export async function updateSession(request: NextRequest) {
         data: { user },
     } = await supabase.auth.getUser()
 
-    const isAdminRoute = request.nextUrl.pathname.includes('/admin')
+    // Only redirect page-level admin routes — API routes use their own Bearer token auth
+    const isAdminRoute = request.nextUrl.pathname.includes('/admin') &&
+                         !request.nextUrl.pathname.startsWith('/api/')
 
     if (isAdminRoute && !user) {
         const url = request.nextUrl.clone()

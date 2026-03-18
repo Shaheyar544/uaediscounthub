@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UAEDiscountHub Importer</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- ── Header ─────────────────────────────────────────────────────────── -->
+  <div class="header">
+    <div class="logo">
+      <div class="logo-icon">🛍</div>
+      <div class="logo-text">
+        <span class="logo-title">UAEDiscountHub</span>
+        <span class="logo-sub">Product Importer</span>
+      </div>
+    </div>
+    <button class="settings-btn" id="settingsBtn" title="Settings">⚙</button>
+  </div>
+
+  <!-- ── Main View ──────────────────────────────────────────────────────── -->
+  <div id="mainView">
+    <div class="store-badge" id="storeBadge">Detecting store...</div>
+
+    <div class="hero">
+      <p class="hero-text">Open a product page on Amazon.ae, Noon, SharafDG, or Carrefour UAE, then click Import.</p>
+    </div>
+
+    <button class="btn-primary" id="scrapeBtn">
+      <span class="btn-icon">⬇</span>
+      Import This Product
+    </button>
+
+    <div class="status" id="status"></div>
+  </div>
+
+  <!-- ── Preview View ───────────────────────────────────────────────────── -->
+  <div id="previewView" class="hidden">
+    <div class="preview-card">
+      <img id="previewImage" class="preview-image" src="" alt="" />
+      <div class="preview-body">
+        <div class="preview-store" id="previewStore"></div>
+        <div class="preview-name" id="previewName"></div>
+        <div class="preview-meta">
+          <span class="preview-price" id="previewPrice"></span>
+          <span class="preview-images" id="previewImages"></span>
+        </div>
+        <div class="preview-brand" id="previewBrand"></div>
+      </div>
+    </div>
+
+    <div class="action-row">
+      <button class="btn-secondary" id="importDraftBtn">
+        💾 Save as Draft
+      </button>
+      <button class="btn-primary" id="importPublishBtn">
+        🚀 Publish Product
+      </button>
+    </div>
+
+    <button class="btn-ghost" id="cancelBtn">← Back</button>
+
+    <div class="status" id="previewStatus"></div>
+  </div>
+
+  <!-- ── Settings View ──────────────────────────────────────────────────── -->
+  <div id="settingsView" class="hidden">
+    <div class="settings-header">
+      <button class="btn-ghost" id="backFromSettings">← Back</button>
+      <h2>Settings</h2>
+    </div>
+
+    <div class="form-group">
+      <label for="adminUrl">Admin URL</label>
+      <input type="url" id="adminUrl" placeholder="https://uaediscounthub.com" />
+      <p class="hint">Use http://localhost:3000 for local dev</p>
+    </div>
+
+    <div class="form-group">
+      <label for="apiKey">Import API Key</label>
+      <input type="password" id="apiKey" placeholder="Paste your IMPORT_API_KEY here" />
+      <p class="hint">Found in .env.local as IMPORT_API_KEY</p>
+    </div>
+
+    <div class="form-group">
+      <label for="defaultStore">Default Store UUID</label>
+      <input type="text" id="defaultStore" placeholder="Amazon UAE store UUID from Supabase" />
+      <p class="hint">Supabase → stores table → Amazon UAE row → id</p>
+    </div>
+
+    <button class="btn-primary" id="saveSettings">Save Settings</button>
+    <div class="status" id="settingsStatus"></div>
+  </div>
+
+  <!-- ── Success View ───────────────────────────────────────────────────── -->
+  <div id="successView" class="hidden">
+    <div class="success-icon">✅</div>
+    <h2 class="success-title">Product Imported!</h2>
+    <p class="success-sub" id="successSub"></p>
+    <a class="btn-primary" id="editLink" href="#" target="_blank">Open in Admin →</a>
+    <button class="btn-ghost" id="importAnother">Import Another</button>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
