@@ -154,11 +154,28 @@
 }
 
 @keyframes meshMove {
-  0% {
-    transform: scale(1) translate(0, 0);
-  }
-
-  100% {
-    transform: scale(1.05) translate(-10px, 5px);
-  }
+  0%   { transform: scale(1)    translate(0, 0); }
+  100% { transform: scale(1.05) translate(-10px, 5px); }
 }
+
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50%       { background-position: 100% 50%; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-10px); }
+}
+
+.animate-gradient-text {
+  background-size: 200% 200%;
+  animation: gradient-shift 3s ease infinite;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animation-delay-1000 { animation-delay: 1000ms; }
+.animation-delay-2000 { animation-delay: 2000ms; }

@@ -1,79 +1,67 @@
-"use client"
+'use client'
 
 import { motion } from 'framer-motion'
 import Link from 'next/link'
-import Image from 'next/image'
 
 interface Store {
-    id: string
-    name: string
-    slug: string
-    logo_url?: string | null
-    deals_count?: number
+  id: string
+  name: string
+  slug: string
+  logo_url?: string | null
+  deals_count?: number
 }
 
-interface FeaturedStoresProps {
-    stores: Store[]
-}
+export function FeaturedStores({ stores }: { stores: Store[] }) {
+  return (
+    <section className="py-12 px-0">
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h2 className="text-2xl font-black text-gray-900">Shop Top Stores</h2>
+          <p className="text-gray-500 text-sm mt-1">Verified authorized retailers in UAE</p>
+        </div>
+        <Link href="/en/stores" className="text-blue-600 font-bold text-sm hover:underline">
+          View All →
+        </Link>
+      </div>
 
-export function FeaturedStores({ stores }: FeaturedStoresProps) {
-    return (
-        <section className="stores-section mb-10">
-            <div className="flex items-center justify-between mb-5">
-                <h3 className="text-[18px] font-bold text-foreground">Featured Stores</h3>
-                <Link href="/stores" className="text-[13px] font-semibold text-primary hover:underline">
-                    View All Stores →
-                </Link>
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+        {stores.map((store, i) => (
+          <motion.a
+            key={store.id}
+            href={`/en/coupons/${store.slug}`}
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.05 }}
+            viewport={{ once: true }}
+            className="group relative bg-white rounded-2xl border-2 border-gray-100 hover:border-blue-200 p-4 hover:shadow-lg hover:shadow-blue-50 transition-all duration-300 hover:-translate-y-1 cursor-pointer overflow-hidden"
+          >
+            <div className="w-full h-14 flex items-center justify-center mb-3">
+              {store.logo_url ? (
+                <img
+                  src={store.logo_url}
+                  alt={store.name}
+                  className="max-h-10 max-w-full object-contain"
+                />
+              ) : (
+                <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-extrabold text-lg">
+                  {store.name[0]}
+                </div>
+              )}
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-                {stores.map((store, i) => (
-                    <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        transition={{ delay: i * 0.05 }}
-                        viewport={{ once: true }}
-                        key={store.id}
-                    >
-                        <Link
-                            href={`/coupons/${store.slug}`}
-                            className="store-card group flex items-center gap-4 p-3.5 bg-card border border-border rounded-xl hover:shadow-card-hover hover:border-primary/40 transition-all duration-300"
-                        >
-                            <div className="store-logo w-[52px] h-[52px] bg-white border border-border rounded-lg flex items-center justify-center p-2.5 shrink-0 transition-transform group-hover:scale-105">
-                                {store.logo_url ? (
-                                    <img
-                                        src={store.logo_url}
-                                        alt={store.name}
-                                        className="w-full h-full object-contain"
-                                        onError={(e) => {
-                                            e.currentTarget.style.display = 'none'
-                                            const parent = e.currentTarget.parentElement
-                                            if (parent && !parent.querySelector('.store-initial')) {
-                                                const span = document.createElement('span')
-                                                span.className = 'store-initial text-[18px] font-bold text-gray-500'
-                                                span.textContent = store.name.charAt(0).toUpperCase()
-                                                parent.appendChild(span)
-                                            }
-                                        }}
-                                    />
-                                ) : (
-                                    <span className="text-[18px] font-bold text-gray-500">
-                                        {store.name.charAt(0).toUpperCase()}
-                                    </span>
-                                )}
-                            </div>
-                            <div className="store-info flex flex-col justify-center overflow-hidden">
-                                <span className="store-name font-bold text-[14px] text-foreground truncate group-hover:text-primary transition-colors">
-                                    {store.name}
-                                </span>
-                                <span className="store-meta text-[11px] text-muted-foreground font-medium">
-                                    {store.deals_count || 'View'} active deals
-                                </span>
-                            </div>
-                        </Link>
-                    </motion.div>
-                ))}
-            </div>
-        </section>
-    )
-}
 
+            <div className="text-center">
+              <div className="font-bold text-sm text-gray-800 group-hover:text-blue-600 transition-colors truncate">
+                {store.name}
+              </div>
+              <div className="text-xs text-gray-400 mt-0.5">
+                {store.deals_count || 0} active deals
+              </div>
+            </div>
+
+            <div className="absolute inset-0 bg-blue-600/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+          </motion.a>
+        ))}
+      </div>
+    </section>
+  )
+}

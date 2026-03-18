@@ -1,9 +1,9 @@
-"use client"
+'use client'
 
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Star, Heart, Zap, Tag, ShoppingCart } from 'lucide-react'
+import { Star, Heart, ShoppingCart } from 'lucide-react'
 import { useHasMounted } from '@/hooks/use-has-mounted'
 
 interface DealCardProps {
@@ -25,42 +25,31 @@ export function DealCard({
   base_price, originalPrice = 0,
   discountPercent = 0, rating = 4.5,
   store = 'Amazon AE', badge,
-  locale = 'en'
+  locale = 'en',
 }: DealCardProps) {
   const hasMounted = useHasMounted()
-
-  // Mock specs for demo if not provided
-  const specs = ['5G', '256GB', 'OLED']
+  const viewingCount = (id.charCodeAt(0) % 16) + 5
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 15 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      className="deal-card group relative bg-card border border-border rounded-xl overflow-hidden hover:shadow-card-hover hover:border-primary/30 transition-all duration-300"
+      className="group relative bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-xl hover:shadow-blue-100/50 hover:-translate-y-1 transition-all duration-300 cursor-pointer"
     >
-      {/* Top Badges & Actions */}
-      <div className="absolute top-2.5 left-2.5 z-10 flex flex-col gap-1.5">
-        {discountPercent > 0 && (
-          <div className="bg-[#FF6B00] text-white text-[10.5px] font-bold px-2 py-0.5 rounded-sm shadow-deal-badge flex items-center gap-1">
-            -{discountPercent}% OFF
-          </div>
-        )}
-        {badge === 'Flash' && (
-          <div className="bg-primary text-white text-[10.5px] font-bold px-2 py-0.5 rounded-sm flex items-center gap-1">
-            <Zap className="w-2.5 h-2.5 fill-current" /> FLASH
-          </div>
-        )}
-      </div>
+      {discountPercent > 0 && (
+        <div className="absolute top-3 left-3 z-10 bg-red-500 text-white font-black text-sm px-2 py-1 rounded-lg shadow-lg shadow-red-200">
+          -{discountPercent}%
+        </div>
+      )}
 
       <button
-        className={`absolute top-2.5 right-2.5 z-10 w-8 h-8 bg-white/80 backdrop-blur-md border border-border rounded-full flex items-center justify-center text-muted-foreground hover:text-red-500 hover:bg-white transition-all shadow-sm ${!hasMounted ? 'opacity-0' : 'opacity-100'}`}
+        className={`absolute top-3 right-3 z-10 w-8 h-8 bg-white/90 backdrop-blur-md border border-gray-100 rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-white transition-all shadow-sm ${!hasMounted ? 'opacity-0' : 'opacity-100'}`}
       >
         <Heart className="w-4 h-4" />
       </button>
 
-      {/* Product Image */}
-      <div className="relative aspect-[4/3] w-full bg-white flex items-center justify-center p-6 overflow-hidden">
+      <div className="relative aspect-[4/3] w-full bg-white flex items-center justify-center overflow-hidden">
         {image_url ? (
           <Image
             src={image_url}
@@ -71,71 +60,61 @@ export function DealCard({
             unoptimized
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-muted text-muted-foreground text-xs uppercase font-bold text-center p-4">
+          <div className="w-full h-full flex items-center justify-center bg-gray-50 text-gray-300 text-xs font-bold text-center p-4 uppercase">
             {name}
           </div>
         )}
       </div>
 
-      {/* Content */}
-      <div className="p-4 flex flex-col gap-2.5">
-        <div className="flex items-center gap-2">
-          <div className="store-tag flex items-center gap-1.5 px-1.5 py-0.5 bg-secondary border border-border rounded-sm">
-            <div className="w-3 h-3 rounded-full bg-primary/20 flex items-center justify-center text-[7px] font-bold text-primary">
-              {store?.[0] || 'A'}
-            </div>
-            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{store}</span>
-          </div>
-          <div className="flex items-center gap-1 ml-auto">
-            <Star className="w-3 h-3 text-brand-gold fill-current" />
-            <span className="text-[11px] font-bold text-foreground">{rating.toFixed(1)}</span>
+      <div className="p-4 flex flex-col gap-2">
+        <div className="flex items-center justify-between">
+          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider bg-gray-100 px-2 py-0.5 rounded">
+            {store}
+          </span>
+          <div className="flex items-center gap-1">
+            <Star className="w-3 h-3 text-yellow-400 fill-current" />
+            <span className="text-[11px] font-bold text-gray-700">{rating.toFixed(1)}</span>
           </div>
         </div>
 
-        <h3 className="text-[14px] font-bold text-foreground leading-[1.4] line-clamp-2 h-10 group-hover:text-primary transition-colors">
-          <Link href={`/${locale}/product/${slug}`}>
-            {name}
-          </Link>
+        <h3 className="text-[13px] font-bold text-gray-800 leading-snug line-clamp-2 group-hover:text-blue-600 transition-colors min-h-[40px]">
+          <Link href={`/${locale}/product/${slug}`}>{name}</Link>
         </h3>
 
-        {/* Spec Pills */}
-        <div className="flex flex-wrap gap-1.5 mt-1">
-          {specs.map((s, i) => (
-            <span key={i} className="text-[10px] font-semibold text-muted-foreground bg-secondary px-2 py-0.5 rounded-sm border border-border/50">
-              {s}
-            </span>
-          ))}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-1 text-xs text-orange-500 font-medium">
+            <span className="w-2 h-2 bg-orange-500 rounded-full animate-pulse" />
+            {viewingCount} viewing
+          </div>
+          <div className="text-xs text-green-600 font-bold">↓ Lowest in 30 days</div>
         </div>
 
-        {/* Price Section */}
-        <div className="flex items-end justify-between mt-2 pt-2 border-t border-border/50">
-          <div className="flex flex-col gap-0.5">
+        <div className="flex items-end justify-between mt-1 pt-2 border-t border-gray-100">
+          <div>
             <div className="flex items-baseline gap-1.5">
-              <span className="text-[18px] font-extrabold text-foreground">
+              <span className="text-[18px] font-extrabold text-gray-900">
                 AED {base_price?.toLocaleString()}
               </span>
               {originalPrice > base_price && (
-                <span className="text-[12px] text-muted-foreground line-through font-medium">
+                <span className="text-[12px] text-gray-400 line-through">
                   {originalPrice.toLocaleString()}
                 </span>
               )}
             </div>
             {originalPrice > base_price && (
-              <span className="text-[11px] font-bold text-brand-green">
+              <span className="text-[11px] font-bold text-green-600">
                 Save AED {(originalPrice - base_price).toLocaleString()}
               </span>
             )}
           </div>
-
           <Link
             href={`/${locale}/product/${slug}`}
-            className="w-9 h-9 bg-primary text-white rounded-lg flex items-center justify-center hover:bg-primary-dim hover:-translate-y-0.5 transition-all shadow-sm"
+            className="w-9 h-9 bg-blue-600 text-white rounded-xl flex items-center justify-center hover:bg-blue-700 hover:-translate-y-0.5 transition-all shadow-sm"
           >
-            <ShoppingCart className="w-4.5 h-4.5" />
+            <ShoppingCart className="w-4 h-4" />
           </Link>
         </div>
       </div>
     </motion.div>
   )
 }
-
