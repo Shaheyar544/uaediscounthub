@@ -283,8 +283,10 @@ export default async function ProductPage({
           {/* FIX 7A: Coupon teaser — rendered via CouponSection (client) */}
           {hasCoupons && <CouponSection prices={finalPrices} teaserOnly />}
 
-          {/* AI Summary — FIX 3A */}
-          <AISummaryBlock text={product.ai_summary_en || product.description_en || product.description || 'Synthesizing global reviews...'} />
+          {/* AI Summary — only shown when real AI content exists */}
+          {product.ai_summary_en && (
+            <AISummaryBlock text={product.ai_summary_en} />
+          )}
 
           <div className="flex flex-col gap-3">
             <PriceAlertTrigger productId={product.id} productName={product.name} />
