@@ -14,8 +14,8 @@ interface PriceHistoryChartProps {
 
 // FIX 5D: Shows real price history or a helpful empty state — never fake data
 export function PriceHistoryChart({ history }: PriceHistoryChartProps) {
-  // Need at least 2 points to draw a meaningful chart
-  if (!history || history.length < 2) {
+  // No data at all
+  if (!history || history.length === 0) {
     return (
       <div className="bg-card border border-border rounded-2xl p-6 my-10 flex items-center gap-4 text-muted-foreground">
         <div className="p-2 bg-primary/10 rounded-xl shrink-0">
@@ -27,6 +27,29 @@ export function PriceHistoryChart({ history }: PriceHistoryChartProps) {
             <Info className="w-3.5 h-3.5" />
             Price history will appear after the first price update
           </p>
+        </div>
+      </div>
+    )
+  }
+
+  // Single point — show starting price card
+  if (history.length === 1) {
+    const fmtDate  = (iso: string) => new Date(iso).toLocaleDateString('en-AE', { month: 'short', day: 'numeric' })
+    const fmtPrice = (p: number)   => `AED ${p.toLocaleString()}`
+    return (
+      <div className="bg-card border border-border rounded-2xl p-6 my-10 flex items-center gap-4">
+        <div className="p-2 bg-primary/10 rounded-xl shrink-0">
+          <History className="w-5 h-5 text-primary" />
+        </div>
+        <div className="flex-1">
+          <p className="text-[14px] font-bold text-foreground">Price History</p>
+          <p className="text-[12px] text-muted-foreground mt-0.5">
+            Tracking started {fmtDate(history[0].recorded_at)}
+          </p>
+        </div>
+        <div className="text-right">
+          <p className="text-[11px] font-medium text-muted-foreground uppercase">Starting Price</p>
+          <p className="text-[18px] font-extrabold text-foreground">{fmtPrice(history[0].price)}</p>
         </div>
       </div>
     )
