@@ -4,6 +4,7 @@ import React, { useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { ImageUpload } from '@/components/admin/ImageUpload'
+import { ProductRichEditor } from './ProductRichEditor'
 import {
   saveProduct,
   deleteProductById,
@@ -767,29 +768,19 @@ export function ProductForm({ initialData, stores, categories, locale }: Product
 
           <div className="space-y-4">
             <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <label className={LABEL} style={{ marginBottom: 0 }}>Description (English)</label>
-                <span className="text-[11px] text-[#8A94A6]">{descEn.length} chars</span>
-              </div>
-              <textarea
-                className={INPUT}
-                rows={5}
+              <label className={LABEL}>Description (English)</label>
+              <ProductRichEditor
                 value={descEn}
-                onChange={e => setDescEn(e.target.value)}
+                onChange={setDescEn}
                 placeholder="Detailed product description in English..."
               />
             </div>
 
             <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <label className={LABEL} style={{ marginBottom: 0 }}>Description (Arabic)</label>
-                <span className="text-[11px] text-[#8A94A6]">{descAr.length} chars</span>
-              </div>
-              <textarea
-                className={INPUT}
-                rows={5}
+              <label className={LABEL}>Description (Arabic)</label>
+              <ProductRichEditor
                 value={descAr}
-                onChange={e => setDescAr(e.target.value)}
+                onChange={setDescAr}
                 placeholder="وصف المنتج بالعربية..."
                 dir="rtl"
               />

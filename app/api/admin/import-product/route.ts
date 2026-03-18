@@ -218,9 +218,10 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  // 7. Create store price row
+  // 7. Create store price row + record price history
   const storeId:    string | null = (body.default_store_id as string) || null
   const affiliateUrl: string      = (body.affiliate_url as string) || (body.source_url as string) || ''
+  const asin:        string | null = (body.asin as string) || null
 
   if (storeId && rawPrice && affiliateUrl) {
     const { error: priceError } = await supabase
@@ -239,6 +240,21 @@ export async function POST(req: NextRequest) {
     if (priceError) {
       console.warn('[import-product] store price insert (non-fatal):', priceError.message)
     }
+
+    // FIX 5B: Record initial price history point
+    await supabase.from('price_history').insert({
+      product_id: product.id,
+      store_id:   storeId,
+      asin,
+      price:      rawPrice,
+      currency:   'AED',
+      source:     'extension',
+    })
+  }
+
+  // FIX 5E: Save asin on the product record if we have one
+  if (asin) {
+    await supabase.from('products').update({ asin }).eq('id', product.id)
   }
 
   // 8. Return success

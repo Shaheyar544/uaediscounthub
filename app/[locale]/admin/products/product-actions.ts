@@ -152,6 +152,32 @@ export async function saveProduct(payload: ProductPayload): Promise<SaveResult> 
     if (error) {
       console.error('[product_store_prices upsert]', sp.store_id, error.message)
       storeErrors.push(`Store ${sp.store_id}: ${error.message}`)
+      continue
+    }
+
+    // FIX 5C: Record price history on every save/update
+    await supabase.from('price_history').insert({
+      product_id: productId,
+      store_id:   sp.store_id,
+      price:      sp.price,
+      currency:   'AED',
+      source:     'admin',
+    })
+
+    // FIX 7C: Sync coupon to coupons table when a code is present
+    if (sp.coupon_code && sp.store_id) {
+      await supabase.from('coupons').upsert(
+        {
+          store_id:       sp.store_id,
+          code:           sp.coupon_code,
+          title_en:       sp.coupon_discount || `Save with code ${sp.coupon_code}`,
+          discount_value: null,
+          is_active:      true,
+          product_id:     productId,
+          source:         'product_import',
+        },
+        { onConflict: 'code,store_id', ignoreDuplicates: false }
+      )
     }
   }
 

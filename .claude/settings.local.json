@@ -10,7 +10,12 @@
       "Bash(node -e \"const p=require\\(''./package.json''\\); const s=p.scripts; console.log\\(JSON.stringify\\(s,null,2\\)\\)\")",
       "Bash(npx tsc:*)",
       "Bash(npx supabase:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(git push:*)",
+      "Bash(mkdir -p F:/uaediscounthub/chrome-extension/icons)",
+      "Bash(mkdir -p F:/uaediscounthub/app/api/admin/import-product)",
+      "Bash(node generate-icons.js)",
+      "Bash(node:*)"
     ]
   }
 }
