@@ -35,6 +35,8 @@ export function HeroSection({ locale }: HeroSectionProps) {
       <div className="absolute top-[30%] right-[20%] w-[300px] h-[300px] bg-cyan-500/10 rounded-full blur-[80px] animate-pulse animation-delay-2000 pointer-events-none" />
       {/* Grid overlay */}
       <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
+      {/* Bottom fade — smooth transition to page background */}
+      <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-[#F7F8FA] to-transparent pointer-events-none" />
 
       <div className="relative z-10 flex flex-col items-center justify-center min-h-[600px] px-4 py-16 text-center gap-6">
 

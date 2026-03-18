@@ -15,7 +15,9 @@
       "Bash(mkdir -p F:/uaediscounthub/chrome-extension/icons)",
       "Bash(mkdir -p F:/uaediscounthub/app/api/admin/import-product)",
       "Bash(node generate-icons.js)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(pkill -f \"next dev\")",
+      "Bash(pkill -f \"node.*next\")"
     ]
   }
 }

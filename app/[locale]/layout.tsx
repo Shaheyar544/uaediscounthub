@@ -2,9 +2,10 @@ import type { Metadata } from 'next'
 import { Syne, DM_Sans, Cairo } from 'next/font/google'
 import '../globals.css'
 import { Locale } from '@/i18n/config'
-import { Navbar } from '@/components/layout/Navbar'
-import { Footer } from '@/components/layout/Footer'
-import { FlashBanner } from '@/components/layout/FlashBanner'
+import { Navbar }          from '@/components/layout/Navbar'
+import { Footer }          from '@/components/layout/Footer'
+import { FlashBanner }     from '@/components/layout/FlashBanner'
+import { MobileBottomNav } from '@/components/layout/MobileBottomNav'
 import { ThemeProvider } from '@/components/theme-provider'
 import { AnalyticsProvider } from '@/components/analytics/AnalyticsProvider'
 
@@ -77,10 +78,11 @@ export default async function RootLayout({
           <AnalyticsProvider>
             <FlashBanner />
             <Navbar locale={locale as Locale} />
-            <main className="flex min-h-screen flex-col items-center justify-between">
+            <main className="flex min-h-screen flex-col items-center justify-between pb-16 md:pb-0">
               {children}
             </main>
             <Footer locale={locale as Locale} />
+            <MobileBottomNav />
           </AnalyticsProvider>
         </ThemeProvider>
       </body>

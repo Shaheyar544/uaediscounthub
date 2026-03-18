@@ -14,6 +14,7 @@ import { createClient }      from '@/utils/supabase/server'
 import { createAdminClient } from '@/utils/supabase/admin'
 import { notFound }     from 'next/navigation'
 import { PriceAlertTrigger } from '@/components/product/PriceAlertTrigger'
+import { TrackView }         from '@/components/product/TrackView'
 import Link from 'next/link'
 
 export default async function ProductPage({
@@ -155,6 +156,14 @@ export default async function ProductPage({
 
   return (
     <div className="product-page-container w-full max-w-[1200px] mx-auto px-4 md:px-6 py-6 md:py-10">
+      {/* Track this product view for "Recently Viewed" on homepage */}
+      <TrackView
+        id={product.id}
+        slug={product.slug}
+        name={product.name_en || product.name || ''}
+        image_url={product.image_url}
+        price={bestPrice.price}
+      />
 
       {/* Breadcrumbs */}
       <nav className="flex items-center gap-1.5 text-sm text-gray-500 mb-4">

@@ -8,9 +8,18 @@ import { HeroSection }          from '@/components/home/HeroSection'
 import { CategoryBrowsing }     from '@/components/home/CategoryBrowsing'
 import { PriceAlertBanner }     from '@/components/home/PriceAlertBanner'
 import { TrustBar }             from '@/components/home/TrustBar'
+import { RecentlyViewed }       from '@/components/home/RecentlyViewed'
 import { createClient }         from '@/utils/supabase/server'
+import Image                    from 'next/image'
 
-export const dynamic = 'force-dynamic'
+// ISR: revalidate every 5 minutes — much faster than force-dynamic
+export const revalidate = 300
+
+const R2_HOST = 'media.uaediscounthub.com'
+
+function isR2Url(url?: string | null): boolean {
+  return !!url && url.includes(R2_HOST)
+}
 
 export default async function Home({
   params,
@@ -22,40 +31,57 @@ export default async function Home({
     const dict       = await getDictionary(locale as Locale)
     const supabase   = await createClient()
 
-    // 1. Featured Stores
-    const { data: stores, error: storesError } = await supabase
-      .from('stores')
-      .select('id, name, slug, logo_url')
-      .eq('is_active', true)
-      .eq('is_featured', true)
-      .order('display_order', { ascending: true })
-    if (storesError) throw new Error(`Stores: ${storesError.message}`)
+    // Run all queries in parallel for speed
+    const [
+      { data: stores,           error: storesError    },
+      { data: coupons,          error: couponsError   },
+      { data: featuredProducts, error: productsError  },
+      { data: categoryRows,     error: catError       },
+    ] = await Promise.all([
+      supabase
+        .from('stores')
+        .select('id, name, slug, logo_url')
+        .eq('is_active', true)
+        .eq('is_featured', true)
+        .order('display_order', { ascending: true }),
 
-    // 2. Top Coupons
-    const { data: coupons, error: couponsError } = await supabase
-      .from('coupons')
-      .select('id, code, title_en, description_en, discount_type, discount_value, stores(name, logo_url)')
-      .eq('is_active', true)
-      .order('is_verified', { ascending: false })
-      .order('click_count', { ascending: false })
-      .limit(4)
-    if (couponsError) throw new Error(`Coupons: ${couponsError.message}`)
+      supabase
+        .from('coupons')
+        .select('id, code, title_en, description_en, discount_type, discount_value, stores(name, logo_url)')
+        .eq('is_active', true)
+        .order('is_verified', { ascending: false })
+        .order('click_count',  { ascending: false })
+        .limit(4),
 
-    // 3. Products
-    const { data: featuredProducts, error: productsError } = await supabase
-      .from('products')
-      .select(`
-        id, name, name_en, slug, image_url, base_price,
-        average_rating, is_featured,
-        product_prices(current_price, original_price, discount_percent, stores(name, slug))
-      `)
-      .eq('is_active', true)
-      .order('is_featured', { ascending: false })
-      .order('created_at', { ascending: false })
-      .limit(8)
+      supabase
+        .from('products')
+        .select('id, name, name_en, slug, image_url, base_price, average_rating, is_featured, product_prices(current_price, original_price, discount_percent, stores(name, slug))')
+        .eq('is_active', true)
+        .order('is_featured', { ascending: false })
+        .order('created_at',  { ascending: false })
+        .limit(8),
+
+      // ISSUE 4: real category counts
+      supabase
+        .from('products')
+        .select('category_id, categories!inner(name_en, slug)')
+        .eq('is_active', true),
+    ])
+
+    if (storesError)   throw new Error(`Stores: ${storesError.message}`)
+    if (couponsError)  throw new Error(`Coupons: ${couponsError.message}`)
     if (productsError) throw new Error(`Products: ${productsError.message}`)
 
-    const dealsProducts = featuredProducts?.slice(0, 8) ?? []
+    // Build category counts map: slug → count
+    const catCounts: Record<string, number> = {}
+    if (categoryRows) {
+      for (const row of categoryRows) {
+        const cat = (row as any).categories
+        if (!cat) continue
+        const slug = (cat.slug as string)?.toLowerCase() || (cat.name_en as string)?.toLowerCase()
+        if (slug) catCounts[slug] = (catCounts[slug] || 0) + 1
+      }
+    }
 
     function getBestPrice(product: any) {
       const prices = product.product_prices ?? []
@@ -79,8 +105,8 @@ export default async function Home({
         {/* 2 — Featured Stores */}
         <FeaturedStores stores={(stores as any[]) ?? []} />
 
-        {/* 3 — Category Browsing */}
-        <CategoryBrowsing locale={locale} />
+        {/* 3 — Category Browsing (real counts) */}
+        <CategoryBrowsing locale={locale} counts={catCounts} />
 
         {/* 4 — Today's Deals */}
         <section>
@@ -94,7 +120,7 @@ export default async function Home({
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
-            {dealsProducts.map((product: any) => {
+            {(featuredProducts ?? []).map((product: any) => {
               const { price, store, discount, original } = getBestPrice(product)
               return (
                 <DealCard
@@ -115,6 +141,9 @@ export default async function Home({
           </div>
         </section>
 
+        {/* 7 — Recently Viewed (client, reads localStorage) */}
+        <RecentlyViewed locale={locale} />
+
         {/* 5 — Price Alert Banner */}
         <PriceAlertBanner />
 
@@ -133,7 +162,7 @@ export default async function Home({
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {coupons?.map((c: any, i: number) => (
+            {(coupons ?? []).map((c: any, i: number) => (
               <CouponCard
                 key={c.id}
                 id={c.code}
@@ -148,10 +177,10 @@ export default async function Home({
           </div>
         </section>
 
-        {/* 7 — Newsletter */}
+        {/* Newsletter */}
         <NewsletterSignup />
 
-        {/* 8 — Trust Bar */}
+        {/* Trust Bar */}
         <TrustBar />
 
       </div>
