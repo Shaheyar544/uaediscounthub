@@ -1,8 +1,7 @@
 import { Sparkles } from 'lucide-react'
 
-// FIX 3A: Render summary as formatted lines (bullets, paragraphs)
 export function AISummaryBlock({ text }: { text: string }) {
-  const lines = text.split('\n').map(l => l.trim()).filter(Boolean)
+  const isHtml = /<[a-z][\s\S]*>/i.test(text)
 
   return (
     <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-xl p-5 shadow-sm mb-6">
@@ -13,19 +12,31 @@ export function AISummaryBlock({ text }: { text: string }) {
         <h4 className="font-bold text-blue-900">DeepSeek AI Summary</h4>
       </div>
 
-      <div className="text-sm text-blue-800/90 leading-relaxed font-medium space-y-1.5">
-        {lines.map((line, i) => {
-          if (/^[•\-*]\s/.test(line)) {
-            return (
-              <div key={i} className="flex gap-2">
-                <span className="text-blue-500 font-bold mt-0.5 shrink-0">•</span>
-                <span>{line.replace(/^[•\-*]\s*/, '')}</span>
-              </div>
-            )
-          }
-          return <p key={i}>{line}</p>
-        })}
-      </div>
+      {isHtml ? (
+        <div
+          dangerouslySetInnerHTML={{ __html: text }}
+          className="text-sm text-blue-800/90 leading-relaxed font-medium prose prose-sm max-w-none
+            [&>ul]:list-disc [&>ul]:pl-4 [&>ul]:space-y-1
+            [&>ol]:list-decimal [&>ol]:pl-4
+            [&>li]:text-blue-800/90
+            [&>p]:mb-2
+            [&>strong]:font-bold"
+        />
+      ) : (
+        <div className="text-sm text-blue-800/90 leading-relaxed font-medium space-y-1.5">
+          {text.split('\n').map(l => l.trim()).filter(Boolean).map((line, i) => {
+            if (/^[•\-*]\s/.test(line)) {
+              return (
+                <div key={i} className="flex gap-2">
+                  <span className="text-blue-500 font-bold mt-0.5 shrink-0">•</span>
+                  <span>{line.replace(/^[•\-*]\s*/, '')}</span>
+                </div>
+              )
+            }
+            return <p key={i}>{line}</p>
+          })}
+        </div>
+      )}
     </div>
   )
 }

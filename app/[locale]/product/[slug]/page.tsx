@@ -4,6 +4,7 @@ import { ProsConsGrid }         from '@/components/product/ProsConsGrid'
 import { PriceHistoryChart }    from '@/components/product/PriceHistoryChart'
 import { ProductGallery }       from '@/components/product/ProductGallery'
 import { CouponSection }        from '@/components/product/CouponSection'
+import { ExpandableTitle }      from '@/components/product/ExpandableTitle'
 import { Badge }                from '@/components/ui/badge'
 import {
   Check, Info, ShieldCheck, Share2, Heart,
@@ -178,9 +179,7 @@ export default async function ProductPage({
               <div className="flex items-center gap-2 text-[12px] font-bold text-primary tracking-wider uppercase mb-1">
                 <Zap className="w-3.5 h-3.5 fill-current" /> Instant Price Compare
               </div>
-              <h1 className="font-display text-[30px] md:text-[36px] font-extrabold tracking-tight text-foreground leading-[1.15]">
-                {product.name_en || product.name}
-              </h1>
+              <ExpandableTitle title={product.name_en || product.name || ''} />
             </div>
             <div className="flex gap-2.5 shrink-0 pt-2">
               <button className="w-10 h-10 border border-border rounded-full flex items-center justify-center text-muted-foreground hover:bg-secondary transition-all">
@@ -326,16 +325,18 @@ export default async function ProductPage({
       {(product.description_en || product.description) && (
         <div className="mb-16">
           <h3 className="text-[20px] font-bold mb-4">About This Product</h3>
-          {(product.description_en || product.description || '').startsWith('<') ? (
-            <div
-              className="prose prose-sm max-w-none text-foreground"
-              dangerouslySetInnerHTML={{ __html: product.description_en || product.description }}
-            />
-          ) : (
-            <p className="text-[14px] text-muted-foreground leading-relaxed whitespace-pre-line">
-              {product.description_en || product.description}
-            </p>
-          )}
+          <div
+            dangerouslySetInnerHTML={{ __html: product.description_en || product.description || '' }}
+            className="prose prose-sm max-w-none text-gray-700
+              [&>ul]:list-disc [&>ul]:pl-5 [&>ul]:space-y-1
+              [&>ol]:list-decimal [&>ol]:pl-5
+              [&>li]:text-gray-700
+              [&>p]:mb-3
+              [&>h2]:text-lg [&>h2]:font-bold [&>h2]:mt-4
+              [&>h3]:text-base [&>h3]:font-bold [&>h3]:mt-3
+              [&>strong]:font-semibold
+              [&>a]:text-blue-600 [&>a]:underline"
+          />
         </div>
       )}
 
