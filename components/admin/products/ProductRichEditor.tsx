@@ -35,7 +35,8 @@ export function ProductRichEditor({
       }),
       Link.configure({ openOnClick: false }),
     ],
-    content:   value || '',
+    content:          value || '',
+    immediatelyRender: false,
     onUpdate:  ({ editor }) => onChange(editor.getHTML()),
     editorProps: {
       attributes: {
