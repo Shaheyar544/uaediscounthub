@@ -150,7 +150,7 @@ export default async function ProductPage({
   const hasCoupons = finalPrices.some(p => p.couponCode)
 
   return (
-    <div className="product-page-container w-full max-w-[1200px] mx-auto px-6 py-10">
+    <div className="product-page-container w-full max-w-[1200px] mx-auto px-4 md:px-6 py-6 md:py-10">
 
       {/* Breadcrumbs */}
       <nav className="flex items-center gap-1.5 text-sm text-gray-500 mb-4">
@@ -165,7 +165,7 @@ export default async function ProductPage({
         </span>
       </nav>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-12 mb-16">
+      <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-6 lg:gap-12 mb-10 lg:mb-16">
 
         {/* ── FIX 2: Image Gallery with thumbnails + zoom ──────────────────── */}
         <div className="product-gallery">
@@ -222,7 +222,7 @@ export default async function ProductPage({
                   </span>
                 )}
               </div>
-              <Badge variant="outline" className="font-bold text-[11px] bg-brand-green/10 text-brand-green border-brand-green/20">
+              <Badge variant="outline" className="hidden sm:inline-flex font-bold text-[11px] bg-brand-green/10 text-brand-green border-brand-green/20">
                 Verified Authorized Retailers
               </Badge>
             </div>
@@ -234,7 +234,7 @@ export default async function ProductPage({
               Estimated Lowest Price
             </div>
             <div className="flex items-baseline gap-2.5">
-              <span className="text-[34px] font-extrabold text-foreground leading-none">
+              <span className="text-[28px] md:text-[34px] font-extrabold text-foreground leading-none">
                 AED {bestPrice.price?.toLocaleString()}
               </span>
               {bestPrice.originalPrice > bestPrice.price && (
@@ -252,31 +252,33 @@ export default async function ProductPage({
           </div>
 
           {/* FIX 4: Best price store box */}
-          <div className="flex items-center gap-3 p-3 bg-green-50 border border-green-200 rounded-xl mb-4">
-            {bestPrice.storeLogoUrl ? (
-              <img src={bestPrice.storeLogoUrl} alt={bestPrice.store} className="w-9 h-9 object-contain rounded-lg border border-border bg-white p-1 shrink-0" />
-            ) : (
-              <div className="w-9 h-9 rounded-lg bg-white border border-border flex items-center justify-center text-[#0057FF] font-extrabold text-sm shrink-0">
-                {bestPrice.store[0]}
-              </div>
-            )}
-            <div className="flex-1 min-w-0">
-              <div className="text-[11px] text-green-600 font-bold uppercase tracking-wide flex items-center gap-1">
-                <Check className="w-3 h-3" /> Lowest Price
-              </div>
-              <div className="text-[13px] font-bold text-foreground">{bestPrice.store}</div>
-            </div>
-            <div className="text-right shrink-0">
-              <div className="text-[17px] font-extrabold text-green-600">AED {bestPrice.price.toLocaleString()}</div>
-              {bestPrice.originalPrice > bestPrice.price && (
-                <div className="text-[11px] line-through text-muted-foreground">AED {bestPrice.originalPrice.toLocaleString()}</div>
+          <div className="p-3 bg-green-50 border border-green-200 rounded-xl mb-4">
+            <div className="flex items-center gap-3">
+              {bestPrice.storeLogoUrl ? (
+                <img src={bestPrice.storeLogoUrl} alt={bestPrice.store} className="w-9 h-9 object-contain rounded-lg border border-border bg-white p-1 shrink-0" />
+              ) : (
+                <div className="w-9 h-9 rounded-lg bg-white border border-border flex items-center justify-center text-[#0057FF] font-extrabold text-sm shrink-0">
+                  {bestPrice.store[0]}
+                </div>
               )}
+              <div className="flex-1 min-w-0">
+                <div className="text-[11px] text-green-600 font-bold uppercase tracking-wide flex items-center gap-1">
+                  <Check className="w-3 h-3" /> Lowest Price
+                </div>
+                <div className="text-[13px] font-bold text-foreground">{bestPrice.store}</div>
+              </div>
+              <div className="text-right shrink-0">
+                <div className="text-[17px] font-extrabold text-green-600">AED {bestPrice.price.toLocaleString()}</div>
+                {bestPrice.originalPrice > bestPrice.price && (
+                  <div className="text-[11px] line-through text-muted-foreground">AED {bestPrice.originalPrice.toLocaleString()}</div>
+                )}
+              </div>
             </div>
             <a
               href={bestPrice.affiliateUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-green-500 hover:bg-green-600 text-white font-bold px-4 py-2 rounded-lg text-[13px] transition-colors shrink-0"
+              className="mt-2.5 flex items-center justify-center bg-green-500 hover:bg-green-600 text-white font-bold py-2.5 rounded-lg text-[13px] transition-colors w-full"
             >
               Buy Now →
             </a>

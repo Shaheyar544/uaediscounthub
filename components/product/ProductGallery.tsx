@@ -22,11 +22,11 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
   }
 
   return (
-    <div className="flex gap-3">
-      {/* Thumbnail strip — only show when multiple images */}
+    <div className="flex flex-col-reverse gap-3 md:flex-row">
+      {/* Thumbnail strip — horizontal scroll on mobile, vertical on desktop */}
       {validImages.length > 1 && (
         <div
-          className="flex flex-col gap-2 overflow-y-auto max-h-[500px]"
+          className="flex flex-row gap-2 overflow-x-auto md:flex-col md:overflow-y-auto md:overflow-x-visible md:max-h-[500px]"
           style={{ scrollbarWidth: 'thin', scrollbarColor: '#DDE3EF transparent' }}
         >
           {validImages.map((img, i) => (
@@ -34,7 +34,7 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
               key={i}
               type="button"
               onClick={() => setSelectedIndex(i)}
-              className={`w-[68px] h-[68px] rounded-[10px] border-2 p-1 transition-all shrink-0 bg-white ${
+              className={`w-[60px] h-[60px] md:w-[68px] md:h-[68px] rounded-[10px] border-2 p-1 transition-all shrink-0 bg-white ${
                 selectedIndex === i
                   ? 'border-[#0057FF] shadow-[0_0_0_2px_rgba(0,87,255,0.15)]'
                   : 'border-[#DDE3EF] hover:border-[#8A94A6]'
