@@ -156,13 +156,16 @@ export async function saveProduct(payload: ProductPayload): Promise<SaveResult> 
     }
 
     // FIX 5C: Record price history on every save/update
-    await supabase.from('price_history').insert({
+    const { error: phError } = await supabase.from('price_history').insert({
       product_id: productId,
       store_id:   sp.store_id,
       price:      sp.price,
       currency:   'AED',
-      source:     'admin',
+      source:     'admin_save',
     })
+    if (phError) {
+      console.error('❌ price_history insert failed:', phError.message, phError.details)
+    }
 
     // FIX 7C: Sync coupon to coupons table when a code is present
     if (sp.coupon_code && sp.store_id) {

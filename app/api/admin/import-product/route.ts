@@ -242,14 +242,17 @@ export async function POST(req: NextRequest) {
     }
 
     // FIX 5B: Record initial price history point
-    await supabase.from('price_history').insert({
+    const { error: phError } = await supabase.from('price_history').insert({
       product_id: product.id,
       store_id:   storeId,
       asin,
       price:      rawPrice,
       currency:   'AED',
-      source:     'extension',
+      source:     'extension_import',
     })
+    if (phError) {
+      console.error('❌ price_history insert failed:', phError.message, phError.details)
+    }
   }
 
   // FIX 5E: Save asin on the product record if we have one

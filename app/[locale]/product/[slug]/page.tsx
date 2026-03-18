@@ -10,7 +10,8 @@ import {
   Check, Info, ShieldCheck, Heart,
   MessageCircle, ArrowRight, Star, TrendingDown,
 } from 'lucide-react'
-import { createClient } from '@/utils/supabase/server'
+import { createClient }      from '@/utils/supabase/server'
+import { createAdminClient } from '@/utils/supabase/admin'
 import { notFound }     from 'next/navigation'
 import { PriceAlertTrigger } from '@/components/product/PriceAlertTrigger'
 import Link from 'next/link'
@@ -52,13 +53,16 @@ export default async function ProductPage({
     .eq('product_id', product.id)
     .order('price', { ascending: true })
 
-  // ── FIX 5D: Fetch real price history ─────────────────────────────────────
-  const { data: priceHistoryRaw } = await supabase
+  // ── Fetch price history via admin client (bypasses RLS) ──────────────────
+  const supabaseAdmin = createAdminClient()
+  const { data: priceHistoryRaw, error: phError } = await supabaseAdmin
     .from('price_history')
     .select('price, recorded_at')
     .eq('product_id', product.id)
     .order('recorded_at', { ascending: true })
     .limit(90)
+  if (phError) console.error('❌ price_history fetch failed:', phError.message)
+  console.log(`📊 Chart data points for ${product.id}:`, priceHistoryRaw?.length ?? 0)
 
   const priceHistory = (priceHistoryRaw || []).map(h => ({
     price:       Number(h.price),
