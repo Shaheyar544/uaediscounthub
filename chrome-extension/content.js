@@ -74,6 +74,57 @@ function generateTags(name, brand, category) {
   ])].filter(Boolean);
 }
 
+// ── FIX 1: Coupon code scraper ───────────────────────────────────────────────
+
+function scrapeCouponCode() {
+  // Collect all text from promotion/coupon elements
+  const savingsText = Array.from(document.querySelectorAll(
+    '#promoPriceBlockMessage_feature_div span,' +
+    '#couponBadgeRegularVpc span,' +
+    '.reinventPriceSavingsPercentageMargin,' +
+    '#vpcButton span,' +
+    '.a-color-success'
+  )).map(el => el.textContent.trim()).join(' ');
+
+  // Method 1: "Enter code XXXXX" pattern in collected text
+  let codeMatch = savingsText.match(/[Ee]nter\s+code\s+([A-Z0-9]{4,12})/);
+
+  // Method 2: Scan raw HTML (catches codes in hidden/JS-rendered nodes)
+  if (!codeMatch) {
+    codeMatch = document.body.innerHTML.match(/[Ee]nter\s+code\s+([A-Z0-9]{4,12})/);
+  }
+
+  // Method 3: Clip coupon badge (e.g. "Clip coupon — save 10%")
+  const clipText = document.querySelector(
+    '#couponBadge, .couponBadge, [data-csa-c-type="coupon"]'
+  )?.textContent || '';
+  const clipCode = clipText.match(/\b([A-Z0-9]{4,12})\b/)?.[1] || null;
+
+  const coupon_code = codeMatch?.[1] || clipCode || null;
+
+  // Extract discount description: "10% max AED 50" style
+  const fullText = savingsText + ' ' + clipText;
+  const coupon_discount = fullText.match(/(\d+%[^|.\n]{0,40})/)?.[1]?.trim() || null;
+
+  return { coupon_code, coupon_discount };
+}
+
+// ── FIX 2: Meta description generator ────────────────────────────────────────
+
+function generateMetaDescription(name, bullets, price) {
+  const features = (bullets || [])
+    .slice(0, 2)
+    .join('. ')
+    .substring(0, 100);
+
+  const priceText = price ? `From AED ${price}.` : '';
+
+  return (`${name}. ${features} ${priceText} Best price in UAE. Compare prices across Amazon, Noon, Sharaf DG and more.`)
+    .replace(/\s+/g, ' ')
+    .trim()
+    .substring(0, 160);
+}
+
 // ── FIX 7: Description cleaner ────────────────────────────────────────────────
 
 function cleanDescription(text) {
@@ -272,31 +323,50 @@ function scrapeAmazon() {
   // FIX 6: Tags
   const tags = generateTags(name, brand, category);
 
-  // FIX 1: Short slug
+  // FIX 1 (prev session): Short slug
   const slug = generateSlug(name);
 
+  // FIX 1 (this session): Coupon code
+  const { coupon_code, coupon_discount } = scrapeCouponCode();
+
+  // FIX 2: Auto meta description
+  const meta_description = generateMetaDescription(name, bullet_points, rawPrice);
+
+  // FIX 3: Additional fields
+  const availability     = text('#availability span').replace(/\s+/g, ' ') || null;
+  const delivery         = text('#mir-layout-DELIVERY_BLOCK span[data-csa-c-type]') || null;
+  const reviews_count    = text('#acrCustomerReviewText').replace(/[^0-9]/g, '') || null;
+  const is_amazon_choice = !!document.querySelector('.ac-badge-wrapper, #acBadge_feature_div');
+
   return {
-    source_store:   'Amazon UAE',
-    source_url:     window.location.href,
+    source_store:     'Amazon UAE',
+    source_url:       window.location.href,
     asin,
     name,
     slug,
     brand,
     category,
-    price:          rawPrice,
-    original_price: rawOriginal || null,
-    currency:       'AED',
+    price:            rawPrice,
+    original_price:   rawOriginal || null,
+    currency:         'AED',
     rating,
     rating_count,
+    reviews_count,
     images,
     thumbnail_url,
     description,
     bullet_points,
     specs,
     tags,
-    store:          'Amazon UAE',
-    affiliate_url:  window.location.href,
-    status:         'draft',
+    coupon_code,
+    coupon_discount,
+    meta_description,
+    availability,
+    delivery,
+    is_amazon_choice,
+    store:            'Amazon UAE',
+    affiliate_url:    window.location.href,
+    status:           'draft',
   };
 }
 

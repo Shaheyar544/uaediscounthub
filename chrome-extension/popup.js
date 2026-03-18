@@ -106,6 +106,9 @@ scrapeBtn.addEventListener('click', async () => {
 
     scrapedData = response.data;
 
+    // Debug: log full scraped payload to extension's console
+    console.log('[UAEDiscountHub] Scraped data:', JSON.stringify(scrapedData, null, 2));
+
     if (!scrapedData.name) {
       throw new Error('Could not detect product title. Try scrolling down so the page fully loads, then retry.');
     }
