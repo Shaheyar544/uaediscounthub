@@ -210,6 +210,25 @@ body {
 .success-sub { text-align: center; color: #8A94A6; font-size: 12px; margin-bottom: 16px; line-height: 1.5; }
 #importAnother { display: block; text-align: center; width: 100%; margin-top: 10px; }
 
+/* ── Deals Loading State ──────────────────────────────────────────────────── */
+.deals-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 16px;
+  color: #8A94A6;
+  font-size: 12px;
+  font-weight: 600;
+}
+.spinner-dark {
+  border-color: rgba(0,0,0,0.12);
+  border-top-color: #0057FF;
+  width: 22px;
+  height: 22px;
+  border-width: 2.5px;
+}
+
 /* ── Deals Button ─────────────────────────────────────────────────────────── */
 .btn-deals {
   display: flex;

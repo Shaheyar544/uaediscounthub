@@ -145,41 +145,89 @@ scrapeBtn.addEventListener('click', async () => {
   }
 });
 
-// ── Deals Page Scrape ─────────────────────────────────────────────────────────
+// ── Deals Page Scrape (storage-polling pattern) ───────────────────────────────
+
+const dealsLoadingState = document.getElementById('dealsLoadingState');
+const dealsLoadingText  = document.getElementById('dealsLoadingText');
+
+function showDealsLoading(msg) {
+  scrapeDealsBtn.classList.add('hidden');
+  dealsLoadingState.classList.remove('hidden');
+  dealsLoadingText.textContent = msg || 'Scanning deals page...';
+}
+
+function hideDealsLoading() {
+  dealsLoadingState.classList.add('hidden');
+  scrapeDealsBtn.classList.remove('hidden');
+  scrapeDealsBtn.disabled = false;
+  scrapeDealsBtn.innerHTML = '<span class="btn-icon">🏷</span> Scrape Deals Page';
+}
 
 scrapeDealsBtn.addEventListener('click', async () => {
   clearStatus(status);
   scrapeDealsBtn.disabled = true;
-  scrapeDealsBtn.innerHTML = '<span class="spinner"></span> Scraping deals...';
 
   try {
     const tab = await getActiveTab();
 
+    // Clear any previous scrape result
+    await chrome.storage.local.remove(['dealsResult', 'dealsScrapeTs']);
+
+    // Inject content script (no-op if already there)
     await chrome.scripting.executeScript({
       target: { tabId: tab.id },
       files: ['content.js'],
     }).catch(() => {});
 
-    const response = await chrome.tabs.sendMessage(tab.id, { action: 'scrapeDeals' });
+    // Tell content script to scrape — it ACKs immediately, writes to storage async
+    await chrome.tabs.sendMessage(tab.id, { action: 'scrapeDeals' }).catch(() => {});
 
-    if (!response?.success) {
-      throw new Error(response?.error || 'Could not scrape deals. Make sure you are on amazon.ae/deals.');
+    // Show loading UI and poll storage for results
+    showDealsLoading('Scanning deals page...');
+
+    const MAX_WAIT_MS = 12000;
+    const POLL_MS     = 400;
+    const start       = Date.now();
+    let elapsed       = 0;
+
+    while (elapsed < MAX_WAIT_MS) {
+      await new Promise(r => setTimeout(r, POLL_MS));
+      elapsed = Date.now() - start;
+
+      const { dealsResult, dealsScrapeTs } = await chrome.storage.local.get([
+        'dealsResult', 'dealsScrapeTs',
+      ]);
+
+      if (dealsScrapeTs && dealsScrapeTs >= start) {
+        // Content script finished — check result
+        hideDealsLoading();
+
+        if (!dealsResult?.success) {
+          throw new Error(dealsResult?.error || 'Scraping failed. Try again.');
+        }
+
+        scrapedDeals = dealsResult.deals || [];
+
+        if (scrapedDeals.length === 0) {
+          throw new Error('No deals detected. Scroll down on the deals page to load more, then retry.');
+        }
+
+        renderDealsView(scrapedDeals);
+        showView(dealsView);
+        return;
+      }
+
+      // Update progress text
+      dealsLoadingText.textContent = `Scanning... ${(elapsed / 1000).toFixed(0)}s`;
     }
 
-    scrapedDeals = response.deals || [];
-
-    if (scrapedDeals.length === 0) {
-      throw new Error('No deals found on this page. Try scrolling down to load more deals, then retry.');
-    }
-
-    renderDealsView(scrapedDeals);
-    showView(dealsView);
+    // Timed out
+    hideDealsLoading();
+    throw new Error('Scraping timed out. Try scrolling the deals page first, then retry.');
 
   } catch (err) {
+    hideDealsLoading();
     setStatus(status, err.message, 'error');
-  } finally {
-    scrapeDealsBtn.disabled = false;
-    scrapeDealsBtn.innerHTML = '<span class="btn-icon">🏷</span> Scrape Deals Page';
   }
 });
 

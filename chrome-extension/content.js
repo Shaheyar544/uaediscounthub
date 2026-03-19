@@ -541,74 +541,59 @@ function parseAmazonPrice(el) {
 }
 
 function scrapeAmazonDealsPage() {
+  const MAX_DEALS = 30;
   const deals = [];
 
-  // Deal cards container — Amazon uses several layouts depending on page variant
+  // Try selectors in order — stop at first that returns cards
   const cardSelectors = [
     '[data-testid="deal-card"]',
-    '.dealCard',
-    '[class*="DealCard"]',
     '[data-component-type="s-deal-card"]',
-    '.a-section.octopus-dlp-asin-section',
     '.octopus-pc-item',
-    '[class*="GridCard"]',
-    '.s-asin',
+    '[data-asin]',
   ];
 
   let cards = [];
   for (const sel of cardSelectors) {
-    cards = Array.from(document.querySelectorAll(sel));
-    if (cards.length > 0) break;
+    const found = Array.from(document.querySelectorAll(sel));
+    if (found.length > 0) { cards = found; break; }
   }
 
-  // Fallback: collect any element that has an ASIN and a price
-  if (cards.length === 0) {
-    cards = Array.from(document.querySelectorAll('[data-asin]')).filter(el => {
-      return el.querySelector('.a-price, [class*="price"]');
-    });
-  }
-
-  for (const card of cards.slice(0, 50)) {
+  for (const card of cards.slice(0, MAX_DEALS * 2)) {
+    if (deals.length >= MAX_DEALS) break;
     try {
-      // ASIN
+      // ASIN — prefer direct attribute, fall back to link href
       const asin =
         card.dataset.asin ||
         card.getAttribute('data-asin') ||
-        card.querySelector('[data-asin]')?.dataset.asin ||
         card.querySelector('a[href*="/dp/"]')?.href?.match(/\/dp\/([A-Z0-9]{10})/)?.[1] ||
         '';
 
       if (!asin || asin.length !== 10) continue;
 
-      // Title
+      // Title — fastest selector first
       const title =
-        card.querySelector('[data-testid="deal-title"], .a-truncate-full, .a-size-base-plus, [class*="title"]')?.textContent?.trim() ||
-        card.querySelector('a[href*="/dp/"]')?.title ||
-        card.querySelector('img')?.alt ||
+        (card.querySelector('.a-truncate-full, .a-size-base-plus')?.textContent?.trim()) ||
+        (card.querySelector('a[href*="/dp/"]')?.title) ||
+        (card.querySelector('img')?.alt) ||
         '';
 
       if (!title) continue;
 
-      // Image
-      const img = card.querySelector('img');
-      let image_url = img?.src || img?.dataset.src || '';
-      if (image_url) {
-        image_url = image_url.replace(/\._[A-Z0-9_,]+_\./, '._SL500_.').split('?')[0];
-      }
+      // Image URL only (no download)
+      const imgEl = card.querySelector('img');
+      const image_url = (imgEl?.src || imgEl?.dataset.src || '')
+        .replace(/\._[A-Z0-9_,]+_\./, '._SL300_.')
+        .split('?')[0];
 
       // Prices
-      const priceEl     = card.querySelector('.a-price:not(.a-text-price)');
-      const origPriceEl = card.querySelector('.a-text-price, .a-price.a-text-price');
-
-      const current_price  = parseAmazonPrice(priceEl);
-      const original_price = parseAmazonPrice(origPriceEl);
+      const current_price  = parseAmazonPrice(card.querySelector('.a-price:not(.a-text-price)'));
+      const original_price = parseAmazonPrice(card.querySelector('.a-text-price'));
 
       if (!current_price) continue;
 
-      // Discount percent — from badge or calculated
-      let discount_percent: number | null = null;
-      const badgeText =
-        card.querySelector('[class*="badge"], [class*="discount"], .a-badge-text')?.textContent || '';
+      // Discount
+      let discount_percent = null;
+      const badgeText = card.querySelector('.a-badge-text')?.textContent || '';
       const badgeMatch = badgeText.match(/(\d+)\s*%/);
       if (badgeMatch) {
         discount_percent = parseInt(badgeMatch[1], 10);
@@ -617,38 +602,23 @@ function scrapeAmazonDealsPage() {
       }
 
       // Coupon
-      let coupon_value: string | null = null;
-      let coupon_type: 'percentage' | 'fixed' | null = null;
-      const couponEl = card.querySelector('[id*="coupon"], [class*="coupon"], .couponBadge');
+      let coupon_value = null;
+      let coupon_type = null;
+      const couponEl = card.querySelector('[id*="coupon"], [class*="coupon"]');
       if (couponEl) {
         const ct = couponEl.textContent.trim();
         const pctMatch = ct.match(/(\d+)\s*%/);
         const aedMatch = ct.match(/AED\s*([\d.]+)/i);
-        if (pctMatch) { coupon_value = `${pctMatch[1]}%`; coupon_type = 'percentage'; }
+        if (pctMatch)      { coupon_value = `${pctMatch[1]}%`;    coupon_type = 'percentage'; }
         else if (aedMatch) { coupon_value = `AED ${aedMatch[1]}`; coupon_type = 'fixed'; }
       }
 
-      // Lightning deal / badge
-      const is_lightning = !!(
-        card.querySelector('[class*="lightning"], [id*="lightning"]') ||
-        card.textContent.includes('Lightning Deal')
-      );
-      const badge = badgeText.trim() || null;
+      // Lightning deal
+      const is_lightning = card.textContent.includes('Lightning Deal');
 
-      // Rating
-      const ratingText = card.querySelector('.a-icon-star-small, [class*="rating"]')?.textContent || '';
-      const rating = ratingText.match(/([\d.]+)/)?.[1] || null;
-      const rating_count = card.querySelector('[class*="review"]')?.textContent?.replace(/[^\d]/g, '') || null;
-
-      // Affiliate URL
-      const productPath = `/dp/${asin}`;
-      const affiliate_url = `https://www.amazon.ae${productPath}?tag=${AFFILIATE_TAG}`;
-
-      // Expiry (lightning deals show countdown)
-      let expires_at: string | null = null;
-      const countdownEl = card.querySelector('[class*="countdown"], [class*="timer"], [id*="timer"]');
-      if (countdownEl) {
-        // Just mark it as expiring soon — we don't have an absolute time from the DOM
+      // Expiry marker for lightning deals
+      let expires_at = null;
+      if (is_lightning) {
         const future = new Date();
         future.setHours(future.getHours() + 6);
         expires_at = future.toISOString();
@@ -663,12 +633,12 @@ function scrapeAmazonDealsPage() {
         discount_percent,
         coupon_value,
         coupon_type,
-        affiliate_url,
+        affiliate_url: `https://www.amazon.ae/dp/${asin}?tag=${AFFILIATE_TAG}`,
         expires_at,
         is_lightning,
-        badge,
-        rating,
-        rating_count,
+        badge: badgeText.trim() || null,
+        rating: null,
+        rating_count: null,
       });
     } catch (_) {
       // skip malformed card
@@ -711,17 +681,31 @@ chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
     } catch (err) {
       sendResponse({ success: false, error: err.message });
     }
+    return false; // synchronous — no need to keep channel open
   }
+
   if (request.action === 'scrapeDeals') {
+    // ACK immediately so channel doesn't time out
+    sendResponse({ success: true, status: 'scraping' });
+
+    // Scrape and write results to storage (popup polls for this)
     try {
       const deals = scrapeAmazonDealsPage();
-      sendResponse({ success: true, deals });
+      chrome.storage.local.set({
+        dealsResult: { success: true, deals },
+        dealsScrapeTs: Date.now(),
+      });
     } catch (err) {
-      sendResponse({ success: false, error: err.message });
+      chrome.storage.local.set({
+        dealsResult: { success: false, error: err.message },
+        dealsScrapeTs: Date.now(),
+      });
     }
+    return false; // don't keep channel open
   }
+
   if (request.action === 'ping') {
     sendResponse({ success: true, store: detectStore(), isDealsPage: isAmazonDealsPage() });
+    return false;
   }
-  return true;
 });
