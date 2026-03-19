@@ -541,110 +541,125 @@ function parseAmazonPrice(el) {
 }
 
 function scrapeAmazonDealsPage() {
-  const MAX_DEALS = 30;
+  const AFFILIATE_TAG = 'uaediscount-21';
   const deals = [];
 
-  // Try selectors in order — stop at first that returns cards
-  const cardSelectors = [
-    '[data-testid="deal-card"]',
-    '[data-component-type="s-deal-card"]',
-    '.octopus-pc-item',
-    '[data-asin]',
-  ];
+  const cards = document.querySelectorAll(
+    'div[data-testid="product-card"][data-asin]'
+  );
 
-  let cards = [];
-  for (const sel of cardSelectors) {
-    const found = Array.from(document.querySelectorAll(sel));
-    if (found.length > 0) { cards = found; break; }
-  }
+  console.log(`Found ${cards.length} deal cards`);
 
-  for (const card of cards.slice(0, MAX_DEALS * 2)) {
-    if (deals.length >= MAX_DEALS) break;
+  cards.forEach(card => {
     try {
-      // ASIN — prefer direct attribute, fall back to link href
-      const asin =
-        card.dataset.asin ||
-        card.getAttribute('data-asin') ||
-        card.querySelector('a[href*="/dp/"]')?.href?.match(/\/dp\/([A-Z0-9]{10})/)?.[1] ||
-        '';
+      // ASIN
+      const asin = card.getAttribute('data-asin');
+      if (!asin) return;
 
-      if (!asin || asin.length !== 10) continue;
+      // Product title (full untruncated)
+      const name = card.querySelector(
+        '.a-truncate-full.a-offscreen'
+      )?.textContent?.trim();
+      if (!name) return;
 
-      // Title — fastest selector first
-      const title =
-        (card.querySelector('.a-truncate-full, .a-size-base-plus')?.textContent?.trim()) ||
-        (card.querySelector('a[href*="/dp/"]')?.title) ||
-        (card.querySelector('img')?.alt) ||
-        '';
+      // Coupon badge — "Save 15%" or "Save AED 50"
+      const couponRaw = card.querySelector(
+        'span.CouponExperienceBadge-module__label_Qzf0b6DKge1SbAxIoQeY'
+      )?.textContent?.trim();
 
-      if (!title) continue;
+      // Limited time deal badge — "20% off"
+      const limitedDealBadge = card.querySelector(
+        '.style_couponBadgeLabelOnyxText__f1Itu'
+      )?.textContent?.trim();
 
-      // Image URL only (no download)
-      const imgEl = card.querySelector('img');
-      const image_url = (imgEl?.src || imgEl?.dataset.src || '')
-        .replace(/\._[A-Z0-9_,]+_\./, '._SL300_.')
-        .split('?')[0];
+      // Current deal price — "Price: AED 708.96" or "Deal Price: AED 217.22"
+      const priceRaw = card.querySelector(
+        '.ProductCard-module__priceToPay_olAgJzVNGyj2javg2pAe .a-offscreen'
+      )?.textContent?.trim();
 
-      // Prices
-      const current_price  = parseAmazonPrice(card.querySelector('.a-price:not(.a-text-price)'));
-      const original_price = parseAmazonPrice(card.querySelector('.a-text-price'));
+      // Original price — "Was: AED 798.97" or "List: AED 599.00"
+      const originalRaw = card.querySelector(
+        '.ProductCard-module__wrapPrice__sMO92NjAjHmGPn3jnIH .a-offscreen'
+      )?.textContent?.trim();
 
-      if (!current_price) continue;
+      // High quality image (2x from srcset)
+      const imgEl = card.querySelector('img.a-amazon-image');
+      const srcset = imgEl?.getAttribute('srcset') || '';
+      const imgUrl = srcset.includes('2x')
+        ? srcset.split(',').find(s => s.includes('2x'))?.trim()?.split(' ')?.[0]
+        : imgEl?.src;
 
-      // Discount
-      let discount_percent = null;
-      const badgeText = card.querySelector('.a-badge-text')?.textContent || '';
-      const badgeMatch = badgeText.match(/(\d+)\s*%/);
-      if (badgeMatch) {
-        discount_percent = parseInt(badgeMatch[1], 10);
-      } else if (original_price && original_price > current_price) {
-        discount_percent = Math.round(((original_price - current_price) / original_price) * 100);
+      // Product URL with affiliate tag
+      const rawHref = card.querySelector(
+        'a[data-testid="product-card-link"]'
+      )?.getAttribute('href');
+      const cleanPath = rawHref?.split('?')?.[0];
+      const affiliateUrl = cleanPath
+        ? `https://www.amazon.ae${cleanPath}?tag=${AFFILIATE_TAG}`
+        : null;
+
+      // Parse prices
+      const dealPrice     = parseFloat(priceRaw?.replace(/[^0-9.]/g, '') || '0');
+      const originalPrice = parseFloat(originalRaw?.replace(/[^0-9.]/g, '') || '0');
+
+      // Parse coupon
+      let couponType  = null;
+      let couponValue = null;
+      const couponText = couponRaw || limitedDealBadge;
+
+      if (couponRaw) {
+        const percentMatch = couponRaw.match(/(\d+)%/);
+        const amountMatch  = couponRaw.match(/AED[\s\u00a0]*(\d+)/i);
+        if (percentMatch)     { couponType = 'percentage'; couponValue = parseInt(percentMatch[1]); }
+        else if (amountMatch) { couponType = 'amount';     couponValue = parseInt(amountMatch[1]); }
       }
 
-      // Coupon
-      let coupon_value = null;
-      let coupon_type = null;
-      const couponEl = card.querySelector('[id*="coupon"], [class*="coupon"]');
-      if (couponEl) {
-        const ct = couponEl.textContent.trim();
-        const pctMatch = ct.match(/(\d+)\s*%/);
-        const aedMatch = ct.match(/AED\s*([\d.]+)/i);
-        if (pctMatch)      { coupon_value = `${pctMatch[1]}%`;    coupon_type = 'percentage'; }
-        else if (aedMatch) { coupon_value = `AED ${aedMatch[1]}`; coupon_type = 'fixed'; }
+      // Limited time deal discount percent
+      let limitedDealPercent = null;
+      if (limitedDealBadge) {
+        const match = limitedDealBadge.match(/(\d+)%/);
+        if (match) limitedDealPercent = parseInt(match[1]);
       }
 
-      // Lightning deal
-      const is_lightning = card.textContent.includes('Lightning Deal');
+      // Final price after coupon
+      let finalPrice = dealPrice;
+      if (couponType === 'percentage' && couponValue) {
+        finalPrice = dealPrice * (1 - couponValue / 100);
+      } else if (couponType === 'amount' && couponValue) {
+        finalPrice = dealPrice - couponValue;
+      }
+      finalPrice = Math.round(finalPrice * 100) / 100;
 
-      // Expiry marker for lightning deals
-      let expires_at = null;
-      if (is_lightning) {
-        const future = new Date();
-        future.setHours(future.getHours() + 6);
-        expires_at = future.toISOString();
+      // Total discount %
+      let discountPercent = null;
+      if (originalPrice > 0 && dealPrice > 0) {
+        discountPercent = Math.round((1 - dealPrice / originalPrice) * 100);
       }
 
-      deals.push({
-        asin,
-        title,
-        image_url,
-        current_price,
-        original_price,
-        discount_percent,
-        coupon_value,
-        coupon_type,
-        affiliate_url: `https://www.amazon.ae/dp/${asin}?tag=${AFFILIATE_TAG}`,
-        expires_at,
-        is_lightning,
-        badge: badgeText.trim() || null,
-        rating: null,
-        rating_count: null,
-      });
-    } catch (_) {
-      // skip malformed card
+      if (dealPrice > 0) {
+        deals.push({
+          asin,
+          name: name.substring(0, 200),
+          deal_price:           dealPrice,
+          original_price:       originalPrice || null,
+          final_price:          finalPrice,
+          coupon_text:          couponText || null,
+          coupon_type:          couponType,
+          coupon_value:         couponValue,
+          limited_deal_percent: limitedDealPercent,
+          discount_percent:     discountPercent,
+          image_url:            imgUrl || null,
+          affiliate_url:        affiliateUrl,
+          store:                'Amazon UAE',
+          is_limited_time:      !!limitedDealBadge,
+        });
+      }
+    } catch (e) {
+      console.warn('Error scraping card:', e);
     }
-  }
+  });
 
+  console.log(`Scraped ${deals.length} valid deals`);
   return deals;
 }
 
@@ -685,23 +700,25 @@ chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
   }
 
   if (request.action === 'scrapeDeals') {
-    // ACK immediately so channel doesn't time out
-    sendResponse({ success: true, status: 'scraping' });
+    // ACK immediately so the message channel doesn't time out
+    sendResponse({ status: 'started' });
 
-    // Scrape and write results to storage (popup polls for this)
     try {
       const deals = scrapeAmazonDealsPage();
       chrome.storage.local.set({
-        dealsResult: { success: true, deals },
-        dealsScrapeTs: Date.now(),
+        scrapedDeals:  deals,
+        scrapeComplete: true,
+        scrapeCount:   deals.length,
+        scrapeTime:    Date.now(),
       });
-    } catch (err) {
+    } catch (e) {
       chrome.storage.local.set({
-        dealsResult: { success: false, error: err.message },
-        dealsScrapeTs: Date.now(),
+        scrapeComplete: true,
+        scrapeError:   e.message,
+        scrapedDeals:  [],
       });
     }
-    return false; // don't keep channel open
+    return false;
   }
 
   if (request.action === 'ping') {

@@ -5,19 +5,26 @@ import { createAdminClient } from '@/utils/supabase/admin'
 
 interface DealPayload {
   asin: string
-  title: string
-  image_url: string
-  current_price: number
-  original_price: number | null
-  discount_percent: number | null
-  coupon_value: string | null
-  coupon_type: 'percentage' | 'fixed' | null
-  affiliate_url: string
-  expires_at: string | null
-  is_lightning: boolean
-  badge: string | null
-  rating: string | null
-  rating_count: string | null
+  // new scraper fields
+  name?: string
+  deal_price?: number
+  final_price?: number
+  coupon_text?: string | null
+  coupon_value?: string | number | null
+  coupon_type?: 'percentage' | 'amount' | 'fixed' | null
+  limited_deal_percent?: number | null
+  is_limited_time?: boolean
+  // legacy scraper fields (backwards compat)
+  title?: string
+  current_price?: number
+  is_lightning?: boolean
+  badge?: string | null
+  // shared
+  image_url?: string | null
+  original_price?: number | null
+  discount_percent?: number | null
+  affiliate_url?: string | null
+  expires_at?: string | null
 }
 
 // ── Auth helper ───────────────────────────────────────────────────────────────
@@ -62,11 +69,23 @@ export async function POST(req: NextRequest) {
 
   for (const deal of deals) {
     try {
-      // 1. Upsert product by ASIN (find existing or create stub)
+      // Normalise field names — support both new scraper (name/deal_price) and legacy (title/current_price)
+      const productName  = deal.name || deal.title || ''
+      const currentPrice = deal.deal_price ?? deal.current_price ?? 0
+      const finalPrice   = deal.final_price ?? currentPrice
+      // coupon_value may be a number (new) or string (old) — store as string for the DB TEXT column
+      const couponValueStr = deal.coupon_value != null ? String(deal.coupon_value) : null
+      const couponTypeStr  = deal.coupon_type === 'amount' ? 'fixed' : (deal.coupon_type ?? null)
+
+      if (!productName || !currentPrice) {
+        results.push({ asin: deal.asin, success: false, error: 'Missing name or price' })
+        continue
+      }
+
+      // 1. Upsert product stub by ASIN
       let productId: string | null = null
 
       if (deal.asin) {
-        // Try to find existing product by ASIN in specs or slug pattern
         const { data: existing } = await supabase
           .from('products')
           .select('id')
@@ -76,8 +95,7 @@ export async function POST(req: NextRequest) {
         productId = existing?.id ?? null
 
         if (!productId) {
-          // Create a stub product
-          const slug = deal.title
+          const slug = productName
             .toLowerCase()
             .replace(/[^a-z0-9\s]/g, '')
             .split(/\s+/)
@@ -88,12 +106,12 @@ export async function POST(req: NextRequest) {
           const { data: newProduct, error: prodError } = await supabase
             .from('products')
             .insert({
-              name_en: deal.title,
+              name_en: productName,
               slug: `${slug}-${deal.asin.toLowerCase()}`,
               sku: deal.asin,
               image_url: deal.image_url || null,
               thumbnail_url: deal.image_url || null,
-              base_price: deal.current_price,
+              base_price: currentPrice,
               status: 'draft',
               is_active: false,
               currency: 'AED',
@@ -103,16 +121,15 @@ export async function POST(req: NextRequest) {
             .single()
 
           if (prodError) {
-            // Slug might conflict — try with timestamp
             const { data: retryProduct } = await supabase
               .from('products')
               .insert({
-                name_en: deal.title,
+                name_en: productName,
                 slug: `${slug}-${Date.now()}`,
                 sku: deal.asin,
                 image_url: deal.image_url || null,
                 thumbnail_url: deal.image_url || null,
-                base_price: deal.current_price,
+                base_price: currentPrice,
                 status: 'draft',
                 is_active: false,
                 currency: 'AED',
@@ -129,22 +146,22 @@ export async function POST(req: NextRequest) {
 
       // 2. Upsert deal record
       const dealData = {
-        product_id: productId,
-        store_id: storeId,
-        asin: deal.asin || null,
-        title_en: deal.title,
-        image_url: deal.image_url || null,
-        deal_price: deal.current_price,
-        final_price: deal.current_price,
-        original_price: deal.original_price ?? null,
+        product_id:       productId,
+        store_id:         storeId,
+        asin:             deal.asin || null,
+        title_en:         productName,
+        image_url:        deal.image_url || null,
+        deal_price:       currentPrice,
+        final_price:      finalPrice,
+        original_price:   deal.original_price ?? null,
         discount_percent: deal.discount_percent ?? null,
-        coupon_value: deal.coupon_value ?? null,
-        coupon_type: deal.coupon_type ?? null,
-        affiliate_url: deal.affiliate_url || null,
-        expires_at: deal.expires_at ?? null,
-        source: 'amazon_deals',
-        is_active: true,
-        updated_at: new Date().toISOString(),
+        coupon_value:     couponValueStr,
+        coupon_type:      couponTypeStr,
+        affiliate_url:    deal.affiliate_url || null,
+        expires_at:       deal.expires_at ?? null,
+        source:           'amazon_deals',
+        is_active:        true,
+        updated_at:       new Date().toISOString(),
       }
 
       if (deal.asin) {
@@ -159,10 +176,10 @@ export async function POST(req: NextRequest) {
       if (productId && storeId) {
         await supabase.from('price_history').insert({
           product_id: productId,
-          store_id: storeId,
-          price: deal.current_price,
-          currency: 'AED',
-          source: 'amazon_deals',
+          store_id:   storeId,
+          price:      currentPrice,
+          currency:   'AED',
+          source:     'amazon_deals',
         })
       }
 

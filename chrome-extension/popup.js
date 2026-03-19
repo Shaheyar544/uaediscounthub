@@ -170,46 +170,45 @@ scrapeDealsBtn.addEventListener('click', async () => {
   try {
     const tab = await getActiveTab();
 
-    // Clear any previous scrape result
-    await chrome.storage.local.remove(['dealsResult', 'dealsScrapeTs']);
+    // Clear previous results
+    await chrome.storage.local.remove(['scrapedDeals', 'scrapeComplete', 'scrapeError']);
 
-    // Inject content script (no-op if already there)
+    // Inject content script (no-op if already loaded)
     await chrome.scripting.executeScript({
       target: { tabId: tab.id },
       files: ['content.js'],
     }).catch(() => {});
 
-    // Tell content script to scrape — it ACKs immediately, writes to storage async
-    await chrome.tabs.sendMessage(tab.id, { action: 'scrapeDeals' }).catch(() => {});
+    // Fire scrape command — content script ACKs immediately then writes to storage
+    chrome.tabs.sendMessage(tab.id, { action: 'scrapeDeals' }).catch(() => {});
 
-    // Show loading UI and poll storage for results
     showDealsLoading('Scanning deals page...');
 
-    const MAX_WAIT_MS = 12000;
-    const POLL_MS     = 400;
-    const start       = Date.now();
-    let elapsed       = 0;
+    const MAX_WAIT = 20000;
+    const start    = Date.now();
 
-    while (elapsed < MAX_WAIT_MS) {
-      await new Promise(r => setTimeout(r, POLL_MS));
-      elapsed = Date.now() - start;
+    const poll = setInterval(async () => {
+      const elapsed = Date.now() - start;
+      dealsLoadingText.textContent = `Scanning... ${Math.round(elapsed / 1000)}s`;
 
-      const { dealsResult, dealsScrapeTs } = await chrome.storage.local.get([
-        'dealsResult', 'dealsScrapeTs',
+      const result = await chrome.storage.local.get([
+        'scrapeComplete', 'scrapedDeals', 'scrapeError', 'scrapeCount',
       ]);
 
-      if (dealsScrapeTs && dealsScrapeTs >= start) {
-        // Content script finished — check result
+      if (result.scrapeComplete) {
+        clearInterval(poll);
         hideDealsLoading();
 
-        if (!dealsResult?.success) {
-          throw new Error(dealsResult?.error || 'Scraping failed. Try again.');
+        if (result.scrapeError) {
+          setStatus(status, `Error: ${result.scrapeError}`, 'error');
+          return;
         }
 
-        scrapedDeals = dealsResult.deals || [];
+        scrapedDeals = result.scrapedDeals || [];
 
         if (scrapedDeals.length === 0) {
-          throw new Error('No deals detected. Scroll down on the deals page to load more, then retry.');
+          setStatus(status, 'No deals detected. Scroll down to load more, then retry.', 'error');
+          return;
         }
 
         renderDealsView(scrapedDeals);
@@ -217,13 +216,12 @@ scrapeDealsBtn.addEventListener('click', async () => {
         return;
       }
 
-      // Update progress text
-      dealsLoadingText.textContent = `Scanning... ${(elapsed / 1000).toFixed(0)}s`;
-    }
-
-    // Timed out
-    hideDealsLoading();
-    throw new Error('Scraping timed out. Try scrolling the deals page first, then retry.');
+      if (elapsed > MAX_WAIT) {
+        clearInterval(poll);
+        hideDealsLoading();
+        setStatus(status, 'Timeout — try scrolling the deals page first, then retry.', 'error');
+      }
+    }, 300);
 
   } catch (err) {
     hideDealsLoading();
@@ -245,20 +243,24 @@ function renderDealsView(deals) {
     item.className = 'deal-item';
     item.dataset.idx = idx;
 
+    // Support both old field names (current_price/title) and new (deal_price/name)
+    const displayName  = deal.name || deal.title || '';
+    const displayPrice = deal.deal_price ?? deal.current_price;
     const discount = deal.discount_percent ? `−${deal.discount_percent}%` : '';
-    const couponBadge = deal.coupon_value
-      ? `<span class="deal-coupon">🏷 ${deal.coupon_value} coupon</span>` : '';
-    const lightningBadge = deal.is_lightning
-      ? `<span class="deal-lightning">⚡ Lightning</span>` : '';
+    const couponLabel = deal.coupon_text || (deal.coupon_value ? `${deal.coupon_value}${deal.coupon_type === 'percentage' ? '%' : ' AED'} off` : '');
+    const couponBadge = couponLabel
+      ? `<span class="deal-coupon">🏷 ${couponLabel}</span>` : '';
+    const lightningBadge = (deal.is_limited_time || deal.is_lightning)
+      ? `<span class="deal-lightning">⚡ Limited</span>` : '';
 
     item.innerHTML = `
       <label class="deal-row">
         <input type="checkbox" class="deal-checkbox" data-idx="${idx}" />
         <img class="deal-thumb" src="${deal.image_url || ''}" alt="" onerror="this.style.display='none'" />
         <div class="deal-info">
-          <div class="deal-name">${deal.title.slice(0, 70)}${deal.title.length > 70 ? '…' : ''}</div>
+          <div class="deal-name">${displayName.slice(0, 70)}${displayName.length > 70 ? '…' : ''}</div>
           <div class="deal-pricing">
-            <span class="deal-price">AED ${deal.current_price?.toLocaleString()}</span>
+            <span class="deal-price">AED ${displayPrice?.toLocaleString()}</span>
             ${deal.original_price ? `<span class="deal-original">AED ${deal.original_price?.toLocaleString()}</span>` : ''}
             ${discount ? `<span class="deal-discount">${discount}</span>` : ''}
           </div>
