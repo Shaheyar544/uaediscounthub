@@ -299,6 +299,12 @@ Rules to maintain scores:
 
 ## Pending Items (Next Session)
 
+### Security (In Progress)
+- [ ] Consolidate multiple permissive SELECT policies on categories, coupons, deals, products, stores
+  — Split `FOR ALL TO authenticated` into scoped INSERT/UPDATE/DELETE policies
+  — Awaiting approval before migration
+- [ ] Enable Leaked Password Protection in Dashboard (Auth → Settings → Security)
+
 ### High Priority
 - [ ] Fix robots.txt (SEO: 85 → 90+)
 - [ ] Add canonical URLs to all pages
@@ -346,6 +352,21 @@ Rules to maintain scores:
 - Homepage premium redesign ✅
 - Mobile bottom navigation ✅
 - Performance: 98/100 PageSpeed ✅
+
+### March 19, 2026
+- Categories management fully upgraded ✅
+  (ImageUpload, emoji, color picker, SEO fields,
+   product count badge, up/down reorder, bulk actions)
+- Supabase Security Advisor — all errors fixed ✅
+  - RLS enabled on 10 unprotected tables
+  - Functions search_path vulnerability fixed (update_updated_at, handle_new_user)
+  - price_history and product_store_prices permissive SELECT policies consolidated
+  - idx_price_history_product_date index added
+- Leaked Password Protection: PENDING (manual Dashboard toggle)
+- Remaining Security Warnings (in progress):
+  - Multiple permissive SELECT policies on: categories, coupons, deals, products, stores
+  - affiliate_clicks INSERT (true) — intentional, acknowledged
+  - newsletter_subscribers INSERT (true) — intentional, acknowledged
 
 ---
 
