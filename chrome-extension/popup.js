@@ -219,7 +219,7 @@ scrapeDealsBtn.addEventListener('click', async () => {
       if (elapsed > MAX_WAIT) {
         clearInterval(poll);
         hideDealsLoading();
-        setStatus(status, 'Timeout — try scrolling the deals page first, then retry.', 'error');
+        setStatus(status, 'Page still loading deals — scroll down on Amazon first, then retry.', 'error');
       }
     }, 300);
 

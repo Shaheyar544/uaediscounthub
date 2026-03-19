@@ -686,6 +686,31 @@ function scrapeCurrentPage() {
   }
 }
 
+// ── Wait for lazy-loaded deal cards ──────────────────────────────────────────
+
+function waitForDeals(timeout) {
+  return new Promise(function(resolve) {
+    var selector = 'div[data-testid="product-card"][data-asin]';
+
+    // Already loaded?
+    var existing = document.querySelectorAll(selector);
+    if (existing.length > 5) { resolve(existing); return; }
+
+    var observer = new MutationObserver(function() {
+      var cards = document.querySelectorAll(selector);
+      if (cards.length > 5) { observer.disconnect(); resolve(cards); }
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    // Timeout fallback — return whatever is in the DOM
+    setTimeout(function() {
+      observer.disconnect();
+      resolve(document.querySelectorAll(selector));
+    }, timeout || 10000);
+  });
+}
+
 // ── Message Listener ──────────────────────────────────────────────────────────
 
 chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
@@ -700,24 +725,111 @@ chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
   }
 
   if (request.action === 'scrapeDeals') {
-    // ACK immediately so the message channel doesn't time out
     sendResponse({ status: 'started' });
 
-    try {
-      const deals = scrapeAmazonDealsPage();
-      chrome.storage.local.set({
-        scrapedDeals:  deals,
-        scrapeComplete: true,
-        scrapeCount:   deals.length,
-        scrapeTime:    Date.now(),
+    // Wait for lazy-loaded cards, then scrape
+    waitForDeals(8000).then(cards => {
+      const deals = [];
+
+      cards.forEach(card => {
+        try {
+          const asin = card.getAttribute('data-asin');
+          if (!asin) return;
+
+          const name = card.querySelector(
+            '.a-truncate-full.a-offscreen'
+          )?.textContent?.trim();
+          if (!name) return;
+
+          const couponRaw = card.querySelector(
+            'span.CouponExperienceBadge-module__label_Qzf0b6DKge1SbAxIoQeY'
+          )?.textContent?.trim();
+
+          const limitedBadge = card.querySelector(
+            '.style_couponBadgeLabelOnyxText__f1Itu'
+          )?.textContent?.trim();
+
+          const priceRaw = card.querySelector(
+            '.ProductCard-module__priceToPay_olAgJzVNGyj2javg2pAe .a-offscreen'
+          )?.textContent?.trim();
+
+          const originalRaw = card.querySelector(
+            '.ProductCard-module__wrapPrice__sMO92NjAjHmGPn3jnIH .a-offscreen'
+          )?.textContent?.trim();
+
+          // High res image from srcset
+          const imgEl = card.querySelector('img.a-amazon-image');
+          const srcset = imgEl?.getAttribute('srcset') || '';
+          const imgUrl = srcset.includes('2x')
+            ? srcset.split(',').find(s => s.includes('2x'))?.trim()?.split(' ')?.[0]
+            : imgEl?.src;
+
+          // Clean affiliate URL
+          const rawHref = card.querySelector(
+            'a[data-testid="product-card-link"]'
+          )?.getAttribute('href');
+          const cleanPath = rawHref?.split('?')?.[0];
+          const affiliateUrl = cleanPath
+            ? `https://www.amazon.ae${cleanPath}?tag=uaediscount-21`
+            : null;
+
+          // Parse prices
+          const dealPrice     = parseFloat(priceRaw?.replace(/[^0-9.]/g, '') || '0');
+          const originalPrice = parseFloat(originalRaw?.replace(/[^0-9.]/g, '') || '0');
+
+          // Parse coupon
+          let couponType  = null;
+          let couponValue = null;
+          if (couponRaw) {
+            const pct = couponRaw.match(/(\d+)%/);
+            const amt = couponRaw.match(/AED[\s\u00a0]*(\d+)/i);
+            if (pct)      { couponType = 'percentage'; couponValue = parseInt(pct[1]); }
+            else if (amt) { couponType = 'amount';     couponValue = parseInt(amt[1]); }
+          }
+
+          // Final price after coupon
+          let finalPrice = dealPrice;
+          if (couponType === 'percentage' && couponValue) {
+            finalPrice = dealPrice * (1 - couponValue / 100);
+          } else if (couponType === 'amount' && couponValue) {
+            finalPrice = dealPrice - couponValue;
+          }
+          finalPrice = Math.round(finalPrice * 100) / 100;
+
+          // Discount %
+          let discountPercent = null;
+          if (originalPrice > 0 && dealPrice > 0) {
+            discountPercent = Math.round((1 - dealPrice / originalPrice) * 100);
+          }
+
+          if (dealPrice > 0) {
+            deals.push({
+              asin,
+              name:             name.substring(0, 200),
+              deal_price:       dealPrice,
+              original_price:   originalPrice || null,
+              final_price:      finalPrice,
+              coupon_text:      couponRaw || limitedBadge || null,
+              coupon_type:      couponType,
+              coupon_value:     couponValue,
+              discount_percent: discountPercent,
+              image_url:        imgUrl || null,
+              affiliate_url:    affiliateUrl,
+              is_limited_time:  !!limitedBadge,
+            });
+          }
+        } catch (e) {
+          console.warn('Card error:', e);
+        }
       });
-    } catch (e) {
+
       chrome.storage.local.set({
+        scrapedDeals:   deals,
         scrapeComplete: true,
-        scrapeError:   e.message,
-        scrapedDeals:  [],
+        scrapeCount:    deals.length,
       });
-    }
+    });
+
     return false;
   }
 
