@@ -20,7 +20,8 @@
       "Bash(pkill -f \"node.*next\")",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(ls -la F:/uaediscounthub/app/[locale]/admin/)"
+      "Bash(ls -la F:/uaediscounthub/app/[locale]/admin/)",
+      "Bash(find F:uaediscounthub/app/[locale]/admin/pages -type f)"
     ]
   }
 }
