@@ -14,6 +14,7 @@ interface Page {
   title_en: string
   title_ar: string
   status: 'draft' | 'published'
+  placement: 'none' | 'header' | 'footer_c1' | 'footer_c2' | 'footer_c3'
   is_active: boolean
   updated_at: string
 }
@@ -32,7 +33,7 @@ export default function PagesManagementClient({ locale }: { locale: string }) {
     setLoading(true)
     const { data, error } = await supabase
       .from('pages')
-      .select('id, slug, title_en, title_ar, status, is_active, updated_at')
+      .select('id, slug, title_en, title_ar, status, placement, is_active, updated_at')
       .order('updated_at', { ascending: false })
     
     if (data) setPages(data)
@@ -116,6 +117,7 @@ export default function PagesManagementClient({ locale }: { locale: string }) {
                 <tr>
                   <th className="p-4 text-left text-[11px] font-bold text-[#8A94A6] uppercase tracking-wider">Page Title</th>
                   <th className="p-4 text-left text-[11px] font-bold text-[#8A94A6] uppercase tracking-wider">URL Slug</th>
+                  <th className="p-4 text-left text-[11px] font-bold text-[#8A94A6] uppercase tracking-wider">Placement</th>
                   <th className="p-4 text-left text-[11px] font-bold text-[#8A94A6] uppercase tracking-wider">Last Updated</th>
                   <th className="p-4 text-left text-[11px] font-bold text-[#8A94A6] uppercase tracking-wider">Status</th>
                   <th className="p-4 text-right text-[11px] font-bold text-[#8A94A6] uppercase tracking-wider">Actions</th>
@@ -137,6 +139,14 @@ export default function PagesManagementClient({ locale }: { locale: string }) {
                           <ExternalLink size={12} />
                         </Link>
                       </div>
+                    </td>
+                    <td className="p-4">
+                      <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#F6F8FC] text-[#4B5675] border border-[#DDE3EF]">
+                        {page.placement === 'none' ? '—' :
+                         page.placement === 'header' ? 'Header' :
+                         page.placement === 'footer_c1' ? 'Footer C1' :
+                         page.placement === 'footer_c2' ? 'Footer C2' : 'Footer C3'}
+                      </span>
                     </td>
                     <td className="p-4">
                       <div className="text-[12px] text-[#4B5675] font-medium">
