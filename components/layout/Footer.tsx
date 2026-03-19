@@ -83,8 +83,13 @@ export async function Footer({ locale }: { locale: Locale }) {
                                     </Link>
                                 </li>
                             ))}
-                            <li><Link href={`/${locale}/contact`} className="text-[13.5px] text-muted-foreground hover:text-primary transition-all">Contact Us</Link></li>
-                            <li><Link href={`/${locale}/privacy`} className="text-[13.5px] text-muted-foreground hover:text-primary transition-all">Privacy Policy</Link></li>
+                            {connectPages.length === 0 && (
+                                <>
+                                    <li><Link href={`/${locale}/about`} className="text-[13.5px] text-muted-foreground hover:text-primary transition-all">About Us</Link></li>
+                                    <li><Link href={`/${locale}/contact`} className="text-[13.5px] text-muted-foreground hover:text-primary transition-all">Contact Us</Link></li>
+                                    <li><Link href={`/${locale}/privacy-policy`} className="text-[13.5px] text-muted-foreground hover:text-primary transition-all">Privacy Policy</Link></li>
+                                </>
+                            )}
                         </ul>
                     </div>
 

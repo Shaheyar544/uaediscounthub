@@ -443,23 +443,19 @@ export function PageEditor({ initialData, locale }: PageEditorProps) {
                 />
               </div>
 
-              {/* SERP Preview */}
-              {(page.meta_title || page.title_en) && (
-                <div className="p-3 bg-[#F6F8FC] rounded-[8px] border border-[#DDE3EF]">
-                  <div className="text-[10px] font-bold text-[#8A94A6] uppercase mb-2">SERP Preview</div>
-                  <div className="text-[13px] font-medium text-[#0057FF] leading-tight truncate">
-                    {page.meta_title || page.title_en}
-                  </div>
-                  <div className="text-[11px] text-[#00803A] mt-0.5 font-mono truncate">
-                    uaediscounthub.com/{page.slug || '...'}
-                  </div>
-                  {page.meta_description && (
-                    <div className="text-[11px] text-[#4B5675] mt-1 line-clamp-2">
-                      {page.meta_description}
-                    </div>
-                  )}
+              {/* SERP Preview — always visible */}
+              <div className="mt-2 p-3 bg-white rounded-[8px] border border-[#DDE3EF]">
+                <div className="text-[10px] font-bold text-[#8A94A6] uppercase mb-2">Search Preview</div>
+                <div className="text-[13px] font-medium text-[#0057FF] leading-tight truncate">
+                  {page.meta_title || page.title_en || 'Page Title'}
                 </div>
-              )}
+                <div className="text-[11px] text-[#00803A] mt-0.5 font-mono truncate">
+                  uaediscounthub.com/{page.slug || '...'}
+                </div>
+                <div className="text-[11px] text-[#4B5675] mt-1 line-clamp-2">
+                  {page.meta_description || 'Add a meta description...'}
+                </div>
+              </div>
             </div>
           </aside>
         </div>
