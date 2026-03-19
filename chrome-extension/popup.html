@@ -24,12 +24,17 @@
     <div class="store-badge" id="storeBadge">Detecting store...</div>
 
     <div class="hero">
-      <p class="hero-text">Open a product page on Amazon.ae, Noon, SharafDG, or Carrefour UAE, then click Import.</p>
+      <p class="hero-text" id="heroText">Open a product page on Amazon.ae, Noon, SharafDG, or Carrefour UAE, then click Import.</p>
     </div>
 
     <button class="btn-primary" id="scrapeBtn">
       <span class="btn-icon">⬇</span>
       Import This Product
+    </button>
+
+    <button class="btn-deals hidden" id="scrapeDealsBtn">
+      <span class="btn-icon">🏷</span>
+      Scrape Deals Page
     </button>
 
     <div class="status" id="status"></div>
@@ -64,6 +69,31 @@
     <div class="status" id="previewStatus"></div>
   </div>
 
+  <!-- ── Deals View ──────────────────────────────────────────────────────── -->
+  <div id="dealsView" class="hidden">
+    <div class="deals-header">
+      <button class="btn-ghost" id="backFromDeals">← Back</button>
+      <div class="deals-title-row">
+        <h2 id="dealsCount">0 deals found</h2>
+        <label class="select-all-label">
+          <input type="checkbox" id="selectAllDeals" />
+          Select all
+        </label>
+      </div>
+    </div>
+
+    <div id="dealsList" class="deals-list"></div>
+
+    <div class="deals-footer">
+      <button class="btn-primary" id="importDealsBtn" disabled>
+        <span class="btn-icon">🚀</span>
+        Import Selected (0)
+      </button>
+    </div>
+
+    <div class="status" id="dealsStatus"></div>
+  </div>
+
   <!-- ── Settings View ──────────────────────────────────────────────────── -->
   <div id="settingsView" class="hidden">
     <div class="settings-header">
@@ -96,7 +126,7 @@
   <!-- ── Success View ───────────────────────────────────────────────────── -->
   <div id="successView" class="hidden">
     <div class="success-icon">✅</div>
-    <h2 class="success-title">Product Imported!</h2>
+    <h2 class="success-title" id="successTitle">Product Imported!</h2>
     <p class="success-sub" id="successSub"></p>
     <a class="btn-primary" id="editLink" href="#" target="_blank">Open in Admin →</a>
     <button class="btn-ghost" id="importAnother">Import Another</button>

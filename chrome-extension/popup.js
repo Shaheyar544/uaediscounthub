@@ -3,23 +3,27 @@
 
 // ── State ─────────────────────────────────────────────────────────────────────
 let scrapedData = null;
+let scrapedDeals = [];   // full list from deals page
 
 // ── DOM refs ──────────────────────────────────────────────────────────────────
 const mainView        = document.getElementById('mainView');
 const previewView     = document.getElementById('previewView');
 const settingsView    = document.getElementById('settingsView');
 const successView     = document.getElementById('successView');
+const dealsView       = document.getElementById('dealsView');
 
 const storeBadge      = document.getElementById('storeBadge');
 const scrapeBtn       = document.getElementById('scrapeBtn');
+const scrapeDealsBtn  = document.getElementById('scrapeDealsBtn');
 const status          = document.getElementById('status');
 const previewStatus   = document.getElementById('previewStatus');
 const settingsStatus  = document.getElementById('settingsStatus');
+const dealsStatus     = document.getElementById('dealsStatus');
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 function showView(view) {
-  [mainView, previewView, settingsView, successView].forEach(v => v.classList.add('hidden'));
+  [mainView, previewView, settingsView, successView, dealsView].forEach(v => v.classList.add('hidden'));
   view.classList.remove('hidden');
 }
 
@@ -63,7 +67,9 @@ async function getActiveTab() {
 
 async function detectStoreOnPage() {
   const tab = await getActiveTab();
-  const host = new URL(tab.url || 'https://example.com').hostname;
+  const url = tab.url || '';
+  let host;
+  try { host = new URL(url).hostname; } catch { host = ''; }
 
   const storeMap = {
     'amazon.ae':        '🛒 Amazon UAE',
@@ -73,16 +79,35 @@ async function detectStoreOnPage() {
   };
 
   const match = Object.entries(storeMap).find(([domain]) => host.includes(domain));
+
+  // Check if this is an Amazon deals page
+  const isAmazonDealsPage =
+    host.includes('amazon.ae') &&
+    (url.includes('/deals') || url.includes('/b/') && url.includes('deal'));
+
   if (match) {
     storeBadge.textContent = match[1];
     storeBadge.className = `store-badge ${storeClass(match[1])}`;
+
+    if (isAmazonDealsPage) {
+      // Show deals scraper mode
+      scrapeBtn.classList.add('hidden');
+      scrapeDealsBtn.classList.remove('hidden');
+      document.getElementById('heroText').textContent =
+        'Amazon Deals page detected! Click below to scrape all visible deals.';
+    } else {
+      scrapeBtn.classList.remove('hidden');
+      scrapeDealsBtn.classList.add('hidden');
+    }
   } else {
     storeBadge.textContent = '⚠ Not a supported store page';
     storeBadge.className = 'store-badge unknown';
+    scrapeBtn.classList.remove('hidden');
+    scrapeDealsBtn.classList.add('hidden');
   }
 }
 
-// ── Scrape ────────────────────────────────────────────────────────────────────
+// ── Single Product Scrape ─────────────────────────────────────────────────────
 
 scrapeBtn.addEventListener('click', async () => {
   clearStatus(status);
@@ -92,11 +117,10 @@ scrapeBtn.addEventListener('click', async () => {
   try {
     const tab = await getActiveTab();
 
-    // Inject content script first (in case it wasn't injected on navigation)
     await chrome.scripting.executeScript({
       target: { tabId: tab.id },
       files: ['content.js'],
-    }).catch(() => {}); // ignore if already injected
+    }).catch(() => {});
 
     const response = await chrome.tabs.sendMessage(tab.id, { action: 'scrape' });
 
@@ -105,9 +129,6 @@ scrapeBtn.addEventListener('click', async () => {
     }
 
     scrapedData = response.data;
-
-    // Debug: log full scraped payload to extension's console
-    console.log('[UAEDiscountHub] Scraped data:', JSON.stringify(scrapedData, null, 2));
 
     if (!scrapedData.name) {
       throw new Error('Could not detect product title. Try scrolling down so the page fully loads, then retry.');
@@ -124,7 +145,171 @@ scrapeBtn.addEventListener('click', async () => {
   }
 });
 
-// ── Preview ───────────────────────────────────────────────────────────────────
+// ── Deals Page Scrape ─────────────────────────────────────────────────────────
+
+scrapeDealsBtn.addEventListener('click', async () => {
+  clearStatus(status);
+  scrapeDealsBtn.disabled = true;
+  scrapeDealsBtn.innerHTML = '<span class="spinner"></span> Scraping deals...';
+
+  try {
+    const tab = await getActiveTab();
+
+    await chrome.scripting.executeScript({
+      target: { tabId: tab.id },
+      files: ['content.js'],
+    }).catch(() => {});
+
+    const response = await chrome.tabs.sendMessage(tab.id, { action: 'scrapeDeals' });
+
+    if (!response?.success) {
+      throw new Error(response?.error || 'Could not scrape deals. Make sure you are on amazon.ae/deals.');
+    }
+
+    scrapedDeals = response.deals || [];
+
+    if (scrapedDeals.length === 0) {
+      throw new Error('No deals found on this page. Try scrolling down to load more deals, then retry.');
+    }
+
+    renderDealsView(scrapedDeals);
+    showView(dealsView);
+
+  } catch (err) {
+    setStatus(status, err.message, 'error');
+  } finally {
+    scrapeDealsBtn.disabled = false;
+    scrapeDealsBtn.innerHTML = '<span class="btn-icon">🏷</span> Scrape Deals Page';
+  }
+});
+
+// ── Deals View Rendering ──────────────────────────────────────────────────────
+
+function renderDealsView(deals) {
+  document.getElementById('dealsCount').textContent = `${deals.length} deal${deals.length !== 1 ? 's' : ''} found`;
+  document.getElementById('selectAllDeals').checked = false;
+
+  const list = document.getElementById('dealsList');
+  list.innerHTML = '';
+
+  deals.forEach((deal, idx) => {
+    const item = document.createElement('div');
+    item.className = 'deal-item';
+    item.dataset.idx = idx;
+
+    const discount = deal.discount_percent ? `−${deal.discount_percent}%` : '';
+    const couponBadge = deal.coupon_value
+      ? `<span class="deal-coupon">🏷 ${deal.coupon_value} coupon</span>` : '';
+    const lightningBadge = deal.is_lightning
+      ? `<span class="deal-lightning">⚡ Lightning</span>` : '';
+
+    item.innerHTML = `
+      <label class="deal-row">
+        <input type="checkbox" class="deal-checkbox" data-idx="${idx}" />
+        <img class="deal-thumb" src="${deal.image_url || ''}" alt="" onerror="this.style.display='none'" />
+        <div class="deal-info">
+          <div class="deal-name">${deal.title.slice(0, 70)}${deal.title.length > 70 ? '…' : ''}</div>
+          <div class="deal-pricing">
+            <span class="deal-price">AED ${deal.current_price?.toLocaleString()}</span>
+            ${deal.original_price ? `<span class="deal-original">AED ${deal.original_price?.toLocaleString()}</span>` : ''}
+            ${discount ? `<span class="deal-discount">${discount}</span>` : ''}
+          </div>
+          <div class="deal-badges">
+            ${lightningBadge}${couponBadge}
+          </div>
+        </div>
+      </label>
+    `;
+
+    list.appendChild(item);
+  });
+
+  // Wire checkboxes
+  list.querySelectorAll('.deal-checkbox').forEach(cb => {
+    cb.addEventListener('change', updateImportButton);
+  });
+
+  updateImportButton();
+}
+
+function getSelectedDeals() {
+  return Array.from(document.querySelectorAll('.deal-checkbox:checked'))
+    .map(cb => scrapedDeals[parseInt(cb.dataset.idx, 10)])
+    .filter(Boolean);
+}
+
+function updateImportButton() {
+  const selected = getSelectedDeals();
+  const btn = document.getElementById('importDealsBtn');
+  btn.disabled = selected.length === 0;
+  btn.innerHTML = `<span class="btn-icon">🚀</span> Import Selected (${selected.length})`;
+}
+
+document.getElementById('selectAllDeals').addEventListener('change', function () {
+  document.querySelectorAll('.deal-checkbox').forEach(cb => {
+    cb.checked = this.checked;
+  });
+  updateImportButton();
+});
+
+document.getElementById('backFromDeals').addEventListener('click', () => {
+  scrapedDeals = [];
+  showView(mainView);
+});
+
+// ── Import Deals ──────────────────────────────────────────────────────────────
+
+document.getElementById('importDealsBtn').addEventListener('click', async () => {
+  const selected = getSelectedDeals();
+  if (selected.length === 0) return;
+
+  const settings = await getSettings();
+  if (!settings.apiKey) {
+    setStatus(dealsStatus, 'API key not set. Open Settings ⚙ and add your IMPORT_API_KEY.', 'error');
+    return;
+  }
+
+  const btn = document.getElementById('importDealsBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Importing...';
+  clearStatus(dealsStatus);
+
+  try {
+    const res = await fetch(`${settings.adminUrl}/api/admin/import-deals`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${settings.apiKey}`,
+      },
+      body: JSON.stringify(selected),
+    });
+
+    const json = await res.json();
+
+    if (!res.ok) {
+      throw new Error(json.error || `Server returned ${res.status}`);
+    }
+
+    // Show success
+    document.getElementById('successTitle').textContent = 'Deals Imported!';
+    document.getElementById('successSub').textContent =
+      `${json.imported} of ${json.total} deal${json.total !== 1 ? 's' : ''} imported successfully.`;
+
+    const editLink = document.getElementById('editLink');
+    editLink.href = `${settings.adminUrl}/en/admin/deals`;
+    editLink.textContent = 'View Deals in Admin →';
+
+    scrapedDeals = [];
+    showView(successView);
+
+  } catch (err) {
+    setStatus(dealsStatus, `Import failed: ${err.message}`, 'error');
+    btn.disabled = false;
+    updateImportButton();
+  }
+});
+
+// ── Preview (single product) ──────────────────────────────────────────────────
 
 function renderPreview(data) {
   const img = document.getElementById('previewImage');
@@ -144,7 +329,7 @@ function renderPreview(data) {
   clearStatus(previewStatus);
 }
 
-// ── Import ────────────────────────────────────────────────────────────────────
+// ── Import (single product) ───────────────────────────────────────────────────
 
 async function doImport(publishStatus) {
   if (!scrapedData) return;
@@ -183,13 +368,14 @@ async function doImport(publishStatus) {
       throw new Error(json.error || `Server returned ${res.status}`);
     }
 
-    // Show success
+    document.getElementById('successTitle').textContent = 'Product Imported!';
     document.getElementById('successSub').textContent =
       `"${scrapedData.name?.slice(0, 60)}${scrapedData.name?.length > 60 ? '…' : ''}" has been ${publishStatus === 'published' ? 'published' : 'saved as draft'}.`;
 
     const editUrl = `${settings.adminUrl}/en/admin/products/${json.productId}/edit`;
     const editLink = document.getElementById('editLink');
     editLink.href = editUrl;
+    editLink.textContent = 'Open in Admin →';
 
     scrapedData = null;
     showView(successView);
