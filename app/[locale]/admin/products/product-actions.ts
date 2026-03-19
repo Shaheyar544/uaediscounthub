@@ -209,11 +209,15 @@ export async function deleteProductById(
 ): Promise<{ success: boolean; error?: string }> {
   const supabase = createAdminClient()
 
-  // Delete child rows first (FK constraints prevent deleting parent otherwise)
+  // Delete all child rows first (8 tables have FK → products)
   await Promise.all([
-    supabase.from('product_store_prices').delete().eq('product_id', id),
-    supabase.from('price_history').delete().eq('product_id', id),
+    supabase.from('affiliate_clicks').delete().eq('product_id', id),
+    supabase.from('coupons').delete().eq('product_id', id),
+    supabase.from('deals').delete().eq('product_id', id),
     supabase.from('price_alerts').delete().eq('product_id', id),
+    supabase.from('price_history').delete().eq('product_id', id),
+    supabase.from('product_prices').delete().eq('product_id', id),
+    supabase.from('product_store_prices').delete().eq('product_id', id),
     supabase.from('wishlists').delete().eq('product_id', id),
   ])
 
