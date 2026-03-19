@@ -1,7 +1,7 @@
 import { createAdminClient } from '@/utils/supabase/admin'
-import { PlusCircle, Edit, Eye, Trash2 } from 'lucide-react'
+import { PlusCircle, Edit, Eye } from 'lucide-react'
 import Link from 'next/link'
-import { deleteProductById } from './product-actions'
+import { DeleteProductButton } from '@/components/admin/products/DeleteProductButton'
 
 const STATUS_STYLES: Record<string, string> = {
   published: 'bg-emerald-50 text-emerald-700 border-emerald-200',
@@ -317,29 +317,12 @@ export default async function AdminProductsPage({
                         >
                           <Edit size={15} />
                         </Link>
-                        <form
-                          action={async () => {
-                            'use server'
-                            await deleteProductById(product.id, product.slug ?? '', locale)
-                          }}
-                          style={{ display: 'inline' }}
-                        >
-                          <button
-                            type="submit"
-                            title="Delete"
-                            style={{
-                              background: 'none',
-                              border: 'none',
-                              cursor: 'pointer',
-                              color: '#EF4444',
-                              padding: 6,
-                              borderRadius: 6,
-                              display: 'flex',
-                            }}
-                          >
-                            <Trash2 size={15} />
-                          </button>
-                        </form>
+                        <DeleteProductButton
+                          productId={product.id}
+                          productName={product.name_en ?? ''}
+                          slug={product.slug ?? ''}
+                          locale={locale}
+                        />
                       </div>
                     </td>
                   </tr>
