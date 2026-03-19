@@ -28,6 +28,7 @@
     {
       "matches": [
         "https://www.amazon.ae/*",
+        "https://amazon.ae/*",
         "https://www.noon.com/*",
         "https://www.sharafdg.com/*",
         "https://www.carrefouruae.com/*"
