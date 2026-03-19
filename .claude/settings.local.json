@@ -17,7 +17,10 @@
       "Bash(node generate-icons.js)",
       "Bash(node:*)",
       "Bash(pkill -f \"next dev\")",
-      "Bash(pkill -f \"node.*next\")"
+      "Bash(pkill -f \"node.*next\")",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(ls -la F:/uaediscounthub/app/[locale]/admin/)"
     ]
   }
 }

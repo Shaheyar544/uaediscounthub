@@ -299,16 +299,15 @@ Rules to maintain scores:
 
 ## Pending Items (Next Session)
 
-### Security (In Progress)
-- [ ] Consolidate multiple permissive SELECT policies on categories, coupons, deals, products, stores
-  — Split `FOR ALL TO authenticated` into scoped INSERT/UPDATE/DELETE policies
-  — Awaiting approval before migration
+### Security
 - [ ] Enable Leaked Password Protection in Dashboard (Auth → Settings → Security)
+- [ ] Enable Index Advisor in Dashboard (Database → Index Advisor)
 
 ### High Priority
+- [ ] Category page improvements (already analyzed, ready to implement)
 - [ ] Fix robots.txt (SEO: 85 → 90+)
 - [ ] Add canonical URLs to all pages
-- [ ] Fix button accessibility labels
+- [ ] Fix button accessibility labels (Accessibility: 87 → 95)
 - [ ] Fix color contrast ratios
 - [ ] Price history chart real data fix
 
@@ -354,19 +353,24 @@ Rules to maintain scores:
 - Performance: 98/100 PageSpeed ✅
 
 ### March 19, 2026
+- CLAUDE.md upgraded with agency system roles ✅
 - Categories management fully upgraded ✅
   (ImageUpload, emoji, color picker, SEO fields,
    product count badge, up/down reorder, bulk actions)
-- Supabase Security Advisor — all errors fixed ✅
+- Supabase Security Advisor — 0 errors remaining ✅
   - RLS enabled on 10 unprotected tables
-  - Functions search_path vulnerability fixed (update_updated_at, handle_new_user)
-  - price_history and product_store_prices permissive SELECT policies consolidated
-  - idx_price_history_product_date index added
+  - Functions search_path vulnerability fixed
+  - All permissive SELECT policy overlaps eliminated
+  - Admin-JWT-gated writes on categories, coupons, deals, products, stores
+  - newsletter_subscribers layered access model
+- Admin JWT role=admin set for shaheryarahmed.awan@gmail.com ✅
+  (raw_app_meta_data + profiles.role both set)
+- Admin header user menu + sign out dropdown ✅
+- Admin profile page (/admin/profile) ✅
+  (avatar, password change, account info, sign out)
+- Users page fixed — now shows real users ✅
+  (was querying wrong table; switched to admin client + profiles)
 - Leaked Password Protection: PENDING (manual Dashboard toggle)
-- Remaining Security Warnings (in progress):
-  - Multiple permissive SELECT policies on: categories, coupons, deals, products, stores
-  - affiliate_clicks INSERT (true) — intentional, acknowledged
-  - newsletter_subscribers INSERT (true) — intentional, acknowledged
 
 ---
 
