@@ -2,10 +2,10 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { 
-    LayoutDashboard, ShoppingBag, Tags, Users, Settings, 
-    LogOut, Mail, FileText, PenTool, Layout, FolderTree, 
-    FileCode, Store, Beaker 
+import {
+    LayoutDashboard, ShoppingBag, Tags, Users, Settings,
+    LogOut, Mail, FileText, PenTool, Layout, FolderTree,
+    FileCode, Store, Beaker, UserCircle
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useHasMounted } from '@/hooks/use-has-mounted'
@@ -30,6 +30,7 @@ const contentNavItems = [
 const settingsNavItems = [
     { href: '/settings', label: 'Settings', icon: Settings },
     { href: '/api-sandbox', label: 'API Sandbox', icon: Beaker },
+    { href: '/profile', label: 'My Profile', icon: UserCircle },
 ]
 
 export function AdminSidebar({ locale }: { locale: string }) {
