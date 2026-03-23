@@ -6,6 +6,10 @@ import { Trash2, Zap, TrendingUp, Clock, ExternalLink, Image as ImageIcon, Box }
 import Link from 'next/link'
 import { deleteDeal, toggleDealActive } from './actions'
 import { formatDistanceToNow } from 'date-fns'
+import { EditDealModal } from '@/components/admin/deals/EditDealModal'
+import { Plus } from 'lucide-react'
+
+export const dynamic = 'force-dynamic'
 
 export default async function AdminDealsPage({ params }: { params: Promise<{ locale: string }> }) {
     const { locale } = await params
@@ -13,8 +17,13 @@ export default async function AdminDealsPage({ params }: { params: Promise<{ loc
 
     const { data: deals } = await supabase
         .from('deals')
-        .select('*, stores ( name, slug ), products ( name_en, slug )')
+        .select('*, stores ( id, name, slug ), products ( name_en, slug )')
         .order('created_at', { ascending: false })
+
+    const { data: stores } = await supabase
+        .from('stores')
+        .select('id, name')
+        .order('name')
 
     const totalActive = deals?.filter((d) => d.is_active).length ?? 0
     const totalDiscounts = deals?.length ?? 0
@@ -32,6 +41,9 @@ export default async function AdminDealsPage({ params }: { params: Promise<{ loc
                     <h1 className="text-3xl font-bold tracking-tight">Deals Registry</h1>
                     <p className="text-muted-foreground">Manage imported flash deals, discounts, and specific store offers.</p>
                 </div>
+                <Button className="font-bold">
+                    <Plus className="w-4 h-4 mr-2" /> Add Deal
+                </Button>
             </div>
 
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -150,11 +162,14 @@ export default async function AdminDealsPage({ params }: { params: Promise<{ loc
                                             <div className="flex items-center justify-end gap-1">
                                                 {deal.affiliate_url && (
                                                     <Link href={deal.affiliate_url} target="_blank">
-                                                        <Button variant="ghost" size="sm" className="h-8 text-xs font-bold text-primary">Go to Deal</Button>
+                                                        <Button variant="ghost" size="icon" className="h-8 w-8 text-primary" title="Go to Deal">
+                                                            <ExternalLink className="w-4 h-4" />
+                                                        </Button>
                                                     </Link>
                                                 )}
+                                                <EditDealModal deal={deal} stores={stores || []} locale={locale} />
                                                 <form action={async () => { "use server"; await toggleDealActive(deal.id, deal.is_active, locale) }}>
-                                                    <Button variant="ghost" size="sm" className="h-8 text-xs font-bold">{deal.is_active ? 'Disable' : 'Enable'}</Button>
+                                                    <Button variant="ghost" size="sm" className="h-8 text-[11px] font-bold px-2">{deal.is_active ? 'Disable' : 'Enable'}</Button>
                                                 </form>
                                                 <form action={async () => { "use server"; await deleteDeal(deal.id, locale) }}>
                                                     <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:bg-destructive/10">

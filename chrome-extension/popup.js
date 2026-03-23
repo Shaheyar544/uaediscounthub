@@ -342,8 +342,13 @@ document.getElementById('importDealsBtn').addEventListener('click', async () => 
 
     // Show success
     document.getElementById('successTitle').textContent = 'Deals Imported!';
-    document.getElementById('successSub').textContent =
-      `${json.imported} of ${json.total} deal${json.total !== 1 ? 's' : ''} imported successfully.`;
+    const errorCount = json.errors?.length || 0;
+    let statusText = `${json.imported} of ${json.total} deal${json.total !== 1 ? 's' : ''} imported successfully.`;
+    if (errorCount > 0) {
+      statusText += `\n(${errorCount} items failed, see console for details)`;
+      console.error('Import Errors:', json.errors);
+    }
+    document.getElementById('successSub').textContent = statusText;
 
     const editLink = document.getElementById('editLink');
     editLink.href = `${settings.adminUrl}/en/admin/deals`;

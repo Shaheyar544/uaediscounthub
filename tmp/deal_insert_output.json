@@ -1,0 +1,10 @@
+[dotenv@17.3.1] injecting env (16) from .env.local -- tip: ≡ƒ¢í∩╕Å auth for agents: https://vestauth.com
+Upserting dealData: {
+  asin: 'B0DEALTEST123',
+  title_en: 'Manual Test Deal',
+  deal_price: 99.99,
+  affiliate_url: 'https://www.amazon.ae/dp/B0DEALTEST123',
+  is_active: true,
+  source: 'manual_test'
+}
+Γ¥î ERROR: there is no unique or exclusion constraint matching the ON CONFLICT specification null null

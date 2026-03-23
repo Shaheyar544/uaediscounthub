@@ -200,7 +200,76 @@ export async function saveProduct(payload: ProductPayload): Promise<SaveResult> 
   }
 }
 
-// ── Delete Product ────────────────────────────────────────────────────────────
+// ── Delete / Trash Product ──────────────────────────────────────────────────────
+
+export async function softDeleteProductById(
+  id: string,
+  locale: string
+): Promise<{ success: boolean; error?: string }> {
+  const supabase = createAdminClient()
+  const { error } = await supabase
+    .from('products')
+    .update({ status: 'archived', updated_at: new Date().toISOString() })
+    .eq('id', id)
+    
+  if (error) return { success: false, error: error.message }
+  revalidatePath(`/${locale}/admin/products`)
+  return { success: true }
+}
+
+export async function bulkSoftDeleteProducts(
+  ids: string[],
+  locale: string
+): Promise<{ success: boolean; error?: string }> {
+  const supabase = createAdminClient()
+  const { error } = await supabase
+    .from('products')
+    .update({ status: 'archived', updated_at: new Date().toISOString() })
+    .in('id', ids)
+    
+  if (error) return { success: false, error: error.message }
+  revalidatePath(`/${locale}/admin/products`)
+  return { success: true }
+}
+
+export async function bulkRestoreProducts(
+  ids: string[],
+  locale: string
+): Promise<{ success: boolean; error?: string }> {
+  const supabase = createAdminClient()
+  const { error } = await supabase
+    .from('products')
+    .update({ status: 'draft', updated_at: new Date().toISOString() })
+    .in('id', ids)
+    
+  if (error) return { success: false, error: error.message }
+  revalidatePath(`/${locale}/admin/products`)
+  return { success: true }
+}
+
+export async function bulkHardDeleteProducts(
+  ids: string[],
+  locale: string
+): Promise<{ success: boolean; error?: string }> {
+  const supabase = createAdminClient()
+
+  await Promise.all([
+    supabase.from('affiliate_clicks').delete().in('product_id', ids),
+    supabase.from('coupons').delete().in('product_id', ids),
+    supabase.from('deals').delete().in('product_id', ids),
+    supabase.from('price_alerts').delete().in('product_id', ids),
+    supabase.from('price_history').delete().in('product_id', ids),
+    supabase.from('product_prices').delete().in('product_id', ids),
+    supabase.from('product_store_prices').delete().in('product_id', ids),
+    supabase.from('wishlists').delete().in('product_id', ids),
+  ])
+
+  const { error } = await supabase.from('products').delete().in('id', ids)
+  if (error) return { success: false, error: error.message }
+
+  revalidatePath(`/${locale}/admin/products`)
+  return { success: true }
+}
 
 export async function deleteProductById(
   id: string,

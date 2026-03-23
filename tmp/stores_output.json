@@ -1,0 +1,28 @@
+[dotenv@17.3.1] injecting env (16) from .env.local -- tip: ΓÜÖ∩╕Å  suppress all logs with { quiet: true }
+All stores: [
+  {
+    "id": "63a7593f-9541-4286-8186-8247282a438a",
+    "name": "Amazon UAE",
+    "slug": "amazon-ae"
+  },
+  {
+    "id": "7edda798-f91d-4694-839c-09719872dfc2",
+    "name": "Noon",
+    "slug": "noon"
+  },
+  {
+    "id": "343f99b9-8fb8-42f0-9c1b-778f26a5b5db",
+    "name": "Sharaf DG",
+    "slug": "sharaf-dg"
+  },
+  {
+    "id": "96ebf504-9c8b-4a8d-81c1-e97217c9a066",
+    "name": "Carrefour",
+    "slug": "carrefour"
+  },
+  {
+    "id": "e2ff8e55-e3b4-43db-b169-96ac36cd6483",
+    "name": "Jarir",
+    "slug": "jarir"
+  }
+]

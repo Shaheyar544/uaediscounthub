@@ -17,6 +17,20 @@ export async function toggleDealActive(id: string, currentStatus: boolean, local
     revalidatePath(`/${locale}/admin/deals`)
 }
 
+export async function updateDeal(id: string, data: any, locale: string) {
+    const supabase = createAdminClient()
+    const { error } = await supabase
+        .from('deals')
+        .update(data)
+        .eq('id', id)
+    
+    if (error) {
+        console.error('Error updating deal:', error)
+        throw new Error('Failed to update deal')
+    }
+    revalidatePath(`/${locale}/admin/deals`)
+}
+
 export async function deleteDeal(id: string, locale: string) {
     const supabase = createAdminClient()
     const { error } = await supabase

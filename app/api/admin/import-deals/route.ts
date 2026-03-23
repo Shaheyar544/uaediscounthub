@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/utils/supabase/admin'
 
+export const dynamic = 'force-dynamic'
+
 // ── Types ─────────────────────────────────────────────────────────────────────
 
 interface DealPayload {
@@ -63,7 +65,12 @@ export async function POST(req: NextRequest) {
     .ilike('name', '%amazon%')
     .single()
 
-  const storeId = amazonStore?.id ?? null
+  let storeId = amazonStore?.id ?? null
+  
+  // Robust fallback: if ilike fails, use the known Amazon UAE ID we found in the DB
+  if (!storeId) {
+    storeId = '63a7593f-9541-4286-8186-8247282a438a'
+  }
 
   const results: { asin: string; success: boolean; error?: string }[] = []
 
@@ -75,7 +82,13 @@ export async function POST(req: NextRequest) {
       const finalPrice   = deal.final_price ?? currentPrice
       // coupon_value may be a number (new) or string (old) — store as string for the DB TEXT column
       const couponValueStr = deal.coupon_value != null ? String(deal.coupon_value) : null
-      const couponTypeStr  = deal.coupon_type === 'amount' ? 'fixed' : (deal.coupon_type ?? null)
+      // Normalise coupon type to match DB CHECK constraint: ('percentage', 'fixed', NULL)
+      let couponTypeStr: string | null = null
+      if (deal.coupon_type) {
+        const ct = String(deal.coupon_type).toLowerCase()
+        if (ct.includes('percent')) couponTypeStr = 'percentage'
+        else if (ct.includes('fixed') || ct.includes('amount')) couponTypeStr = 'fixed'
+      }
 
       if (!productName || !currentPrice) {
         results.push({ asin: deal.asin, success: false, error: 'Missing name or price' })
@@ -151,36 +164,59 @@ export async function POST(req: NextRequest) {
         asin:             deal.asin || null,
         title_en:         productName,
         image_url:        deal.image_url || null,
-        deal_price:       currentPrice,
-        final_price:      finalPrice,
-        original_price:   deal.original_price ?? null,
-        discount_percent: deal.discount_percent ?? null,
+        deal_price:       Number(currentPrice) || 0,
+        final_price:      Number(finalPrice) || Number(currentPrice) || 0,
+        original_price:   deal.original_price ? Number(deal.original_price) : null,
+        discount_percent: deal.discount_percent ? Math.round(Number(deal.discount_percent)) : null,
         coupon_value:     couponValueStr,
         coupon_type:      couponTypeStr,
-        affiliate_url:    deal.affiliate_url || null,
+        affiliate_url:    deal.affiliate_url || `https://www.amazon.ae/dp/${deal.asin}`, // Fallback for NOT NULL constraint
         expires_at:       deal.expires_at ?? null,
         source:           'amazon_deals',
         is_active:        true,
         updated_at:       new Date().toISOString(),
       }
 
-      if (deal.asin) {
-        await supabase
+      const { data: existingDeal } = deal.asin
+        ? await supabase
           .from('deals')
-          .upsert(dealData, { onConflict: 'asin', ignoreDuplicates: false })
+          .select('id')
+          .eq('asin', deal.asin)
+          .maybeSingle()
+        : { data: null }
+
+      let dealError
+      if (existingDeal) {
+        // Update existing
+        const { error } = await supabase
+          .from('deals')
+          .update(dealData)
+          .eq('id', existingDeal.id)
+        dealError = error
       } else {
-        await supabase.from('deals').insert(dealData)
+        // Insert new
+        const { error } = await supabase
+          .from('deals')
+          .insert(dealData)
+        dealError = error
+      }
+
+      if (dealError) {
+        throw new Error(`Deal Table Error: ${dealError.message}`)
       }
 
       // 3. Record price history
       if (productId && storeId) {
-        await supabase.from('price_history').insert({
+        const { error: histError } = await supabase.from('price_history').insert({
           product_id: productId,
           store_id:   storeId,
           price:      currentPrice,
           currency:   'AED',
           source:     'amazon_deals',
         })
+        if (histError) {
+          console.warn('[import-deals] price_history error (non-fatal):', histError.message)
+        }
       }
 
       results.push({ asin: deal.asin, success: true })

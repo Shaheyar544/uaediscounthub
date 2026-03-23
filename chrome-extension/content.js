@@ -545,7 +545,10 @@ function scrapeAmazonDealsPage() {
   const deals = [];
 
   const cards = document.querySelectorAll(
-    'div[data-testid="product-card"][data-asin]'
+    'div[data-testid="product-card"][data-asin], ' +
+    'div[data-asin][data-csa-c-type="item"], ' +
+    '.a-section.octopus-dlp-asin-section, ' +
+    '.s-result-item[data-asin]'
   );
 
   console.log(`Found ${cards.length} deal cards`);
