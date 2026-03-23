@@ -21,7 +21,8 @@
       "Bash(git add:*)",
       "Bash(git commit:*)",
       "Bash(ls -la F:/uaediscounthub/app/[locale]/admin/)",
-      "Bash(find F:uaediscounthub/app/[locale]/admin/pages -type f)"
+      "Bash(find F:uaediscounthub/app/[locale]/admin/pages -type f)",
+      "Bash(ls F:/uaediscounthub/app/[locale]/deals/)"
     ]
   }
 }

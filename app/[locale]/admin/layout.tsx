@@ -25,7 +25,9 @@ export default async function AdminLayout({
                     <ThemeToggle />
                 </header>
                 <div className="p-8 flex-1 overflow-auto bg-muted/10">
-                    {children}
+                    <div className="max-w-7xl">
+                        {children}
+                    </div>
                 </div>
             </main>
         </div>

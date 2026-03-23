@@ -69,7 +69,7 @@ export default function PagesManagementClient({ locale }: { locale: string }) {
   )
 
   return (
-    <div className="p-8">
+    <div className="space-y-8">
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-[22px] font-extrabold text-[#0D1117]">Pages Management</h1>

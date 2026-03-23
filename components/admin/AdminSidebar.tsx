@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation'
 import {
     LayoutDashboard, ShoppingBag, Tags, Users, Settings,
     LogOut, Mail, FileText, PenTool, Layout, FolderTree,
-    FileCode, Store, Beaker, UserCircle
+    FileCode, Store, Beaker, UserCircle, Zap
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useHasMounted } from '@/hooks/use-has-mounted'
@@ -15,7 +15,8 @@ const mainNavItems = [
     { href: '/products', label: 'Products', icon: ShoppingBag },
     { href: '/categories', label: 'Categories', icon: FolderTree },
     { href: '/stores', label: 'Stores', icon: Store },
-    { href: '/coupons', label: 'Coupons & Deals', icon: Tags },
+    { href: '/coupons', label: 'Coupons', icon: Tags },
+    { href: '/deals', label: 'Deals', icon: Zap },
     { href: '/newsletters', label: 'Newsletter', icon: Mail },
     { href: '/users', label: 'Users', icon: Users },
 ]
