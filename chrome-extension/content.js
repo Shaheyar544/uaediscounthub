@@ -1,5 +1,7 @@
 (function() {
 'use strict';
+if (window.__UAE_HUB_INJECTED__) return;
+window.__UAE_HUB_INJECTED__ = true;
 
 // ── FIX 2: Category mapping ───────────────────────────────────────────────────
 

@@ -325,7 +325,10 @@ document.getElementById('importDealsBtn').addEventListener('click', async () => 
   clearStatus(dealsStatus);
 
   try {
-    const res = await fetch(`${settings.adminUrl}/api/admin/import-deals`, {
+    const targetUrl = `${settings.adminUrl}/api/admin/import-deals`;
+    console.log('Sending deals to:', targetUrl);
+    
+    const res = await fetch(targetUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
