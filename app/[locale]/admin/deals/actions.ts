@@ -19,9 +19,15 @@ export async function toggleDealActive(id: string, currentStatus: boolean, local
 
 export async function updateDeal(id: string, data: any, locale: string) {
     const supabase = createAdminClient()
+    
+    // Comprehensive cleaner: convert all empty strings to null to avoid type casting errors
+    const cleanedData = Object.fromEntries(
+        Object.entries(data).map(([k, v]) => [k, v === '' ? null : v])
+    )
+
     const { error } = await supabase
         .from('deals')
-        .update(data)
+        .update(cleanedData)
         .eq('id', id)
     
     if (error) {
