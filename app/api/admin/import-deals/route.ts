@@ -202,7 +202,7 @@ export async function POST(req: NextRequest) {
       }
 
       if (dealError) {
-        throw new Error(`Deal Table Error: ${dealError.message}`)
+        throw new Error(`${dealError.message}${dealError.details ? ' - ' + dealError.details : ''}`)
       }
 
       // 3. Record price history

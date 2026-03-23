@@ -710,7 +710,7 @@ function extractDealsFromCards(cards) {
       var asin = card.getAttribute('data-asin');
       if (!asin) return;
 
-      var name = card.querySelector('.a-truncate-full.a-offscreen')?.textContent?.trim();
+      var name = card.querySelector('.a-truncate-full.a-offscreen, .ProductCard-module__title_3_5P_8, h2, [data-testid="product-card-title"]')?.textContent?.trim();
       if (!name) return;
 
       var couponRaw    = card.querySelector('span.CouponExperienceBadge-module__label_Qzf0b6DKge1SbAxIoQeY')?.textContent?.trim();
