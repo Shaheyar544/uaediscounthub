@@ -1,6 +1,4 @@
-// ─── UAEDiscountHub Product Importer — Content Script ────────────────────────
-// Runs on: amazon.ae, noon.com, sharafdg.com, carrefouruae.com
-
+(function() {
 'use strict';
 
 // ── FIX 2: Category mapping ───────────────────────────────────────────────────
@@ -840,3 +838,5 @@ chrome.runtime.onMessage.addListener(function(request, _sender, sendResponse) {
     return false;
   }
 });
+
+})();
