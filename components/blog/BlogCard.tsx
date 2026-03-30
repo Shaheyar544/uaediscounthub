@@ -18,6 +18,8 @@ interface BlogCardProps {
  */
 export function BlogCard({ post, variant = 'default', locale = 'en' }: BlogCardProps) {
   const postUrl = `/${locale}/blog/${post.slug}`
+  const authorName = post.author?.display_name || 'Admin'
+  const authorInitial = authorName[0] || 'A'
 
   // Featured Post Layout (Large horizontal card)
   if (variant === 'featured') {
@@ -53,11 +55,17 @@ export function BlogCard({ post, variant = 'default', locale = 'en' }: BlogCardP
             {post.excerpt || post.content.substring(0, 160).replace(/<[^>]+>/g, '')}
           </p>
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-6 h-6 rounded-full bg-[#0057FF] text-white text-[10px] font-bold flex items-center justify-center">
-              {post.author?.full_name?.[0] || 'A'}
-            </div>
+            {post.author?.avatar_url ? (
+              <div className="relative w-6 h-6 rounded-full overflow-hidden border border-[#DDE3EF]">
+                <Image src={post.author.avatar_url} alt={authorName} fill className="object-cover" />
+              </div>
+            ) : (
+              <div className="w-6 h-6 rounded-full bg-[#0057FF] text-white text-[10px] font-bold flex items-center justify-center">
+                {authorInitial}
+              </div>
+            )}
             <div>
-              <div className="text-[12px] font-semibold text-[#4B5675]">{post.author?.full_name || 'Admin'}</div>
+              <div className="text-[12px] font-semibold text-[#4B5675]">{authorName}</div>
               <div className="text-[11px] text-[#8A94A6]">
                 {post.published_at ? new Date(post.published_at).toLocaleDateString(locale === 'ar' ? 'ar-AE' : 'en-AE', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Draft'}
               </div>
@@ -126,10 +134,16 @@ export function BlogCard({ post, variant = 'default', locale = 'en' }: BlogCardP
       <div className="p-5 flex-1 flex flex-col">
         <div className="flex items-center gap-3 mb-3">
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-full bg-[#0057FF] text-white text-[10px] font-bold flex items-center justify-center">
-              {post.author?.full_name?.[0] || 'A'}
-            </div>
-            <div className="text-[12px] font-semibold text-[#4B5675]">{post.author?.full_name || 'Admin'}</div>
+            {post.author?.avatar_url ? (
+              <div className="relative w-6 h-6 rounded-full overflow-hidden border border-[#DDE3EF]">
+                <Image src={post.author.avatar_url} alt={authorName} fill className="object-cover" />
+              </div>
+            ) : (
+              <div className="w-6 h-6 rounded-full bg-[#0057FF] text-white text-[10px] font-bold flex items-center justify-center">
+                {authorInitial}
+              </div>
+            )}
+            <div className="text-[12px] font-semibold text-[#4B5675]">{authorName}</div>
           </div>
           <div className="text-[11px] text-[#8A94A6]">
             {post.published_at ? new Date(post.published_at).toLocaleDateString(locale === 'ar' ? 'ar-AE' : 'en-AE', { month: 'short', day: 'numeric' }) : 'Draft'}

@@ -1,11 +1,10 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
-import { createClient } from '@/utils/supabase/client'
+import React, { useMemo, useState } from 'react'
 import Link from 'next/link'
 import { 
   Plus, Search, TrendingUp, FileText, CheckCircle, Clock,
-  MoreVertical, Eye, Edit3, Trash2
+  Eye, Edit3, Trash2
 } from 'lucide-react'
 
 interface Post {
@@ -16,55 +15,29 @@ interface Post {
   featured_image: string | null
   view_count: number
   created_at: string
-  author?: { full_name: string }
+  author?: { display_name: string | null }
   category?: { name: string, color: string }
 }
 
-export default function BlogClient({ locale }: { locale: string }) {
-  const supabase = createClient()
-  const [posts, setPosts] = useState<Post[]>([])
-  const [loading, setLoading] = useState(true)
-  const [stats, setStats] = useState([
-    { label: 'Total Posts', value: 0, delta: '+0 this week', color: 'text-[#0D1117]', icon: <FileText size={20} /> },
-    { label: 'Published', value: 0, delta: 'Live & Indexed', color: 'text-[#00C48C]', icon: <CheckCircle size={20} /> },
-    { label: 'Drafts', value: 0, delta: 'Pending', color: 'text-[#FFC107]', icon: <Clock size={20} /> },
-    { label: 'Monthly Views', value: '0', delta: '+0% MoM', color: 'text-[#0057FF]', icon: <TrendingUp size={20} /> },
-  ])
-
-  useEffect(() => {
-    fetchData()
-  }, [])
-
-  const fetchData = async () => {
-    try {
-      setLoading(true)
-      
-      // Fetch Stats
-      const { count: totalPosts } = await supabase.from('blog_posts').select('*', { count: 'exact', head: true })
-      const { count: publishedPosts } = await supabase.from('blog_posts').select('*', { count: 'exact', head: true }).eq('status', 'published')
-      const { count: drafts } = await supabase.from('blog_posts').select('*', { count: 'exact', head: true }).eq('status', 'draft')
-
-      setStats([
-        { label: 'Total Posts', value: totalPosts || 0, delta: '+3 this week', color: 'text-[#0D1117]', icon: <FileText size={20} /> },
-        { label: 'Published', value: publishedPosts || 0, delta: 'Live & Indexed', color: 'text-[#00C48C]', icon: <CheckCircle size={20} /> },
-        { label: 'Drafts', value: drafts || 0, delta: 'Pending', color: 'text-[#FFC107]', icon: <Clock size={20} /> },
-        { label: 'Monthly Views', value: '84K', delta: '+22% MoM', color: 'text-[#0057FF]', icon: <TrendingUp size={20} /> },
-      ])
-
-      // Fetch Posts
-      const { data, error } = await supabase
-        .from('blog_posts')
-        .select('*, author:author_id(full_name), category:category_id(name, color)')
-        .order('created_at', { ascending: false })
-
-      if (error) throw error
-      setPosts(data || [])
-    } catch (err) {
-      console.error('Error fetching blog data:', err)
-    } finally {
-      setLoading(false)
-    }
+interface BlogClientProps {
+  locale: string
+  initialPosts: Post[]
+  initialStats: {
+    totalPosts: number
+    publishedPosts: number
+    drafts: number
   }
+}
+
+export default function BlogClient({ locale, initialPosts, initialStats }: BlogClientProps) {
+  const [posts] = useState<Post[]>(initialPosts)
+
+  const stats = useMemo(() => ([
+    { label: 'Total Posts', value: initialStats.totalPosts, delta: '+3 this week', color: 'text-[#0D1117]', icon: <FileText size={20} /> },
+    { label: 'Published', value: initialStats.publishedPosts, delta: 'Live & Indexed', color: 'text-[#00C48C]', icon: <CheckCircle size={20} /> },
+    { label: 'Drafts', value: initialStats.drafts, delta: 'Pending', color: 'text-[#FFC107]', icon: <Clock size={20} /> },
+    { label: 'Monthly Views', value: '84K', delta: '+22% MoM', color: 'text-[#0057FF]', icon: <TrendingUp size={20} /> },
+  ]), [initialStats])
 
   return (
     <div className="space-y-8">
@@ -144,11 +117,7 @@ export default function BlogClient({ locale }: { locale: string }) {
                 </tr>
               </thead>
               <tbody>
-                {loading ? (
-                  <tr>
-                    <td colSpan={8} className="p-10 text-center text-[13px] text-[#8A94A6]">Loading posts...</td>
-                  </tr>
-                ) : posts.length === 0 ? (
+                {posts.length === 0 ? (
                   <tr>
                     <td colSpan={8} className="p-10 text-center text-[13px] text-[#8A94A6]">No posts found.</td>
                   </tr>
@@ -182,9 +151,9 @@ export default function BlogClient({ locale }: { locale: string }) {
                       <td className="p-4">
                         <div className="flex items-center gap-2">
                           <div className="w-6 h-6 rounded-full bg-[#0057FF] text-white text-[9px] font-bold flex items-center justify-center">
-                            {post.author?.full_name?.[0] || 'A'}
+                            {post.author?.display_name?.[0] || 'A'}
                           </div>
-                          <span className="text-[12px] font-semibold text-[#4B5675]">{post.author?.full_name || 'Admin'}</span>
+                          <span className="text-[12px] font-semibold text-[#4B5675]">{post.author?.display_name || 'Admin'}</span>
                         </div>
                       </td>
                       <td className="p-4">

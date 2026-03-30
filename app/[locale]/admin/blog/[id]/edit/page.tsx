@@ -13,7 +13,7 @@ export default async function AdminEditPostPage(props: { params: Promise<{ id: s
   // Fetch the post
   const { data: post, error } = await supabase
     .from('blog_posts')
-    .select('*, author:author_id(full_name,avatar_url,role), category:category_id(*), tags:blog_post_tags(tag:blog_tags(*))')
+    .select('*, author:author_id(display_name,bio,avatar_url,social_links,role), category:category_id(*), tags:blog_post_tags(tag:blog_tags(*))')
     .eq('id', id)
     .single()
 

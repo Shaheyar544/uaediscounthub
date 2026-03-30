@@ -1,0 +1,21 @@
+[dotenv@17.3.1] injecting env (16) from .env.local -- tip: ≡ƒñû agentic secret storage: https://dotenvx.com/as2
+--- Detailed Column Inspection ---
+Insert Error: null value in column "title_en" of relation "deals" violates not-null constraint
+Details: Failing row contains (1aa21b4a-c7d7-4484-9335-cac19cb18c73, null, null, null, null, null, null, AED, null, null, null, f, 0, 2026-03-27 02:05:51.42622+00, null, 0, 0, t, 2026-03-27 02:05:51.42622+00, MANDATORY_TEST, manual, null, null, null, null, null).
+Hint: null
+Store Test Result: null value in column "deal_price" of relation "deals" violates not-null constraint
+Available Columns: [
+  'id',                 'product_id',
+  'store_id',           'title_en',
+  'title_ar',           'deal_price',
+  'original_price',     'currency',
+  'affiliate_url',      'badge_text',
+  'badge_text_ar',      'is_flash_sale',
+  'social_proof_count', 'starts_at',
+  'expires_at',         'view_count',
+  'click_count',        'is_active',
+  'created_at',         'asin',
+  'source',             'image_url',
+  'final_price',        'coupon_value',
+  'coupon_type',        'discount_percent'
+]

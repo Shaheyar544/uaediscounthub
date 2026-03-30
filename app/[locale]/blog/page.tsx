@@ -46,7 +46,7 @@ export default async function BlogListingPage(props: {
   // 2. Build Posts Query
   let query = supabase
     .from('blog_posts')
-    .select('*, author:author_id(full_name,avatar_url,role), category:category_id(*)', { count: 'exact' })
+    .select('*, author:author_id(display_name,bio,avatar_url,social_links,role), category:category_id(*)', { count: 'exact' })
     .eq('status', 'published')
     .ilike('locale', `%${locale}%`)
     .order('published_at', { ascending: false })

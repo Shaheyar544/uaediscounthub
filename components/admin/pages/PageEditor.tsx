@@ -12,6 +12,7 @@ import {
   Link as LinkIcon, Save, Eye, ChevronLeft, RefreshCw, FileCode, Search,
   AlignLeft, AlignCenter, AlignRight, LayoutTemplate, X
 } from 'lucide-react'
+import { sanitizeRichHtml } from '@/lib/sanitize-html'
 import { createClient } from '@/utils/supabase/client'
 import { useRouter } from 'next/navigation'
 import { useHasMounted } from '@/hooks/use-has-mounted'
@@ -131,11 +132,17 @@ export function PageEditor({ initialData, locale }: PageEditorProps) {
     }
     setSaving(true)
     try {
+      const sanitizedPage = {
+        ...page,
+        content_en: sanitizeRichHtml(page.content_en),
+        content_ar: sanitizeRichHtml(page.content_ar),
+      }
+
       if (page.id) {
-        const { error } = await supabase.from('pages').update(page).eq('id', page.id)
+        const { error } = await supabase.from('pages').update(sanitizedPage).eq('id', page.id)
         if (error) throw error
       } else {
-        const { error } = await supabase.from('pages').insert([page])
+        const { error } = await supabase.from('pages').insert([sanitizedPage])
         if (error) throw error
       }
       router.push(`/${locale}/admin/pages`)
@@ -230,7 +237,13 @@ export function PageEditor({ initialData, locale }: PageEditorProps) {
           <select
             className="bg-[#F6F8FC] border border-[#DDE3EF] rounded-[8px] px-3 py-1.5 text-[12px] font-bold text-[#4B5675] outline-none"
             value={page.status}
-            onChange={(e) => update({ status: e.target.value as Page['status'] })}
+            onChange={(e) => {
+              const newStatus = e.target.value as Page['status']
+              update({ 
+                status: newStatus,
+                ...(newStatus === 'published' ? { is_active: true, is_visible: true } : {})
+              })
+            }}
           >
             <option value="draft">DRAFT</option>
             <option value="published">PUBLISHED</option>

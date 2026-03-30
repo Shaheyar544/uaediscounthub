@@ -1,5 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import { hasAdminRole } from '@/utils/auth/admin'
 
 export async function updateSession(request: NextRequest) {
     let supabaseResponse = NextResponse.next({
@@ -40,6 +41,15 @@ export async function updateSession(request: NextRequest) {
         const localeMatch = request.nextUrl.pathname.match(/^\/(en|ar)(\/|$)/)
         const locale = localeMatch ? localeMatch[1] : 'en'
         url.pathname = `/${locale}/login`
+        return NextResponse.redirect(url)
+    }
+
+    if (isAdminRoute && user && !hasAdminRole(user)) {
+        const url = request.nextUrl.clone()
+        const localeMatch = request.nextUrl.pathname.match(/^\/(en|ar)(\/|$)/)
+        const locale = localeMatch ? localeMatch[1] : 'en'
+        url.pathname = `/${locale}`
+        url.search = ''
         return NextResponse.redirect(url)
     }
 

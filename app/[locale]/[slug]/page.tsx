@@ -1,4 +1,5 @@
-import { createAdminClient } from '@/utils/supabase/admin'
+import { sanitizeRichHtml } from '@/lib/sanitize-html'
+import { createClient } from '@/utils/supabase/server'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 
@@ -13,7 +14,7 @@ export async function generateMetadata({
   params: Promise<Params>
 }): Promise<Metadata> {
   const { locale, slug } = await params
-  const supabase = createAdminClient()
+  const supabase = await createClient()
 
   const { data: page } = await supabase
     .from('pages')
@@ -42,7 +43,7 @@ export default async function DynamicPage({
   params: Promise<Params>
 }) {
   const { locale, slug } = await params
-  const supabase = createAdminClient()
+  const supabase = await createClient()
 
   const { data: page } = await supabase
     .from('pages')
@@ -54,7 +55,7 @@ export default async function DynamicPage({
   if (!page || page.status !== 'published') notFound()
 
   const title = locale === 'ar' ? (page.title_ar || page.title_en) : page.title_en
-  const content = locale === 'ar' ? (page.content_ar || page.content_en) : page.content_en
+  const content = sanitizeRichHtml(locale === 'ar' ? (page.content_ar || page.content_en) : page.content_en)
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-12 w-full">

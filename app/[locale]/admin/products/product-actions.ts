@@ -1,6 +1,6 @@
 'use server'
 
-import { createAdminClient } from '@/utils/supabase/admin'
+import { requireAdmin } from '@/utils/auth/require-admin'
 import { revalidatePath } from 'next/cache'
 
 // ── Shared Types ─────────────────────────────────────────────────────────────
@@ -57,7 +57,36 @@ export interface SaveResult {
 // ── Save Product ──────────────────────────────────────────────────────────────
 
 export async function saveProduct(payload: ProductPayload): Promise<SaveResult> {
-  const supabase = createAdminClient()
+  const { supabase } = await requireAdmin()
+
+  // --- SKU Uniqueness Check (Hardened) ---
+  if (payload.sku && payload.sku.trim()) {
+    const cleanSku = payload.sku.trim()
+    let skuQuery = supabase
+      .from('products')
+      .select('id, name_en')
+      .eq('sku', cleanSku)
+    
+    if (payload.id) {
+      skuQuery = skuQuery.neq('id', payload.id)
+    }
+
+    // limit(1) handles cases where duplicates might already exist (avoiding maybeSingle error)
+    const { data: existingRows, error: skuErr } = await skuQuery.limit(1)
+    
+    if (skuErr) {
+      console.error('[saveProduct] SKU Check Failure:', skuErr.message)
+      return { success: false, error: `SKU validation failed: ${skuErr.message}` }
+    }
+
+    if (existingRows && existingRows.length > 0) {
+      const existingProduct = existingRows[0]
+      return { 
+        success: false, 
+        error: `A product with this SKU (ASIN) already exists: "${existingProduct.name_en}" (ID: ${existingProduct.id}). Each SKU must be unique.` 
+      }
+    }
+  }
 
   // Convert spec entries array → object
   const specsObj: Record<string, string> = {}
@@ -206,7 +235,7 @@ export async function softDeleteProductById(
   id: string,
   locale: string
 ): Promise<{ success: boolean; error?: string }> {
-  const supabase = createAdminClient()
+  const { supabase } = await requireAdmin()
   const { error } = await supabase
     .from('products')
     .update({ status: 'archived', updated_at: new Date().toISOString() })
@@ -221,7 +250,7 @@ export async function bulkSoftDeleteProducts(
   ids: string[],
   locale: string
 ): Promise<{ success: boolean; error?: string }> {
-  const supabase = createAdminClient()
+  const { supabase } = await requireAdmin()
   const { error } = await supabase
     .from('products')
     .update({ status: 'archived', updated_at: new Date().toISOString() })
@@ -236,7 +265,7 @@ export async function bulkRestoreProducts(
   ids: string[],
   locale: string
 ): Promise<{ success: boolean; error?: string }> {
-  const supabase = createAdminClient()
+  const { supabase } = await requireAdmin()
   const { error } = await supabase
     .from('products')
     .update({ status: 'draft', updated_at: new Date().toISOString() })
@@ -251,7 +280,7 @@ export async function bulkHardDeleteProducts(
   ids: string[],
   locale: string
 ): Promise<{ success: boolean; error?: string }> {
-  const supabase = createAdminClient()
+  const { supabase } = await requireAdmin()
 
   await Promise.all([
     supabase.from('affiliate_clicks').delete().in('product_id', ids),
@@ -276,7 +305,7 @@ export async function deleteProductById(
   slug: string,
   locale: string
 ): Promise<{ success: boolean; error?: string }> {
-  const supabase = createAdminClient()
+  const { supabase } = await requireAdmin()
 
   // Delete all child rows first (8 tables have FK → products)
   await Promise.all([

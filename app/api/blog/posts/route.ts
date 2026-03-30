@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { sanitizeRichHtml } from '@/lib/sanitize-html'
 import { createClient } from '@/utils/supabase/server'
 import { BlogPost } from '@/types/blog'
 
@@ -23,7 +24,7 @@ export async function GET(req: NextRequest) {
 
     let query = supabase
       .from('blog_posts')
-      .select('*, author:author_id(full_name,avatar_url,role), category:category_id(*)', { count: 'exact' })
+      .select('*, author:author_id(display_name,bio,avatar_url,social_links,role), category:category_id(*)', { count: 'exact' })
       .eq('locale', locale)
 
     if (status) query = query.eq('status', status)
@@ -78,7 +79,7 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json()
-    const { 
+    const {
       title, 
       subtitle, 
       slug, 
@@ -99,9 +100,10 @@ export async function POST(req: NextRequest) {
       allow_comments, 
       locale 
     } = body
+    const sanitizedContent = sanitizeRichHtml(content)
 
     // Validate required fields
-    if (!title || !slug || !content) {
+    if (!title || !slug || !sanitizedContent) {
       return NextResponse.json({ error: 'Title, Slug, and Content are required' }, { status: 400 })
     }
 
@@ -111,8 +113,8 @@ export async function POST(req: NextRequest) {
         title,
         subtitle,
         slug,
-        content,
-        excerpt: excerpt || content.substring(0, 160).replace(/<[^>]+>/g, ''),
+        content: sanitizedContent,
+        excerpt: excerpt || sanitizedContent.substring(0, 160).replace(/<[^>]+>/g, ''),
         featured_image,
         og_image,
         status: status || 'draft',
@@ -120,7 +122,7 @@ export async function POST(req: NextRequest) {
         published_at: status === 'published' ? new Date().toISOString() : null,
         author_id: user.id,
         category_id,
-        reading_time_min: reading_time_min || Math.ceil(content.split(/\s+/).length / 200),
+        reading_time_min: reading_time_min || Math.ceil(sanitizedContent.split(/\s+/).length / 200),
         seo_title,
         seo_description,
         seo_keywords,

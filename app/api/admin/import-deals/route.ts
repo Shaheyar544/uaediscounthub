@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/utils/supabase/admin'
+import { uploadRemoteImage } from '@/lib/r2-storage'
 
 export const dynamic = 'force-dynamic'
 
@@ -68,9 +69,7 @@ export async function POST(req: NextRequest) {
   let storeId = amazonStore?.id ?? null
   
   // Robust fallback: if ilike fails, use the known Amazon UAE ID we found in the DB
-  if (!storeId) {
-    storeId = '63a7593f-9541-4286-8186-8247282a438a'
-  }
+  console.log(`[import-deals] Processing ${deals.length} deals. StoreId: ${storeId}${!amazonStore ? ' (using fallback)' : ''}`);
 
   const results: { asin: string; success: boolean; error?: string }[] = []
 
@@ -93,6 +92,23 @@ export async function POST(req: NextRequest) {
       if (!productName || !currentPrice) {
         results.push({ asin: deal.asin, success: false, error: 'Missing name or price' })
         continue
+      }
+
+      // --- Image Proxy Logic ---
+      let finalImageUrl = deal.image_url || null
+      if (finalImageUrl && finalImageUrl.includes('amazon.com') || finalImageUrl?.includes('amazon.ae') || finalImageUrl?.includes('media-amazon.com')) {
+        try {
+          // Identify/Clean image suffix for better R2 key
+          const imageIdMatch = finalImageUrl.match(/\/images\/I\/([A-Z0-9]+)/i)
+          const imageId = imageIdMatch ? imageIdMatch[1] : `amazon-${deal.asin || Date.now()}`
+          
+          console.log(`[import-deals] Proxying image for ASIN ${deal.asin || 'unknown'}`)
+          const r2Result = await uploadRemoteImage(finalImageUrl, `${imageId}.webp`)
+          finalImageUrl = r2Result.url
+        } catch (imgErr) {
+          console.error(`[import-deals] Image proxy failed for ${deal.asin}:`, imgErr instanceof Error ? imgErr.message : imgErr)
+          // Fallback to original URL - non-fatal
+        }
       }
 
       // 1. Upsert product stub by ASIN
@@ -122,13 +138,12 @@ export async function POST(req: NextRequest) {
               name_en: productName,
               slug: `${slug}-${deal.asin.toLowerCase()}`,
               sku: deal.asin,
-              image_url: deal.image_url || null,
-              thumbnail_url: deal.image_url || null,
+              image_url: finalImageUrl,
+              thumbnail_url: finalImageUrl,
               base_price: currentPrice,
               status: 'draft',
               is_active: false,
               currency: 'AED',
-              updated_at: new Date().toISOString(),
             })
             .select('id')
             .single()
@@ -140,13 +155,12 @@ export async function POST(req: NextRequest) {
                 name_en: productName,
                 slug: `${slug}-${Date.now()}`,
                 sku: deal.asin,
-                image_url: deal.image_url || null,
-                thumbnail_url: deal.image_url || null,
+                image_url: finalImageUrl,
+                thumbnail_url: finalImageUrl,
                 base_price: currentPrice,
                 status: 'draft',
                 is_active: false,
                 currency: 'AED',
-                updated_at: new Date().toISOString(),
               })
               .select('id')
               .single()
@@ -163,7 +177,7 @@ export async function POST(req: NextRequest) {
         store_id:         storeId,
         asin:             deal.asin || null,
         title_en:         productName,
-        image_url:        deal.image_url || null,
+        image_url:        finalImageUrl,
         deal_price:       Number(currentPrice) || 0,
         final_price:      Number(finalPrice) || Number(currentPrice) || 0,
         original_price:   deal.original_price ? Number(deal.original_price) : null,
@@ -172,9 +186,9 @@ export async function POST(req: NextRequest) {
         coupon_type:      couponTypeStr,
         affiliate_url:    deal.affiliate_url || `https://www.amazon.ae/dp/${deal.asin}`, // Fallback for NOT NULL constraint
         expires_at:       deal.expires_at ?? null,
+        currency:         'AED',
         source:           'amazon_deals',
         is_active:        true,
-        updated_at:       new Date().toISOString(),
       }
 
       const { data: existingDeal } = deal.asin
@@ -202,6 +216,7 @@ export async function POST(req: NextRequest) {
       }
 
       if (dealError) {
+        console.error(`[import-deals] DB Error for ASIN ${deal.asin}:`, dealError.message);
         throw new Error(`${dealError.message}${dealError.details ? ' - ' + dealError.details : ''}`)
       }
 
@@ -221,10 +236,12 @@ export async function POST(req: NextRequest) {
 
       results.push({ asin: deal.asin, success: true })
     } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Unknown error';
+      console.error(`[import-deals] Failed ASIN ${deal.asin}:`, msg);
       results.push({
         asin: deal.asin,
         success: false,
-        error: err instanceof Error ? err.message : 'Unknown error',
+        error: msg,
       })
     }
   }

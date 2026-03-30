@@ -296,14 +296,29 @@ body {
 
 .deal-checkbox { flex-shrink: 0; cursor: pointer; accent-color: #0057FF; }
 
-.deal-thumb {
+.deal-thumb-container {
   width: 48px;
   height: 48px;
-  object-fit: contain;
   border-radius: 6px;
   background: #F6F8FC;
   border: 1px solid #DDE3EF;
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.deal-thumb {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.deal-thumb.fallback-img {
+  width: 24px;
+  height: 24px;
+  opacity: 0.5;
 }
 
 .deal-info { flex: 1; min-width: 0; }

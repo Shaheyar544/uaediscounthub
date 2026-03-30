@@ -14,12 +14,47 @@ export default async function SearchPage({
     const { q: query } = await searchParams
     const dict = await getDictionary(locale as Locale)
     const supabase = await createClient()
-
-    const { data: products, error } = await supabase
-        .from('products')
-        .select('*')
-        .or(`name_en.ilike.%${query}%,description_en.ilike.%${query}%`)
-        .limit(20)
+    
+    // Split query into words to allow for partial matching/typo tolerance
+    const terms = query.trim().split(/\s+/).filter(word => word.length > 1)
+    
+    let products = []
+    let queryBuilder = supabase.from('products').select('*')
+    
+    if (terms.length > 0) {
+        // Build a filter that looks for ANY of the terms in EN or AR fields
+        // This handles cases like "Honer Pad 9" where "Pad" and "9" will match
+        const orConditions = terms.flatMap(term => [
+            `name_en.ilike.%${term}%`,
+            `name_ar.ilike.%${term}%`,
+            `description_en.ilike.%${term}%`,
+            `description_ar.ilike.%${term}%`
+        ]).join(',')
+        
+        const { data, error } = await queryBuilder
+            .or(orConditions)
+            .limit(20)
+        
+        products = data || []
+        
+        // Simple ranking: products containing MORE terms should come first
+        if (products.length > 1) {
+            products.sort((a, b) => {
+                const countTerms = (text: string) => 
+                    terms.filter(t => text?.toLowerCase().includes(t.toLowerCase())).length
+                
+                const scoreA = countTerms(a.name_en) + countTerms(a.name_ar)
+                const scoreB = countTerms(b.name_en) + countTerms(b.name_ar)
+                return scoreB - scoreA
+            })
+        }
+    } else {
+        // Fallback to basic match if terms are too short
+        const { data } = await queryBuilder
+            .or(`name_en.ilike.%${query}%,name_ar.ilike.%${query}%`)
+            .limit(20)
+        products = data || []
+    }
 
     return (
         <div className="container mx-auto px-4 py-12">

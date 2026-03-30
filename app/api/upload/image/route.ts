@@ -1,11 +1,13 @@
 import { uploadImage, deleteByKey } from '@/lib/r2-storage';
-import { createAdminClient } from '@/utils/supabase/admin';
+import { AdminAuthError } from '@/utils/auth/admin';
+import { requireAdmin } from '@/utils/auth/require-admin';
 import sharp from 'sharp';
 
 export async function POST(request: Request) {
   let uploadedKey: string | null = null;
   
   try {
+    const { supabase } = await requireAdmin();
     const formData = await request.formData();
     const file = formData.get('file') as File;
 
@@ -50,8 +52,7 @@ export async function POST(request: Request) {
     const r2Result = await uploadImage(buffer, newFileName, 'image/webp');
     uploadedKey = r2Result.key;
 
-    // Step 3: Synchronize with Supabase Assets table using Admin Client (Bypass RLS)
-    const supabaseAdmin = createAdminClient();
+    // Step 3: Synchronize with Supabase assets table under the admin's session
     const assetPayload = {
       file_name: newFileName,
       public_url: r2Result.url,
@@ -61,7 +62,7 @@ export async function POST(request: Request) {
       storage_key: r2Result.key
     };
 
-    const { data: asset, error: dbError } = await supabaseAdmin
+    const { data: asset, error: dbError } = await supabase
       .from('assets')
       .insert(assetPayload)
       .select()
@@ -87,10 +88,14 @@ export async function POST(request: Request) {
       }, { status: 500 });
     }
 
-    console.log('[Sync] Asset created successfully (Bypass RLS):', asset.id);
+    console.log('[Sync] Asset created successfully:', asset.id);
     return Response.json({ url: r2Result.url, id: asset.id });
 
   } catch (error: any) {
+    if (error instanceof AdminAuthError) {
+      return Response.json({ error: error.message }, { status: error.status });
+    }
+
     console.error('[Upload Pipeline] Error:', error.message);
     
     if (uploadedKey) {

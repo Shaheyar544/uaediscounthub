@@ -1,5 +1,5 @@
 // app/api/admin/import-product/route.ts
-// Receives scraped product data from the Chrome extension and creates a product.
+// Receives scraped product data from the Chrome extension and creates or updates a product.
 
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/utils/supabase/admin'
@@ -173,7 +173,8 @@ export async function POST(req: NextRequest) {
   const description = (body.description as string) || ''
   const { name_ar, description_ar } = await translateToArabic(name, description)
 
-  // 6. Build product record
+  // 6. Build product record & Check for existing by SKU/ASIN
+  const asin:        string | null = (body.asin as string) || null
   const rawPrice    = parseFloat(body.price as string) || null
   const rawOriginal = parseFloat(body.original_price as string) || null
   const status      = (body.status as string) === 'published' ? 'published' : 'draft'
@@ -182,52 +183,81 @@ export async function POST(req: NextRequest) {
                         : {}
   const tags        = Array.isArray(body.tags) ? (body.tags as string[]) : []
 
-  const slug = await uniqueSlug(supabase, toSlug(name))
+  // Check for existing product by SKU (ASIN)
+  let productId: string | null = null
+  let finalSlug: string | null = null
 
-  const productRow = {
-    name_en:          name,
-    name_ar:          name_ar || null,
-    slug,
-    brand:            (body.brand as string) || null,
-    category_id:      categoryId,
-    status,
-    is_active:        status === 'published',
-    image_url:        primaryImageUrl || thumbnailSrc || null,
-    thumbnail_url:    primaryImageUrl || thumbnailSrc || null,
-    images:           filteredAdditional.length > 0 ? filteredAdditional : null,
-    description_en:   description || null,
-    description_ar:   description_ar || null,
-    base_price:       rawPrice,
-    currency:         'AED',
-    specifications:   Object.keys(specs).length > 0 ? specs : null,
-    tags:             tags.length > 0 ? tags : null,
-    updated_at:       new Date().toISOString(),
+  if (asin) {
+    const { data: existingProduct } = await supabase
+      .from('products')
+      .select('id, slug')
+      .eq('sku', asin)
+      .maybeSingle()
+    
+    if (existingProduct) {
+      productId = existingProduct.id
+      finalSlug = existingProduct.slug
+      console.log(`[import-product] Found existing product ${productId} for ASIN ${asin}`)
+    }
   }
 
-  const { data: product, error: productError } = await supabase
-    .from('products')
-    .insert(productRow)
-    .select('id, slug')
-    .single()
+  if (!productId) {
+    const baseSlug = toSlug(name)
+    finalSlug = await uniqueSlug(supabase, baseSlug)
 
-  if (productError || !product) {
-    console.error('[import-product] insert error', productError)
-    return NextResponse.json(
-      { error: productError?.message || 'Failed to create product' },
-      { status: 500 }
-    )
+    const productRow = {
+      name_en:          name,
+      name_ar:          name_ar || null,
+      slug:             finalSlug,
+      brand:            (body.brand as string) || null,
+      category_id:      categoryId,
+      status,
+      is_active:        status === 'published',
+      image_url:        primaryImageUrl || thumbnailSrc || null,
+      thumbnail_url:    primaryImageUrl || thumbnailSrc || null,
+      images:           filteredAdditional.length > 0 ? filteredAdditional : null,
+      description_en:   description || null,
+      description_ar:   description_ar || null,
+      base_price:       rawPrice,
+      currency:         'AED',
+      specifications:   Object.keys(specs).length > 0 ? specs : null,
+      tags:             tags.length > 0 ? tags : null,
+      sku:              asin,
+      asin:             asin, // keep both for compat
+      updated_at:       new Date().toISOString(),
+    }
+
+    const { data: newProduct, error: productError } = await supabase
+      .from('products')
+      .insert(productRow)
+      .select('id, slug')
+      .single()
+
+    if (productError || !newProduct) {
+      console.error('[import-product] insert error', productError)
+      return NextResponse.json(
+        { error: productError?.message || 'Failed to create product' },
+        { status: 500 }
+      )
+    }
+    productId = newProduct.id
+    finalSlug = newProduct.slug
+  } else {
+    // Update existing product metadata/timestamp
+    await supabase.from('products').update({ 
+      updated_at: new Date().toISOString() 
+    }).eq('id', productId)
   }
 
-  // 7. Create store price row + record price history
+  // 7. Upsert store price row + record price history
   const storeId:    string | null = (body.default_store_id as string) || null
   const affiliateUrl: string      = (body.affiliate_url as string) || (body.source_url as string) || ''
-  const asin:        string | null = (body.asin as string) || null
 
-  if (storeId && rawPrice && affiliateUrl) {
+  if (storeId && productId && rawPrice && affiliateUrl) {
     const { error: priceError } = await supabase
       .from('product_store_prices')
-      .insert({
-        product_id:     product.id,
+      .upsert({
+        product_id:     productId,
         store_id:       storeId,
         price:          rawPrice,
         original_price: rawOriginal,
@@ -236,14 +266,15 @@ export async function POST(req: NextRequest) {
         is_best_price:  true,
         last_checked:   new Date().toISOString(),
         updated_at:     new Date().toISOString(),
-      })
+      }, { onConflict: 'product_id,store_id' })
+    
     if (priceError) {
-      console.warn('[import-product] store price insert (non-fatal):', priceError.message)
+      console.warn('[import-product] store price upsert (non-fatal):', priceError.message)
     }
 
     // FIX 5B: Record initial price history point
     const { error: phError } = await supabase.from('price_history').insert({
-      product_id: product.id,
+      product_id: productId,
       store_id:   storeId,
       asin,
       price:      rawPrice,
@@ -255,17 +286,12 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  // FIX 5E: Save asin on the product record if we have one
-  if (asin) {
-    await supabase.from('products').update({ asin }).eq('id', product.id)
-  }
-
   // 8. Return success
   return NextResponse.json({
     success:        true,
-    productId:      product.id,
-    slug:           product.slug,
-    editUrl:        `/en/admin/products/${product.id}/edit`,
+    productId,
+    slug:           finalSlug,
+    editUrl:        `/en/admin/products/${productId}/edit`,
     translatedAr:   !!name_ar,
     imagesUploaded: (primaryImageUrl ? 1 : 0) + filteredAdditional.length,
   })

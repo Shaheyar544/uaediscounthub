@@ -1,4 +1,5 @@
 import { S3Client, PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
+import sharp from 'sharp';
 
 if (typeof window !== 'undefined') {
   throw new Error('R2-Storage utility can only be used in Server-Side environments.');
@@ -64,6 +65,31 @@ export async function deleteByKey(key: string): Promise<void> {
 export async function deleteImage(imageUrl: string): Promise<void> {
   const key = imageUrl.replace(`${PUBLIC_URL}/`, '');
   await deleteByKey(key);
+}
+
+export async function uploadRemoteImage(
+  url: string,
+  fileName: string
+): Promise<R2UploadResult> {
+  const response = await fetch(url, {
+    headers: {
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36',
+      'Accept': 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8',
+    }
+  });
+  if (!response.ok) {
+    throw new Error(`Failed to fetch remote image: ${response.statusText}`);
+  }
+  const arrayBuffer = await response.arrayBuffer();
+  let buffer = Buffer.from(new Uint8Array(arrayBuffer));
+
+  // Optimize with Sharp
+  const processedBuffer = await sharp(buffer)
+    .resize({ width: 1200, withoutEnlargement: true, fit: 'inside' })
+    .webp({ quality: 80, effort: 6 })
+    .toBuffer();
+
+  return uploadImage(processedBuffer, fileName, 'image/webp');
 }
 
 export function getPublicUrl(key: string): string {
