@@ -1,4 +1,4 @@
-import { AmazonPAAPI } from '@/lib/amazon-paapi';
+import { AmazonCreatorsAPI } from '@/lib/amazon-creators-api';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -10,7 +10,7 @@ export async function GET(request: Request) {
     );
   }
   try {
-    const products = await AmazonPAAPI.searchItems(query);
+    const products = await AmazonCreatorsAPI.searchItems(query);
     return Response.json({ products });
   } catch (error: any) {
     console.error('Search Error:', error.message);

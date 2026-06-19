@@ -10,6 +10,7 @@ import { MobileBottomNav } from '@/components/layout/MobileBottomNav'
 import { ThemeProvider } from '@/components/theme-provider'
 import { AnalyticsProvider } from '@/components/analytics/AnalyticsProvider'
 import { createClient } from '@/utils/supabase/server'
+import { CompareBar } from '@/components/compare/CompareBar'
 
 const syne = Syne({ subsets: ['latin'], variable: '--font-syne' })
 const dmSans = DM_Sans({ subsets: ['latin'], variable: '--font-dm-sans' })
@@ -136,6 +137,7 @@ export default async function RootLayout({
             </main>
             <Footer locale={locale as Locale} />
             <MobileBottomNav />
+            <CompareBar locale={locale} />
           </AnalyticsProvider>
         </ThemeProvider>
       </body>
