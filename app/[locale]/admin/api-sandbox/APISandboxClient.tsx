@@ -9,10 +9,13 @@ import {
     Search, Database, Loader2, Play, AlertCircle, 
     Code, Copy, RefreshCw, AlertTriangle 
 } from 'lucide-react'
-import { AmazonCreatorsAPI } from '@/lib/amazon-creators-api'
-
-export default function APISandboxClient({ locale }: { locale: string }) {
-    const isManualMode = AmazonCreatorsAPI.isManualMode()
+export default function APISandboxClient({ 
+    locale, 
+    isManualMode 
+}: { 
+    locale: string; 
+    isManualMode: boolean; 
+}) {
     // Search Tester State
     const [searchQuery, setSearchQuery] = useState('')
     const [searchLoading, setSearchLoading] = useState(false)

@@ -1,9 +1,11 @@
 'use server'
 
-import { createAdminClient } from '@/utils/supabase/admin'
+import { requireAdmin } from '@/utils/auth/require-admin'
 import { revalidatePath } from 'next/cache'
+import { createAdminClient } from '@/utils/supabase/admin'
 
 export async function toggleDealActive(id: string, currentStatus: boolean, locale: string) {
+    const { user } = await requireAdmin()
     const supabase = createAdminClient()
     const { error } = await supabase
         .from('deals')
@@ -18,6 +20,7 @@ export async function toggleDealActive(id: string, currentStatus: boolean, local
 }
 
 export async function updateDeal(id: string, data: any, locale: string) {
+    const { user } = await requireAdmin()
     const supabase = createAdminClient()
     
     // Comprehensive cleaner: convert all empty strings to null to avoid type casting errors
@@ -38,6 +41,7 @@ export async function updateDeal(id: string, data: any, locale: string) {
 }
 
 export async function deleteDeal(id: string, locale: string) {
+    const { user } = await requireAdmin()
     const supabase = createAdminClient()
     const { error } = await supabase
         .from('deals')
@@ -49,4 +53,36 @@ export async function deleteDeal(id: string, locale: string) {
         throw new Error('Failed to delete deal')
     }
     revalidatePath(`/${locale}/admin/deals`)
+}
+
+export async function bulkDeleteDeals(ids: string[], locale: string) {
+    const { user } = await requireAdmin()
+    const supabase = createAdminClient()
+    const { error } = await supabase
+        .from('deals')
+        .delete()
+        .in('id', ids)
+        
+    if (error) {
+        console.error('Error bulk deleting deals:', error)
+        return { success: false, error: error.message }
+    }
+    revalidatePath(`/${locale}/admin/deals`)
+    return { success: true }
+}
+
+export async function bulkToggleDealsActive(ids: string[], active: boolean, locale: string) {
+    const { user } = await requireAdmin()
+    const supabase = createAdminClient()
+    const { error } = await supabase
+        .from('deals')
+        .update({ is_active: active })
+        .in('id', ids)
+    
+    if (error) {
+        console.error('Error bulk toggling deals:', error)
+        return { success: false, error: error.message }
+    }
+    revalidatePath(`/${locale}/admin/deals`)
+    return { success: true }
 }

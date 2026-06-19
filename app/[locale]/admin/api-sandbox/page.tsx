@@ -1,4 +1,5 @@
 import APISandboxClient from './APISandboxClient'
+import { AmazonCreatorsAPI } from '@/lib/amazon-creators-api'
 
 export default async function Page({
   params
@@ -6,5 +7,6 @@ export default async function Page({
   params: Promise<{ locale: string }>
 }) {
   const { locale } = await params
-  return <APISandboxClient locale={locale} />
+  const isManualMode = AmazonCreatorsAPI.isManualMode()
+  return <APISandboxClient locale={locale} isManualMode={isManualMode} />
 }

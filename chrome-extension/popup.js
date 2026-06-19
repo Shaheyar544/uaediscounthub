@@ -256,7 +256,12 @@ function renderDealsView(deals) {
     item.innerHTML = `
       <label class="deal-row">
         <input type="checkbox" class="deal-checkbox" data-idx="${idx}" />
-        <img class="deal-thumb" src="${deal.image_url || ''}" alt="" onerror="this.style.display='none'" />
+        <div class="deal-thumb-container">
+          <img class="deal-thumb" 
+            src="${deal.image_url || ''}" 
+            alt="" 
+            onerror="this.src='/icons/icon48.png'; this.classList.add('fallback-img')" />
+        </div>
         <div class="deal-info">
           <div class="deal-name">${displayName.slice(0, 70)}${displayName.length > 70 ? '…' : ''}</div>
           <div class="deal-pricing">
@@ -348,7 +353,19 @@ document.getElementById('importDealsBtn').addEventListener('click', async () => 
     const errorCount = json.errors?.length || 0;
     let statusText = `${json.imported} of ${json.total} deal${json.total !== 1 ? 's' : ''} imported successfully.`;
     if (errorCount > 0) {
-      statusText += `\n(${errorCount} items failed, see console for details)`;
+      statusText += `\n(${errorCount} items failed)`;
+      
+      // Show first few errors in UI
+      var errorList = document.createElement('div');
+      errorList.style = 'margin-top: 10px; font-size: 11px; text-align: left; color: #ef4444; background: #fee2e2; padding: 8px; border-radius: 6px; max-height: 100px; overflow-y: auto;';
+      errorList.innerHTML = '<strong>Errors:</strong><ul style="margin: 4px 0 0 16px; padding:0;">' + 
+        json.errors.slice(0, 3).map(function(e) { 
+          return '<li>' + (e.asin || 'Unknown') + ': ' + (e.error || 'Unknown error') + '</li>'; 
+        }).join('') + 
+        (json.errors.length > 3 ? '<li>...and ' + (json.errors.length - 3) + ' more</li>' : '') + 
+        '</ul>';
+      
+      document.getElementById('successView').appendChild(errorList);
       console.error('Import Errors:', json.errors);
     }
     document.getElementById('successSub').textContent = statusText;

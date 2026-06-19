@@ -179,3 +179,17 @@
 
 .animation-delay-1000 { animation-delay: 1000ms; }
 .animation-delay-2000 { animation-delay: 2000ms; }
+
+/* Custom Marquee Animations */
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  animation: marquee var(--marquee-duration, 30s) linear infinite;
+}
+
+.pause-hover:hover {
+  animation-play-state: paused;
+}

@@ -10,8 +10,8 @@ import {
   Check, Info, ShieldCheck, Heart,
   MessageCircle, ArrowRight, Star, TrendingDown,
 } from 'lucide-react'
+import { sanitizeRichHtml } from '@/lib/sanitize-html'
 import { createClient }      from '@/utils/supabase/server'
-import { createAdminClient } from '@/utils/supabase/admin'
 import { notFound }     from 'next/navigation'
 import { PriceAlertTrigger } from '@/components/product/PriceAlertTrigger'
 import { TrackView }         from '@/components/product/TrackView'
@@ -54,9 +54,8 @@ export default async function ProductPage({
     .eq('product_id', product.id)
     .order('price', { ascending: true })
 
-  // ── Fetch price history via admin client (bypasses RLS) ──────────────────
-  const supabaseAdmin = createAdminClient()
-  const { data: priceHistoryRaw, error: phError } = await supabaseAdmin
+  // ── Fetch price history via standard server client ────────────────────────
+  const { data: priceHistoryRaw, error: phError } = await supabase
     .from('price_history')
     .select('price, recorded_at')
     .eq('product_id', product.id)
@@ -153,6 +152,7 @@ export default async function ProductPage({
 
   // ── Coupons (for CouponSection) ────────────────────────────────────────────
   const hasCoupons = finalPrices.some(p => p.couponCode)
+  const sanitizedDescription = sanitizeRichHtml(product.description_en || product.description || '')
 
   return (
     <div className="product-page-container w-full max-w-[1200px] mx-auto px-4 md:px-6 py-6 md:py-10">
@@ -362,7 +362,7 @@ export default async function ProductPage({
         <div className="mb-16">
           <h3 className="text-[20px] font-bold mb-4">About This Product</h3>
           <div
-            dangerouslySetInnerHTML={{ __html: product.description_en || product.description || '' }}
+            dangerouslySetInnerHTML={{ __html: sanitizedDescription }}
             className="prose prose-sm max-w-none text-gray-700
               [&>ul]:list-disc [&>ul]:pl-5 [&>ul]:space-y-1
               [&>ol]:list-decimal [&>ol]:pl-5

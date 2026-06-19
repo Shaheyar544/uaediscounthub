@@ -36,6 +36,7 @@ export default async function Home({
       { data: stores,           error: storesError    },
       { data: coupons,          error: couponsError   },
       { data: featuredProducts, error: productsError  },
+      { data: categories,       error: categoriesError },
       { data: categoryRows,     error: catError       },
     ] = await Promise.all([
       supabase
@@ -61,6 +62,12 @@ export default async function Home({
         .order('created_at',  { ascending: false })
         .limit(8),
 
+      supabase
+        .from('categories')
+        .select('*')
+        .eq('is_active', true)
+        .order('display_order', { ascending: true }),
+
       // ISSUE 4: real category counts
       supabase
         .from('products')
@@ -68,9 +75,10 @@ export default async function Home({
         .eq('is_active', true),
     ])
 
-    if (storesError)   throw new Error(`Stores: ${storesError.message}`)
-    if (couponsError)  throw new Error(`Coupons: ${couponsError.message}`)
-    if (productsError) throw new Error(`Products: ${productsError.message}`)
+    if (storesError)     throw new Error(`Stores: ${storesError.message}`)
+    if (couponsError)    throw new Error(`Coupons: ${couponsError.message}`)
+    if (productsError)   throw new Error(`Products: ${productsError.message}`)
+    if (categoriesError) throw new Error(`Categories: ${categoriesError.message}`)
 
     // Build category counts map: slug → count
     const catCounts: Record<string, number> = {}
@@ -105,8 +113,12 @@ export default async function Home({
         {/* 2 — Featured Stores */}
         <FeaturedStores stores={(stores as any[]) ?? []} />
 
-        {/* 3 — Category Browsing (real counts) */}
-        <CategoryBrowsing locale={locale} counts={catCounts} />
+        {/* 3 — Category Browsing (Dynamic Marquee) */}
+        <CategoryBrowsing 
+          locale={locale} 
+          counts={catCounts} 
+          categories={(categories as any[]) ?? []} 
+        />
 
         {/* 4 — Today's Deals */}
         <section>

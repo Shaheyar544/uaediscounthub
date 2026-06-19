@@ -20,6 +20,7 @@ import {
   X, Check, AlertCircle, Info, Hash, RefreshCw
 } from 'lucide-react'
 import { BlogPost, BlogCategory } from '@/types/blog'
+import { sanitizeRichHtml } from '@/lib/sanitize-html'
 import { GoogleSearchPreview } from '@/components/blog/GoogleSearchPreview'
 import { SEOChecklist } from '@/components/blog/SEOChecklist'
 import { useRouter } from 'next/navigation'
@@ -153,13 +154,18 @@ export function PostEditor({ initialPost, categories }: PostEditorProps) {
     
     setSaving(true)
     try {
+      const sanitizedPost = {
+        ...post,
+        content: sanitizeRichHtml(post.content),
+      }
+
       const url = post.id ? `/api/blog/posts/${post.id}` : '/api/blog/posts'
       const method = post.id ? 'PUT' : 'POST'
       
       const response = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(post),
+        body: JSON.stringify(sanitizedPost),
       })
       
       if (!response.ok) throw new Error('Failed to save')
@@ -227,13 +233,10 @@ export function PostEditor({ initialPost, categories }: PostEditorProps) {
       })
       const data = await res.json()
       if (data.result) {
+        const sanitizedResult = sanitizeRichHtml(data.result)
         // If it's an improvement, we might want to ask before replacing
         // For now, we'll just insert/append or replace selection
-        if (action === 'improve') {
-          editor.chain().focus().insertContent(data.result).run()
-        } else {
-          editor.chain().focus().insertContent(data.result).run()
-        }
+        editor.chain().focus().insertContent(sanitizedResult).run()
       }
     } catch (error) {
       console.error(error)

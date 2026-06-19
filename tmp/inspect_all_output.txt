@@ -1,0 +1,37 @@
+[dotenv@17.3.1] injecting env (16) from .env.local -- tip: ΓÜí∩╕Å secrets for agents: https://dotenvx.com/as2
+--- Detailed Column Inspection (products) ---
+Available Columns: [
+  'id',                 'slug',           'name_en',
+  'name_ar',            'name',           'brand_id',
+  'category_id',        'description_en', 'description_ar',
+  'description',        'ai_summary_en',  'ai_summary_ar',
+  'ai_pros',            'ai_cons',        'ai_price_prediction',
+  'ai_prediction_note', 'specifications', 'specs',
+  'spec_tags',          'images',         'image_url',
+  'base_price',         'has_360_view',   'in_box_contents',
+  'product_videos',     'average_rating', 'review_count',
+  'view_count',         'is_featured',    'is_active',
+  'seo_title_en',       'seo_title_ar',   'seo_description_en',
+  'seo_description_ar', 'schema_faq',     'created_at',
+  'updated_at',         'status',         'brand',
+  'model',              'sku',            'tags',
+  'thumbnail_url',      'meta_title',     'meta_description',
+  'is_trending',        'rating',         'rating_count',
+  'currency',           'asin',           'pros',
+  'cons'
+]
+Deals Columns: [
+  'id',                 'product_id',
+  'store_id',           'title_en',
+  'title_ar',           'deal_price',
+  'original_price',     'currency',
+  'affiliate_url',      'badge_text',
+  'badge_text_ar',      'is_flash_sale',
+  'social_proof_count', 'starts_at',
+  'expires_at',         'view_count',
+  'click_count',        'is_active',
+  'created_at',         'asin',
+  'source',             'image_url',
+  'final_price',        'coupon_value',
+  'coupon_type',        'discount_percent'
+]

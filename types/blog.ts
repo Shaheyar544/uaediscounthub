@@ -1,3 +1,5 @@
+import type { SocialLinks } from '@/types/profile'
+
 export interface BlogPost {
   id: string
   title: string
@@ -11,7 +13,13 @@ export interface BlogPost {
   scheduled_at?: string
   published_at?: string
   author_id: string
-  author?: { full_name: string; avatar_url: string; role: string }
+  author?: {
+    display_name: string | null
+    bio?: string | null
+    avatar_url: string | null
+    role: string | null
+    social_links?: SocialLinks | null
+  }
   category_id?: string
   category?: BlogCategory
   tags?: { tag: BlogTag }[]

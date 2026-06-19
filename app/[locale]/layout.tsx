@@ -9,7 +9,8 @@ import { FlashBanner }     from '@/components/layout/FlashBanner'
 import { MobileBottomNav } from '@/components/layout/MobileBottomNav'
 import { ThemeProvider } from '@/components/theme-provider'
 import { AnalyticsProvider } from '@/components/analytics/AnalyticsProvider'
-import { createAdminClient } from '@/utils/supabase/admin'
+import { createClient } from '@/utils/supabase/server'
+import { CompareBar } from '@/components/compare/CompareBar'
 
 const syne = Syne({ subsets: ['latin'], variable: '--font-syne' })
 const dmSans = DM_Sans({ subsets: ['latin'], variable: '--font-dm-sans' })
@@ -79,8 +80,8 @@ export default async function RootLayout({
   } | null = null
 
   try {
-    const admin = createAdminClient()
-    const { data } = await admin
+    const supabase = await createClient()
+    const { data } = await supabase
       .from('site_settings')
       .select('banner_enabled, banner_text, banner_color, banner_icon, banner_promo_code, banner_link, banner_countdown, google_analytics_id')
       .eq('id', 'global')
@@ -93,7 +94,13 @@ export default async function RootLayout({
   const gaId = settings?.google_analytics_id || ''
 
   return (
-    <html lang={locale} dir={dir} className={`${syne.variable} ${dmSans.variable} ${cairo.variable}`} suppressHydrationWarning>
+    <html
+      lang={locale}
+      dir={dir}
+      data-scroll-behavior="smooth"
+      className={`${syne.variable} ${dmSans.variable} ${cairo.variable}`}
+      suppressHydrationWarning
+    >
       <body className="min-h-screen bg-background text-foreground font-body antialiased" suppressHydrationWarning>
         {/* Google Analytics */}
         {gaId && (
@@ -130,6 +137,7 @@ export default async function RootLayout({
             </main>
             <Footer locale={locale as Locale} />
             <MobileBottomNav />
+            <CompareBar locale={locale} />
           </AnalyticsProvider>
         </ThemeProvider>
       </body>

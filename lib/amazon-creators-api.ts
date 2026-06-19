@@ -33,8 +33,8 @@ const AMAZON_MANUAL_MODE = process.env.AMAZON_MANUAL_MODE !== 'false';
 export class AmazonCreatorsAPI {
     // Confirmed working token endpoint
     private static readonly TOKEN_URL = 'https://api.amazon.com/auth/o2/token';
-    // Regional host for UAE PA API
-    private static readonly API_BASE_URL = 'https://webservices.amazon.ae/paapi5';
+    // Regional host for Amazon Creators API
+    private static readonly API_BASE_URL = 'https://creatorsapi.amazon/catalog/v1';
     private static readonly MARKETPLACE = 'www.amazon.ae';
     private static readonly SCOPE = 'creatorsapi::default';
 
@@ -103,15 +103,13 @@ export class AmazonCreatorsAPI {
         const token = await this.getAccessToken();
         
         // Operation determines the target header and path
-        const endpoint = `/${operation.toLowerCase()}`;
+        const endpoint = `/${operation}`;
         const url = `${this.API_BASE_URL}${endpoint}`;
         
         const headers: Record<string, string> = {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json; charset=utf-8',
-            'content-encoding': 'amz-1.0',
-            'x-amzn-marketplace': this.MARKETPLACE,
-            'x-amz-target': `com.amazon.paapi5.v1.ProductAdvertisingAPIv1.${operation}`
+            'x-marketplace': this.MARKETPLACE
         };
 
         const response = await fetch(url, {
@@ -125,7 +123,7 @@ export class AmazonCreatorsAPI {
         console.log(`[Amazon API] ${operation} - Status:`, response.status);
 
         if (responseText.trim().startsWith('<')) {
-            throw new Error(`Amazon API returned HTML (status ${response.status}). Check headers and x-amz-target.`);
+            throw new Error(`Amazon API returned HTML (status ${response.status}).`);
         }
 
         const data = JSON.parse(responseText);
@@ -134,7 +132,7 @@ export class AmazonCreatorsAPI {
             console.error('=== AMAZON API ERROR ===');
             console.error('Status:', response.status);
             console.error('Full error body:', JSON.stringify(data, null, 2));
-            throw new Error(data.Errors?.[0]?.Message || `Amazon API Error (${response.status})`);
+            throw new Error(data.errors?.[0]?.message || `Amazon API Error (${response.status})`);
         }
 
         return data;
@@ -149,21 +147,20 @@ export class AmazonCreatorsAPI {
         const partnerTag = process.env.AMAZON_PARTNER_TAG;
         
         const payload = {
-            Keywords: keywords.trim(),
-            PartnerTag: partnerTag,
-            PartnerType: 'Associates',
-            SearchIndex: 'All',
-            Marketplace: this.MARKETPLACE,
-            Resources: [
-                'ItemInfo.Title',
-                'Images.Primary.Medium',
-                'OffersV2.Listings.Price',
-                'DetailPageURL'
+            keywords: keywords.trim(),
+            partnerTag: partnerTag,
+            partnerType: 'Associates',
+            searchIndex: 'All',
+            marketplace: this.MARKETPLACE,
+            resources: [
+                'itemInfo.title',
+                'images.primary.medium',
+                'offersV2.listings.price'
             ]
         };
 
-        const data = await this.request('SearchItems', payload);
-        return this.transformResults(data.SearchResult?.Items || []);
+        const data = await this.request('searchItems', payload);
+        return this.transformResults(data.searchResult?.items || []);
     }
 
     /**
@@ -175,35 +172,60 @@ export class AmazonCreatorsAPI {
         const partnerTag = process.env.AMAZON_PARTNER_TAG;
         
         const payload = {
-            ItemIds: [asin],
-            PartnerTag: partnerTag,
-            PartnerType: 'Associates',
-            Marketplace: this.MARKETPLACE,
-            Resources: [
-                'ItemInfo.Title',
-                'Images.Primary.Medium',
-                'OffersV2.Listings.Price',
-                'DetailPageURL'
+            itemIds: [asin],
+            itemIdType: 'ASIN',
+            partnerTag: partnerTag,
+            partnerType: 'Associates',
+            marketplace: this.MARKETPLACE,
+            resources: [
+                'itemInfo.title',
+                'images.primary.medium',
+                'offersV2.listings.price'
             ]
         };
 
-        const data = await this.request('GetItems', payload);
-        const items = this.transformResults(data.ItemsResult?.Items || []);
+        const data = await this.request('getItems', payload);
+        const items = this.transformResults(data.itemsResult?.items || []);
         return items.length > 0 ? items[0] : null;
+    }
+
+    /**
+     * Fetch multiple product details by their ASINs (max 10)
+     */
+    public static async getProducts(asins: string[]): Promise<AmazonProduct[]> {
+        if (AMAZON_MANUAL_MODE || asins.length === 0) return [];
+        
+        const partnerTag = process.env.AMAZON_PARTNER_TAG;
+        
+        const payload = {
+            itemIds: asins.slice(0, 10),
+            itemIdType: 'ASIN',
+            partnerTag: partnerTag,
+            partnerType: 'Associates',
+            marketplace: this.MARKETPLACE,
+            resources: [
+                'itemInfo.title',
+                'images.primary.medium',
+                'offersV2.listings.price'
+            ]
+        };
+
+        const data = await this.request('getItems', payload);
+        return this.transformResults(data.itemsResult?.items || []);
     }
 
     private static transformResults(items: any[]): AmazonProduct[] {
         return items.map(item => {
-            const priceInfo = item.OffersV2?.Listings?.[0]?.Price;
+            const priceInfo = item.offersV2?.listings?.[0]?.price;
             return {
-                asin: item.ASIN,
-                title: item.ItemInfo?.Title?.DisplayValue || 'Amazon Product',
-                imageUrl: item.Images?.Primary?.Medium?.URL || '',
-                price: priceInfo?.Amount || 0,
-                currency: priceInfo?.Currency || 'AED',
-                url: item.DetailPageURL || `https://www.amazon.ae/dp/${item.ASIN}?tag=${process.env.AMAZON_PARTNER_TAG}`,
-                savings: priceInfo?.Savings?.Amount,
-                discountPercent: priceInfo?.Savings?.Percentage
+                asin: item.asin,
+                title: item.itemInfo?.title?.displayValue || 'Amazon Product',
+                imageUrl: item.images?.primary?.medium?.url || '',
+                price: priceInfo?.money?.amount || 0,
+                currency: priceInfo?.money?.currency || 'AED',
+                url: item.detailPageURL || `https://www.amazon.ae/dp/${item.asin}?tag=${process.env.AMAZON_PARTNER_TAG}`,
+                savings: priceInfo?.savings?.money?.amount || priceInfo?.savings?.amount,
+                discountPercent: priceInfo?.savings?.percentage
             };
         });
     }

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
-import { createClient } from '@/utils/supabase/server'
+import { sanitizeRichHtml } from '@/lib/sanitize-html'
+import { AdminAuthError } from '@/utils/auth/admin'
+import { requireAdmin } from '@/utils/auth/require-admin'
 
 // Initialize Anthropic client (requires ANTHROPIC_API_KEY env var)
 const anthropic = new Anthropic({
@@ -33,14 +35,7 @@ const PROMPTS: Record<string, (text: string, title: string, keywords: string[]) 
  */
 export async function POST(req: NextRequest) {
   try {
-    const supabase = await createClient()
-    
-    // Check auth (only admins should use AI assist)
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user || user.app_metadata?.role !== 'admin') {
-      // In development, you might want to bypass this
-      // return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+    await requireAdmin()
 
     if (!process.env.ANTHROPIC_API_KEY) {
       return NextResponse.json({ error: 'Anthropic API key is not configured' }, { status: 500 })
@@ -71,9 +66,13 @@ export async function POST(req: NextRequest) {
       result = response.content[0].text
     }
 
-    return NextResponse.json({ result })
+    return NextResponse.json({ result: sanitizeRichHtml(result) })
 
   } catch (error: any) {
+    if (error instanceof AdminAuthError) {
+      return NextResponse.json({ error: error.message }, { status: error.status })
+    }
+
     console.error('AI Assist error:', error)
     return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 })
   }

@@ -3,8 +3,9 @@
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Star, Heart, ShoppingCart } from 'lucide-react'
+import { Star, Heart, ShoppingCart, BarChart2 } from 'lucide-react'
 import { useHasMounted } from '@/hooks/use-has-mounted'
+import { useCompare } from '@/hooks/use-compare'
 
 interface DealCardProps {
   id: string
@@ -28,7 +29,16 @@ export function DealCard({
   locale = 'en',
 }: DealCardProps) {
   const hasMounted = useHasMounted()
+  const { isInCompare, addToCompare, removeFromCompare } = useCompare()
+  const isCompared = isInCompare(id)
   const viewingCount = (id.charCodeAt(0) % 16) + 5
+
+  const toggleCompare = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (isCompared) removeFromCompare(id)
+    else addToCompare(id)
+  }
 
   return (
     <motion.div
@@ -43,11 +53,25 @@ export function DealCard({
         </div>
       )}
 
-      <button
-        className={`absolute top-3 right-3 z-10 w-8 h-8 bg-white/90 backdrop-blur-md border border-gray-100 rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-white transition-all shadow-sm ${!hasMounted ? 'opacity-0' : 'opacity-100'}`}
-      >
-        <Heart className="w-4 h-4" />
-      </button>
+      <div className="absolute top-3 right-3 z-20 flex flex-col gap-2">
+        <button
+          className={`w-8 h-8 bg-white/90 backdrop-blur-md border border-gray-100 rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-white transition-all shadow-sm ${!hasMounted ? 'opacity-0' : 'opacity-100'}`}
+        >
+          <Heart className="w-4 h-4" />
+        </button>
+
+        <button
+          onClick={toggleCompare}
+          title={isCompared ? "Remove from Compare" : "Add to Compare"}
+          className={`w-8 h-8 rounded-full flex items-center justify-center border transition-all shadow-sm ${!hasMounted ? 'opacity-0' : 'opacity-100'} ${
+            isCompared 
+              ? 'bg-blue-600 border-blue-600 text-white' 
+              : 'bg-white/90 backdrop-blur-md border-gray-100 text-gray-400 hover:text-blue-600 hover:bg-white'
+          }`}
+        >
+          <BarChart2 className="w-4 h-4" />
+        </button>
+      </div>
 
       <div className="relative aspect-[4/3] w-full bg-white flex items-center justify-center overflow-hidden">
         {image_url ? (

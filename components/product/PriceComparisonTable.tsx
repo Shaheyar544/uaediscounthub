@@ -46,7 +46,7 @@ export function PriceComparisonTable({ prices }: { prices: VendorPrice[] }) {
                             <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 bg-white border border-border rounded-lg flex items-center justify-center p-1.5 shadow-sm shrink-0">
                                     {p.storeLogoUrl ? (
-                                        <Image src={p.storeLogoUrl} alt={p.store} width={28} height={28} className="object-contain" />
+                                        <Image src={p.storeLogoUrl} alt={p.store} width={28} height={28} className="h-7 w-auto object-contain" />
                                     ) : (
                                         <span className="text-[13px] font-bold text-primary">{p.store[0]}</span>
                                     )}
@@ -96,7 +96,7 @@ export function PriceComparisonTable({ prices }: { prices: VendorPrice[] }) {
                             <div className="flex items-center gap-4">
                                 <div className="w-12 h-12 bg-white border border-border rounded-lg flex items-center justify-center p-2 shadow-sm transition-transform group-hover:scale-105">
                                     {p.storeLogoUrl ? (
-                                        <Image src={p.storeLogoUrl} alt={p.store} width={32} height={32} className="object-contain" />
+                                        <Image src={p.storeLogoUrl} alt={p.store} width={32} height={32} className="h-8 w-auto object-contain" />
                                     ) : (
                                         <span className="text-[14px] font-bold text-primary">{p.store[0]}</span>
                                     )}

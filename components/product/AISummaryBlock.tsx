@@ -1,7 +1,9 @@
 import { Sparkles } from 'lucide-react'
+import { sanitizeRichHtml } from '@/lib/sanitize-html'
 
 export function AISummaryBlock({ text }: { text: string }) {
   const isHtml = /<[a-z][\s\S]*>/i.test(text)
+  const sanitizedText = sanitizeRichHtml(text)
 
   return (
     <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-xl p-5 shadow-sm mb-6">
@@ -14,7 +16,7 @@ export function AISummaryBlock({ text }: { text: string }) {
 
       {isHtml ? (
         <div
-          dangerouslySetInnerHTML={{ __html: text }}
+          dangerouslySetInnerHTML={{ __html: sanitizedText }}
           className="text-sm text-blue-800/90 leading-relaxed font-medium prose prose-sm max-w-none
             [&>ul]:list-disc [&>ul]:pl-4 [&>ul]:space-y-1
             [&>ol]:list-decimal [&>ol]:pl-4

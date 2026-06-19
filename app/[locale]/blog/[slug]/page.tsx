@@ -7,6 +7,7 @@ import { ReadingProgressBar } from '@/components/blog/ReadingProgressBar'
 import { TableOfContents } from '@/components/blog/TableOfContents'
 import { ShareBar } from '@/components/blog/ShareBar'
 import { AdWidget } from '@/components/blog/AdWidget'
+import { sanitizeRichHtml } from '@/lib/sanitize-html'
 import { BlogPost } from '@/types/blog'
 import { Metadata } from 'next'
 import { Clock, Calendar, Eye, MessageCircle, ChevronRight, User } from 'lucide-react'
@@ -60,7 +61,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   // Fetch the post with relations
   const { data: post } = await supabase
     .from('blog_posts')
-    .select('*, author:author_id(full_name,avatar_url,role), category:category_id(*), tags:blog_post_tags(tag:blog_tags(*))')
+    .select('*, author:author_id(display_name,bio,avatar_url,social_links,role), category:category_id(*), tags:blog_post_tags(tag:blog_tags(*))')
     .eq('slug', slug)
     .eq('status', 'published')
     .single()
@@ -90,6 +91,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   
   const topAd = ads?.find(a => a.position === 'sidebar-top')
   const bottomAd = ads?.find(a => a.position === 'sidebar-bottom')
+  const sanitizedContent = sanitizeRichHtml(post.content)
 
   // JSON-LD Schema
   const jsonLd = {
@@ -102,7 +104,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     dateModified: post.updated_at,
     author: {
       '@type': 'Person',
-      name: post.author?.full_name || 'Admin'
+      name: post.author?.display_name || 'Admin'
     },
     publisher: {
       '@type': 'Organization',
@@ -160,11 +162,17 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
         <div className="flex flex-wrap items-center gap-x-6 gap-y-4 py-6 border-y border-[#DDE3EF] mb-8">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-[#0057FF] text-white flex items-center justify-center font-bold text-[14px]">
-              {post.author?.full_name?.[0] || 'A'}
-            </div>
+            {post.author?.avatar_url ? (
+              <div className="relative w-10 h-10 rounded-full overflow-hidden border border-[#DDE3EF]">
+                <Image src={post.author.avatar_url} alt={post.author.display_name || 'Author'} fill className="object-cover" />
+              </div>
+            ) : (
+              <div className="w-10 h-10 rounded-full bg-[#0057FF] text-white flex items-center justify-center font-bold text-[14px]">
+                {post.author?.display_name?.[0] || 'A'}
+              </div>
+            )}
             <div>
-              <div className="text-[13px] font-bold text-[#0D1117]">{post.author?.full_name || 'Admin'}</div>
+              <div className="text-[13px] font-bold text-[#0D1117]">{post.author?.display_name || 'Admin'}</div>
               <div className="text-[11px] text-[#8A94A6]">{post.author?.role || 'Senior Deal Analyst'}</div>
             </div>
           </div>
@@ -215,7 +223,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           {/* Post Content */}
           <div 
             className="prose prose-blue max-w-none prose-p:text-[#4B5675] prose-p:leading-[1.85] prose-headings:font-display prose-headings:text-[#0D1117] prose-h2:text-[28px] prose-h2:mt-10 prose-h2:mb-4 prose-h3:text-[20px] prose-h3:mt-8 prose-h3:mb-3 prose-strong:text-[#0D1117] prose-a:text-[#0057FF] prose-a:no-underline hover:prose-a:underline prose-img:rounded-[14px] prose-blockquote:border-l-4 prose-blockquote:border-[#0057FF] prose-blockquote:bg-[#e8f0ff] prose-blockquote:p-6 prose-blockquote:rounded-r-[14px] prose-blockquote:not-italic"
-            dangerouslySetInnerHTML={{ __html: post.content }}
+            dangerouslySetInnerHTML={{ __html: sanitizedContent }}
           />
 
           <ShareBar url={`https://uaediscounthub.com/${locale}/blog/${post.slug}`} title={post.title} />
@@ -236,17 +244,23 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
           {/* Author Box */}
           <div className="bg-white border-[1.5px] border-[#DDE3EF] rounded-[14px] p-8 flex gap-6 mb-12 shadow-sm">
-            <div className="w-20 h-20 rounded-full bg-[#0057FF] text-white flex items-center justify-center text-3xl font-extrabold flex-shrink-0">
-              {post.author?.full_name?.[0] || 'A'}
-            </div>
+            {post.author?.avatar_url ? (
+              <div className="relative w-20 h-20 rounded-full overflow-hidden border-[1.5px] border-[#DDE3EF] flex-shrink-0">
+                <Image src={post.author.avatar_url} alt={post.author.display_name || 'Author'} fill className="object-cover" />
+              </div>
+            ) : (
+              <div className="w-20 h-20 rounded-full bg-[#0057FF] text-white flex items-center justify-center text-3xl font-extrabold flex-shrink-0">
+                {post.author?.display_name?.[0] || 'A'}
+              </div>
+            )}
             <div>
-              <div className="text-[18px] font-extrabold text-[#0D1117] mb-1">{post.author?.full_name || 'Ahmed Al-Rashid'}</div>
+              <div className="text-[18px] font-extrabold text-[#0D1117] mb-1">{post.author?.display_name || 'Ahmed Al-Rashid'}</div>
               <div className="text-[13px] font-bold text-[#FF6B00] mb-3">{post.author?.role || 'Senior Deal Analyst @ UAEDiscountHub'}</div>
               <p className="text-[14px] text-[#4B5675] leading-[1.6]">
-                {post.author?.role ? 
-                  `Expert in tracking prices across all major UAE retailers daily and specializing in identifying optimal coupon stacking strategies for UAE shoppers.` : 
-                  'Our senior content team focuses on delivering high-quality shopping guides and retail news to help UAE residents save more every day.'
-                }
+                {post.author?.bio ||
+                  (post.author?.role
+                    ? 'Expert in tracking prices across major UAE retailers daily and identifying the strongest coupon and savings opportunities for local shoppers.'
+                    : 'Our senior content team focuses on delivering high-quality shopping guides and retail news to help UAE residents save more every day.')}
               </p>
             </div>
           </div>

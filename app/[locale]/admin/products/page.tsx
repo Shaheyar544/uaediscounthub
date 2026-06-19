@@ -28,6 +28,7 @@ export default async function AdminProductsPage({
       id,
       name_en,
       slug,
+      sku,
       thumbnail_url,
       image_url,
       status,

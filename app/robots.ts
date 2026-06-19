@@ -1,10 +1,10 @@
 import { MetadataRoute } from 'next'
-import { createAdminClient } from '@/utils/supabase/admin'
+import { createClient } from '@/utils/supabase/server'
 
 export default async function robots(): Promise<MetadataRoute.Robots> {
   try {
-    const admin = createAdminClient()
-    const { data } = await admin
+    const supabase = await createClient()
+    const { data } = await supabase
       .from('site_settings')
       .select('primary_domain')
       .eq('id', 'global')

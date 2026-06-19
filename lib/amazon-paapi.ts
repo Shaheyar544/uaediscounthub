@@ -56,8 +56,7 @@ export class AmazonPAAPI {
     const now = new Date();
     // YYYYMMDDTHHmmssZ format
     const amzDate = now.toISOString()
-      .replace(/[:-]|\.\d{3}/g, '')
-      .substring(0, 13) + '00Z'; 
+      .replace(/[:-]|\.\d{3}/g, ''); 
     const dateStamp = amzDate.substring(0, 8);
 
     // Exact content type used in PA-API

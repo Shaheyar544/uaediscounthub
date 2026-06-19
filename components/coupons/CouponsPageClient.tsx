@@ -270,7 +270,7 @@ export function CouponsPageClient({
                   alt={store.name}
                   width={16}
                   height={16}
-                  className="object-contain rounded-sm"
+                  className="h-4 w-auto object-contain rounded-sm"
                   unoptimized
                 />
               )}

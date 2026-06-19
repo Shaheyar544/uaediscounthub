@@ -16,6 +16,7 @@ interface ProductWithData {
   id: string
   name_en: string | null
   slug: string | null
+  sku: string | null
   thumbnail_url: string | null
   image_url: string | null
   status: string | null
@@ -112,7 +113,7 @@ export function ProductsTableClient({ products, locale, storeCounts, currentStat
             {isTrashTab ? (
               <>
                 <button 
-                  onClick={handleBulkRestore} 
+                   onClick={handleBulkRestore} 
                   disabled={isProcessing}
                   className="px-3 py-1.5 bg-white text-emerald-700 border border-emerald-200 rounded-md text-xs font-bold hover:bg-emerald-50 disabled:opacity-50 flex items-center gap-1"
                 >
@@ -152,7 +153,7 @@ export function ProductsTableClient({ products, locale, storeCounts, currentStat
                   onChange={toggleAll}
                 />
               </th>
-              {['Product', 'Category', 'Status', 'Stores', 'Base Price', 'Actions'].map((h) => (
+              {['Product', 'SKU', 'Category', 'Status', 'Stores', 'Base Price', 'Actions'].map((h) => (
                 <th
                   key={h}
                   style={{
@@ -175,7 +176,7 @@ export function ProductsTableClient({ products, locale, storeCounts, currentStat
             {(!products || products.length === 0) ? (
               <tr>
                 <td
-                  colSpan={7}
+                  colSpan={8}
                   style={{ padding: '48px 16px', textAlign: 'center', color: '#8A94A6', fontSize: 13 }}
                 >
                   No products found. Try changing your filters or add a new product.
@@ -242,6 +243,13 @@ export function ProductsTableClient({ products, locale, storeCounts, currentStat
                           </div>
                         </div>
                       </div>
+                    </td>
+
+                    {/* SKU */}
+                    <td style={{ padding: '12px 16px' }}>
+                      <span style={{ fontSize: 11, fontWeight: 700, color: '#0D1117', fontFamily: 'monospace' }}>
+                        {product.sku || '—'}
+                      </span>
                     </td>
 
                     {/* Category */}

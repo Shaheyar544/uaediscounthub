@@ -2,6 +2,7 @@
 
 import React from 'react'
 import Image from 'next/image'
+import { sanitizeEmbedHtml } from '@/lib/sanitize-html'
 import { BlogAdWidget } from '@/types/blog'
 
 interface AdWidgetProps {
@@ -66,10 +67,12 @@ export function AdWidget({ ad, fallback = 'newsletter' }: AdWidgetProps) {
 
   // If we have an active ad
   if (ad.html_code) {
+    const sanitizedHtmlCode = sanitizeEmbedHtml(ad.html_code)
+
     return (
       <div className="rounded-[14px] overflow-hidden border-[1.5px] border-[#DDE3EF] bg-white">
         <div className="text-[9px] tracking-[1px] uppercase text-[#8A94A6] text-center py-1 border-b border-[#DDE3EF]">Advertisement</div>
-        <div dangerouslySetInnerHTML={{ __html: ad.html_code }} />
+        <div dangerouslySetInnerHTML={{ __html: sanitizedHtmlCode }} />
       </div>
     )
   }

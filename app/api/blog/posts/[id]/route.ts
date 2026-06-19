@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { sanitizeRichHtml } from '@/lib/sanitize-html'
 import { createClient } from '@/utils/supabase/server'
 
 /**
@@ -15,7 +16,7 @@ export async function GET(
 
     const { data, error } = await supabase
       .from('blog_posts')
-      .select('*, author:author_id(full_name,avatar_url,role), category:category_id(*), tags:blog_post_tags(tag:blog_tags(*))')
+      .select('*, author:author_id(display_name,bio,avatar_url,social_links,role), category:category_id(*), tags:blog_post_tags(tag:blog_tags(*))')
       .or(`id.eq.${id},slug.eq.${id}`)
       .single()
 
@@ -54,10 +55,15 @@ export async function PUT(
 
     const body = await req.json()
     const { status, content } = body
+    const sanitizedContent = content ? sanitizeRichHtml(content) : undefined
 
     // Auto-calculate reading time if content changed
-    if (content && !body.reading_time_min) {
-      body.reading_time_min = Math.ceil(content.split(/\s+/).length / 200)
+    if (sanitizedContent) {
+      body.content = sanitizedContent
+    }
+
+    if (sanitizedContent && !body.reading_time_min) {
+      body.reading_time_min = Math.ceil(sanitizedContent.split(/\s+/).length / 200)
     }
 
     // Set published_at if status changed to published

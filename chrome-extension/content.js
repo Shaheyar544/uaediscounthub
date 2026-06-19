@@ -524,7 +524,7 @@ function scrapeCarrefour() {
 
 // ── Amazon Deals Page Scraper ─────────────────────────────────────────────────
 
-const AFFILIATE_TAG = 'uaediscounthub-21'
+const AFFILIATE_TAG = 'uaediscount-21'
 
 function isAmazonDealsPage() {
   const path = window.location.pathname;
@@ -544,68 +544,128 @@ function scrapeAmazonDealsPage() {
   const AFFILIATE_TAG = 'uaediscount-21';
   const deals = [];
 
+  // Broad selector for deal cards
   const cards = document.querySelectorAll(
     'div[data-testid="product-card"][data-asin], ' +
     'div[data-asin][data-csa-c-type="item"], ' +
     '.a-section.octopus-dlp-asin-section, ' +
-    '.s-result-item[data-asin]'
+    '.s-result-item[data-asin], ' +
+    '[class*="ProductCard-module__card"]'
   );
 
-  console.log(`Found ${cards.length} deal cards`);
+  console.log(`[UAEHub] Found ${cards.length} potential deal cards`);
 
   cards.forEach(card => {
     try {
-      // ASIN
-      const asin = card.getAttribute('data-asin');
+      // 1. ASIN Extraction (Attribute or URL)
+      let asin = card.getAttribute('data-asin');
+      if (!asin) {
+        const link = card.querySelector('a[href*="/dp/"]');
+        asin = link?.getAttribute('href')?.match(/\/dp\/([A-Z0-9]{10})/)?.[1];
+      }
       if (!asin) return;
 
-      // Product title (full untruncated)
-      const name = card.querySelector(
-        '.a-truncate-full.a-offscreen'
-      )?.textContent?.trim();
+      // 2. Name Extraction
+      const name = 
+        card.querySelector('.a-truncate-full.a-offscreen')?.textContent?.trim() ||
+        card.querySelector('[class*="ProductCard-module__title"]')?.textContent?.trim() ||
+        card.querySelector('[data-testid="product-card-title"]')?.textContent?.trim() ||
+        card.querySelector('h2')?.textContent?.trim();
+      
       if (!name) return;
 
-      // Coupon badge — "Save 15%" or "Save AED 50"
-      const couponRaw = card.querySelector(
-        'span.CouponExperienceBadge-module__label_Qzf0b6DKge1SbAxIoQeY'
-      )?.textContent?.trim();
+      // 3. Coupon/Badge Extraction
+      const couponRaw = 
+        card.querySelector('span[class*="CouponExperienceBadge-module__label"]')?.textContent?.trim() ||
+        card.querySelector('[class*="ProductCard-module__coupon"]')?.textContent?.trim();
 
-      // Limited time deal badge — "20% off"
-      const limitedDealBadge = card.querySelector(
-        '.style_couponBadgeLabelOnyxText__f1Itu'
-      )?.textContent?.trim();
+      const limitedDealBadge = 
+        card.querySelector('.style_couponBadgeLabelOnyxText__f1Itu')?.textContent?.trim() ||
+        card.querySelector('[class*="Badge-module__label"]')?.textContent?.trim();
 
-      // Current deal price — "Price: AED 708.96" or "Deal Price: AED 217.22"
-      const priceRaw = card.querySelector(
-        '.ProductCard-module__priceToPay_olAgJzVNGyj2javg2pAe .a-offscreen'
-      )?.textContent?.trim();
+      // 4. Price Extraction
+      const priceEl = 
+        card.querySelector('.ProductCard-module__priceToPay_olAgJzVNGyj2javg2pAe .a-offscreen') ||
+        card.querySelector('.a-price .a-offscreen') ||
+        card.querySelector('.a-price-whole');
+      
+      const originalPriceEl = 
+        card.querySelector('.ProductCard-module__wrapPrice__sMO92NjAjHmGPn3jnIH .a-offscreen') ||
+        card.querySelector('span.a-price.a-text-price .a-offscreen') ||
+        card.querySelector('.a-text-strike');
 
-      // Original price — "Was: AED 798.97" or "List: AED 599.00"
-      const originalRaw = card.querySelector(
-        '.ProductCard-module__wrapPrice__sMO92NjAjHmGPn3jnIH .a-offscreen'
-      )?.textContent?.trim();
+      const priceRaw = priceEl?.textContent?.trim();
+      const originalRaw = originalPriceEl?.textContent?.trim();
 
-      // High quality image (2x from srcset)
-      const imgEl = card.querySelector('img.a-amazon-image');
+      // 5. Image Extraction (Hardened for Lazy Loading)
+      const allImgs = Array.from(card.querySelectorAll('img'));
+      
+      // Look for the "real" product image by checking common Amazon image patterns
+      const imgEl = 
+        allImgs.find(img => (img.src?.includes('images/I/') || img.getAttribute('data-src')?.includes('images/I/'))) ||
+        card.querySelector('.ProductCard-module__imageWrapper_ytp5u9656z610A7pYd img') ||
+        card.querySelector('[class*="ProductCard-module__image"] img') ||
+        allImgs[0];
+
+      const dynamicImageData = imgEl?.getAttribute('data-a-dynamic-image');
+      const dataSrc = imgEl?.getAttribute('data-src') || imgEl?.getAttribute('data-lazy-src');
       const srcset = imgEl?.getAttribute('srcset') || '';
-      const imgUrl = srcset.includes('2x')
-        ? srcset.split(',').find(s => s.includes('2x'))?.trim()?.split(' ')?.[0]
-        : imgEl?.src;
+      let imgUrl = dataSrc || imgEl?.src;
 
-      // Product URL with affiliate tag
-      const rawHref = card.querySelector(
-        'a[data-testid="product-card-link"]'
-      )?.getAttribute('href');
+      // Priority 1: data-a-dynamic-image JSON (contains largest versions)
+      if (dynamicImageData) {
+        try {
+          const dict = JSON.parse(dynamicImageData);
+          const urls = Object.keys(dict);
+          if (urls.length > 0) {
+            imgUrl = urls[urls.length - 1]; // Usually the largest
+          }
+        } catch (e) {}
+      } 
+      // Priority 2: High res from srcset
+      else if (srcset.includes('2x') || srcset.includes('3x')) {
+        const parts = srcset.split(',');
+        const highResPart = parts.find(p => p.includes('2x') || p.includes('3x')) || parts[parts.length - 1];
+        const highResUrl = highResPart.trim().split(' ')[0];
+        if (highResUrl) imgUrl = highResUrl;
+      }
+
+      // Filter: Skip common Amazon placeholders/tracking pixels
+      if (imgUrl && (
+        imgUrl.includes('placeholder') || 
+        imgUrl.includes('transparent-pixel') || 
+        imgUrl.includes('G-01-no-image') ||
+        imgUrl.includes('cleardot.gif') ||
+        imgUrl.endsWith('.gif') ||
+        imgUrl.includes('1x1')
+      )) {
+        // If it's a placeholder, try second image if available
+        if (allImgs.length > 1) {
+          const nextImg = allImgs.find(img => {
+            const src = img.getAttribute('data-src') || img.src;
+            return src && !src.endsWith('.gif') && !src.includes('pixel');
+          });
+          if (nextImg) imgUrl = nextImg.getAttribute('data-src') || nextImg.src;
+        }
+      }
+
+      // Final Polish: Strip resizing suffixes for the MASTER high-res version
+      if (imgUrl && imgUrl.includes('images/I/') && imgUrl.includes('._')) {
+        // Pattern: ID.suffix.extension -> ID.extension
+        imgUrl = imgUrl.replace(/\._[A-Z0-9,._-]+(?=\.[a-z]{3,4}$)/i, '');
+      }
+
+      // 6. URL Construction
+      const rawHref = card.querySelector('a[href*="/dp/"]')?.getAttribute('href');
       const cleanPath = rawHref?.split('?')?.[0];
       const affiliateUrl = cleanPath
-        ? `https://www.amazon.ae${cleanPath}?tag=${AFFILIATE_TAG}`
-        : null;
+        ? (cleanPath.startsWith('http') ? cleanPath : `https://www.amazon.ae${cleanPath}`) + `?tag=${AFFILIATE_TAG}`
+        : `https://www.amazon.ae/dp/${asin}?tag=${AFFILIATE_TAG}`;
 
-      // Parse prices
+      // 7. Parsing & Normalization
       const dealPrice     = parseFloat(priceRaw?.replace(/[^0-9.]/g, '') || '0');
       const originalPrice = parseFloat(originalRaw?.replace(/[^0-9.]/g, '') || '0');
 
-      // Parse coupon
       let couponType  = null;
       let couponValue = null;
       const couponText = couponRaw || limitedDealBadge;
@@ -617,14 +677,6 @@ function scrapeAmazonDealsPage() {
         else if (amountMatch) { couponType = 'amount';     couponValue = parseInt(amountMatch[1]); }
       }
 
-      // Limited time deal discount percent
-      let limitedDealPercent = null;
-      if (limitedDealBadge) {
-        const match = limitedDealBadge.match(/(\d+)%/);
-        if (match) limitedDealPercent = parseInt(match[1]);
-      }
-
-      // Final price after coupon
       let finalPrice = dealPrice;
       if (couponType === 'percentage' && couponValue) {
         finalPrice = dealPrice * (1 - couponValue / 100);
@@ -633,11 +685,9 @@ function scrapeAmazonDealsPage() {
       }
       finalPrice = Math.round(finalPrice * 100) / 100;
 
-      // Total discount %
-      let discountPercent = null;
-      if (originalPrice > 0 && dealPrice > 0) {
-        discountPercent = Math.round((1 - dealPrice / originalPrice) * 100);
-      }
+      let discountPercent = (originalPrice > 0 && dealPrice > 0)
+        ? Math.round((1 - dealPrice / originalPrice) * 100)
+        : null;
 
       if (dealPrice > 0) {
         deals.push({
@@ -649,7 +699,6 @@ function scrapeAmazonDealsPage() {
           coupon_text:          couponText || null,
           coupon_type:          couponType,
           coupon_value:         couponValue,
-          limited_deal_percent: limitedDealPercent,
           discount_percent:     discountPercent,
           image_url:            imgUrl || null,
           affiliate_url:        affiliateUrl,
@@ -658,11 +707,11 @@ function scrapeAmazonDealsPage() {
         });
       }
     } catch (e) {
-      console.warn('Error scraping card:', e);
+      console.warn('[UAEHub] Error scraping card:', e);
     }
   });
 
-  console.log(`Scraped ${deals.length} valid deals`);
+  console.log(`[UAEHub] Scraped ${deals.length} valid deals`);
   return deals;
 }
 
@@ -704,73 +753,7 @@ if (window.location.hostname.includes('amazon.ae')) {
 // ── Deal card extraction ──────────────────────────────────────────────────────
 
 function extractDealsFromCards(cards) {
-  var AFFILIATE_TAG = 'uaediscount-21';
-  var deals = [];
-
-  cards.forEach(function(card) {
-    try {
-      var asin = card.getAttribute('data-asin');
-      if (!asin) return;
-
-      var name = card.querySelector('.a-truncate-full.a-offscreen, .ProductCard-module__title_3_5P_8, h2, [data-testid="product-card-title"]')?.textContent?.trim();
-      if (!name) return;
-
-      var couponRaw    = card.querySelector('span.CouponExperienceBadge-module__label_Qzf0b6DKge1SbAxIoQeY')?.textContent?.trim();
-      var limitedBadge = card.querySelector('.style_couponBadgeLabelOnyxText__f1Itu')?.textContent?.trim();
-      var priceRaw     = card.querySelector('.ProductCard-module__priceToPay_olAgJzVNGyj2javg2pAe .a-offscreen')?.textContent?.trim();
-      var originalRaw  = card.querySelector('.ProductCard-module__wrapPrice__sMO92NjAjHmGPn3jnIH .a-offscreen')?.textContent?.trim();
-
-      var imgEl   = card.querySelector('img.a-amazon-image');
-      var srcset  = imgEl?.getAttribute('srcset') || '';
-      var imgUrl  = srcset.includes('2x')
-        ? srcset.split(',').find(function(s) { return s.includes('2x'); })?.trim()?.split(' ')?.[0]
-        : imgEl?.src;
-
-      var rawHref      = card.querySelector('a[data-testid="product-card-link"]')?.getAttribute('href');
-      var cleanPath    = rawHref?.split('?')?.[0];
-      var affiliateUrl = cleanPath ? 'https://www.amazon.ae' + cleanPath + '?tag=' + AFFILIATE_TAG : null;
-
-      var dealPrice     = parseFloat(priceRaw?.replace(/[^0-9.]/g, '') || '0');
-      var originalPrice = parseFloat(originalRaw?.replace(/[^0-9.]/g, '') || '0');
-
-      var couponType = null, couponValue = null;
-      if (couponRaw) {
-        var pct = couponRaw.match(/(\d+)%/);
-        var amt = couponRaw.match(/AED[\s\u00a0]*(\d+)/i);
-        if (pct)      { couponType = 'percentage'; couponValue = parseInt(pct[1]); }
-        else if (amt) { couponType = 'amount';     couponValue = parseInt(amt[1]); }
-      }
-
-      var finalPrice = dealPrice;
-      if (couponType === 'percentage' && couponValue) { finalPrice = dealPrice * (1 - couponValue / 100); }
-      else if (couponType === 'amount' && couponValue) { finalPrice = dealPrice - couponValue; }
-      finalPrice = Math.round(finalPrice * 100) / 100;
-
-      var discountPercent = (originalPrice > 0 && dealPrice > 0)
-        ? Math.round((1 - dealPrice / originalPrice) * 100) : null;
-
-      if (dealPrice > 0) {
-        deals.push({
-          asin:             asin,
-          name:             name.substring(0, 200),
-          deal_price:       dealPrice,
-          original_price:   originalPrice || null,
-          final_price:      finalPrice,
-          coupon_text:      couponRaw || limitedBadge || null,
-          coupon_type:      couponType,
-          coupon_value:     couponValue,
-          discount_percent: discountPercent,
-          image_url:        imgUrl || null,
-          affiliate_url:    affiliateUrl,
-          is_limited_time:  !!limitedBadge,
-        });
-      }
-    } catch (e) {
-      console.warn('[UAEHub] Card error:', e);
-    }
-  });
-
-  return deals;
+  return scrapeAmazonDealsPage(); // Standardized to use the same logic
 }
 
 // ── Message Listener ──────────────────────────────────────────────────────────
@@ -789,48 +772,53 @@ chrome.runtime.onMessage.addListener(function(request, _sender, sendResponse) {
   if (request.action === 'scrapeDeals') {
     sendResponse({ status: 'started' });
 
-    // Try primary selector immediately
-    var cards = document.querySelectorAll('div[data-testid="product-card"][data-asin]');
-    console.log('[UAEHub] Immediate cards:', cards.length);
+    // Trigger a slight scroll to wake up lazy loaders
+    window.scrollBy(0, 500);
+    setTimeout(() => {
+      window.scrollBy(0, -500);
+      
+      // Try primary selector after scroll settling
+      var cards = document.querySelectorAll('div[data-testid="product-card"][data-asin]');
+      console.log('[UAEHub] Immediate cards:', cards.length);
 
-    if (cards.length === 0) {
-      // Try alternative selectors
-      cards = document.querySelectorAll('[data-csa-c-item-type="deal"][data-asin], [data-asin][data-testid="product-card"]');
-      console.log('[UAEHub] Alt cards:', cards.length);
-    }
+      if (cards.length === 0) {
+        // Try alternative selectors
+        cards = document.querySelectorAll('[class*="ProductCard-module__card"], [data-csa-c-item-type="deal"][data-asin], [data-asin][data-testid="product-card"]');
+        console.log('[UAEHub] Alt cards:', cards.length);
+      }
 
-    if (cards.length > 0) {
-      var deals = extractDealsFromCards(cards);
-      console.log('[UAEHub] Scraped immediately:', deals.length);
-      chrome.storage.local.set({ scrapedDeals: deals, scrapeComplete: true, scrapeCount: deals.length });
-    } else {
-      // Cards not in DOM yet — observe
-      console.log('[UAEHub] No cards yet, starting MutationObserver...');
-      var observer = new MutationObserver(function() {
-        var found = document.querySelectorAll('div[data-testid="product-card"][data-asin]');
-        if (found.length > 0) {
-          observer.disconnect();
-          var d = extractDealsFromCards(found);
-          console.log('[UAEHub] Scraped after observe:', d.length);
-          chrome.storage.local.set({ scrapedDeals: d, scrapeComplete: true, scrapeCount: d.length });
-        }
-      });
-      observer.observe(document.body, { childList: true, subtree: true });
-
-      // Hard 15s timeout
-      setTimeout(function() {
-        observer.disconnect();
-        var finalCards = document.querySelectorAll('div[data-testid="product-card"][data-asin]');
-        var finalDeals = finalCards.length > 0 ? extractDealsFromCards(finalCards) : [];
-        console.log('[UAEHub] Timeout fallback — cards:', finalCards.length, 'deals:', finalDeals.length);
-        chrome.storage.local.set({
-          scrapedDeals:   finalDeals,
-          scrapeComplete: true,
-          scrapeCount:    finalDeals.length,
-          scrapeError:    finalCards.length === 0 ? 'No cards found after 15s' : null,
+      if (cards.length > 0) {
+        var deals = scrapeAmazonDealsPage();
+        console.log('[UAEHub] Scraped immediately:', deals.length);
+        chrome.storage.local.set({ scrapedDeals: deals, scrapeComplete: true, scrapeCount: deals.length });
+      } else {
+        // Cards not in DOM yet — observe
+        console.log('[UAEHub] No cards yet, starting MutationObserver...');
+        var observer = new MutationObserver(function() {
+          var found = document.querySelectorAll('[class*="ProductCard-module__card"]');
+          if (found.length > 0) {
+            observer.disconnect();
+            var d = scrapeAmazonDealsPage();
+            console.log('[UAEHub] Scraped after observe:', d.length);
+            chrome.storage.local.set({ scrapedDeals: d, scrapeComplete: true, scrapeCount: d.length });
+          }
         });
-      }, 15000);
-    }
+        observer.observe(document.body, { childList: true, subtree: true });
+
+        // Hard 15s timeout
+        setTimeout(function() {
+          observer.disconnect();
+          var deals = scrapeAmazonDealsPage();
+          console.log('[UAEHub] Timeout fallback — deals:', deals.length);
+          chrome.storage.local.set({
+            scrapedDeals:   deals,
+            scrapeComplete: true,
+            scrapeCount:    deals.length,
+            scrapeError:    deals.length === 0 ? 'No deals found after 15s' : null,
+          });
+        }, 15000);
+      }
+    }, 400);
 
     return false;
   }

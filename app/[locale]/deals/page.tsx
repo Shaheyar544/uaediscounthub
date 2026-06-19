@@ -1,4 +1,4 @@
-import { createAdminClient } from '@/utils/supabase/admin'
+import { createClient } from '@/utils/supabase/server'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { Zap, Tag, ShoppingBag, ChevronRight } from 'lucide-react'
@@ -58,7 +58,7 @@ export default async function DealsPage({
   const { locale } = await params
   const { filter = 'all', sort = 'discount' } = await searchParams
 
-  const supabase = createAdminClient()
+  const supabase = await createClient()
 
   let query = supabase
     .from('deals')
