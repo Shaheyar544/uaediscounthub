@@ -23,7 +23,7 @@ export default async function CategoryPage({
 
     let query = supabase
         .from('products')
-        .select('*, categories!inner(name)')
+        .select('*, categories!inner(name), product_store_prices(price, original_price, discount_percent, stores(name, logo_url))')
         .ilike('categories.name', `%${categoryQueryName}%`)
 
     // Apply Price Filters
@@ -76,19 +76,28 @@ export default async function CategoryPage({
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {validProducts.map(product => (
-                                <DealCard
-                                    key={product.id}
-                                    id={product.id}
-                                    name={product.name}
-                                    slug={product.slug}
-                                    image_url={product.image_url}
-                                    base_price={product.base_price}
-                                    originalPrice={product.base_price ? product.base_price * 1.15 : 0}
-                                    discountPercent={15}
-                                    store="Amazon AE"
-                                />
-                            ))}
+                            {validProducts.map(product => {
+                                const prices = product.product_store_prices ?? []
+                                const sorted = [...prices].sort((a: any, b: any) => (a.price ?? 0) - (b.price ?? 0))
+                                const best = sorted[0]
+                                const price = best?.price ?? product.base_price ?? 0
+                                const original = best?.original_price ?? 0
+                                const discount = Math.round(best?.discount_percent ?? 0)
+                                const store = best?.stores?.name ?? 'Amazon AE'
+                                return (
+                                    <DealCard
+                                        key={product.id}
+                                        id={product.id}
+                                        name={product.name}
+                                        slug={product.slug}
+                                        image_url={product.image_url}
+                                        base_price={price}
+                                        originalPrice={original}
+                                        discountPercent={discount}
+                                        store={store}
+                                    />
+                                )
+                            })}
                         </div>
                     )}
                 </div>

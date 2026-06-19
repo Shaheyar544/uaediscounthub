@@ -56,7 +56,7 @@ export default async function Home({
 
       supabase
         .from('products')
-        .select('id, name, name_en, slug, image_url, base_price, average_rating, is_featured, product_prices(current_price, original_price, discount_percent, stores(name, slug))')
+        .select('id, name, name_en, slug, image_url, base_price, average_rating, is_featured, product_store_prices(price, original_price, discount_percent, stores(name, slug))')
         .eq('is_active', true)
         .order('is_featured', { ascending: false })
         .order('created_at',  { ascending: false })
@@ -92,12 +92,12 @@ export default async function Home({
     }
 
     function getBestPrice(product: any) {
-      const prices = product.product_prices ?? []
+      const prices = product.product_store_prices ?? []
       if (prices.length === 0) return { price: product.base_price, store: 'Amazon AE', discount: 0, original: 0 }
-      const sorted = [...prices].sort((a: any, b: any) => (a.current_price ?? 0) - (b.current_price ?? 0))
+      const sorted = [...prices].sort((a: any, b: any) => (a.price ?? 0) - (b.price ?? 0))
       const best = sorted[0]
       return {
-        price:    best?.current_price  ?? product.base_price,
+        price:    best?.price          ?? product.base_price,
         store:    best?.stores?.name   ?? 'Amazon AE',
         discount: Math.round(best?.discount_percent ?? 0),
         original: best?.original_price ?? 0,

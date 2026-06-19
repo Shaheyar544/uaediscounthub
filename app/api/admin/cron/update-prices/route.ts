@@ -56,9 +56,14 @@ export async function POST(req: NextRequest) {
     if (productsResult.error) throw new Error(`Fetch products failed: ${productsResult.error.message}`);
     if (dealsResult.error) throw new Error(`Fetch deals failed: ${dealsResult.error.message}`);
 
-    const productMap = new Map<string, string>(); // ASIN -> ProductId
+    const productMap = new Map<string, string[]>(); // ASIN -> ProductId[]
     productsResult.data.forEach(p => {
-      if (p.sku) productMap.set(p.sku.toUpperCase(), p.id);
+      if (p.sku) {
+        const skuUpper = p.sku.toUpperCase();
+        const existing = productMap.get(skuUpper) || [];
+        existing.push(p.id);
+        productMap.set(skuUpper, existing);
+      }
     });
 
     const dealAsins = new Set<string>();
@@ -106,8 +111,8 @@ export async function POST(req: NextRequest) {
           }
 
           // A. Update products and product_store_prices
-          const productId = productMap.get(normalizedAsin);
-          if (productId) {
+          const productIds = productMap.get(normalizedAsin) || [];
+          for (const productId of productIds) {
             // Upsert the price comparison record
             const { error: priceError } = await supabase
               .from('product_store_prices')
@@ -125,6 +130,20 @@ export async function POST(req: NextRequest) {
               console.error(`[cron/update-prices] Failed to update price for product ${productId}:`, priceError.message);
               errors.push(`Product Price Update Error (${item.asin}): ${priceError.message}`);
             } else {
+              // Update the base product price in the products table
+              const { error: productUpdateError } = await supabase
+                .from('products')
+                .update({
+                  base_price: item.price,
+                  updated_at: new Date().toISOString()
+                })
+                .eq('id', productId);
+
+              if (productUpdateError) {
+                console.error(`[cron/update-prices] Failed to update base_price for product ${productId}:`, productUpdateError.message);
+                errors.push(`Product Base Price Update Error (${item.asin}): ${productUpdateError.message}`);
+              }
+
               // Insert into price history
               const { error: historyError } = await supabase
                 .from('price_history')

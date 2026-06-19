@@ -19,7 +19,7 @@ export default async function SearchPage({
     const terms = query.trim().split(/\s+/).filter(word => word.length > 1)
     
     let products = []
-    let queryBuilder = supabase.from('products').select('*')
+    let queryBuilder = supabase.from('products').select('*, product_store_prices(price, original_price, discount_percent, stores(name, logo_url))')
     
     if (terms.length > 0) {
         // Build a filter that looks for ANY of the terms in EN or AR fields
@@ -78,19 +78,29 @@ export default async function SearchPage({
                 </div>
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {products.map((product) => (
-                        <DealCard
-                            key={product.id}
-                            id={product.id}
-                            name={product.name_en}
-                            slug={product.slug}
-                            image_url={(product.images as any)?.[0]?.url}
-                            base_price={product.base_price || 0}
-                            originalPrice={(product.base_price || 0) * 1.15}
-                            discountPercent={15}
-                            store="Multiple Stores"
-                        />
-                    ))}
+                    {products.map((product) => {
+                        const prices = product.product_store_prices ?? []
+                        const sorted = [...prices].sort((a: any, b: any) => (a.price ?? 0) - (b.price ?? 0))
+                        const best = sorted[0]
+                        const price = best?.price ?? product.base_price ?? 0
+                        const original = best?.original_price ?? 0
+                        const discount = Math.round(best?.discount_percent ?? 0)
+                        const store = best?.stores?.name ?? 'Multiple Stores'
+                        const imageUrl = product.image_url || (product.images as any)?.[0]?.url
+                        return (
+                            <DealCard
+                                key={product.id}
+                                id={product.id}
+                                name={product.name_en}
+                                slug={product.slug}
+                                image_url={imageUrl}
+                                base_price={price}
+                                originalPrice={original}
+                                discountPercent={discount}
+                                store={store}
+                            />
+                        )
+                    })}
                 </div>
             )}
         </div>
