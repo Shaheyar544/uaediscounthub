@@ -198,18 +198,33 @@ export async function saveProduct(payload: ProductPayload): Promise<SaveResult> 
 
     // FIX 7C: Sync coupon to coupons table when a code is present
     if (sp.coupon_code && sp.store_id) {
-      await supabase.from('coupons').upsert(
-        {
-          store_id:       sp.store_id,
-          code:           sp.coupon_code,
-          title_en:       sp.coupon_discount || `Save with code ${sp.coupon_code}`,
-          discount_value: null,
-          is_active:      true,
-          product_id:     productId,
-          source:         'product_import',
-        },
-        { onConflict: 'code,store_id', ignoreDuplicates: false }
-      )
+      const { data: existingCoupon } = await supabase
+        .from('coupons')
+        .select('id')
+        .eq('store_id', sp.store_id)
+        .eq('code', sp.coupon_code)
+        .maybeSingle()
+
+      const couponData = {
+        store_id:       sp.store_id,
+        code:           sp.coupon_code,
+        title_en:       sp.coupon_discount || `Save with code ${sp.coupon_code}`,
+        discount_value: null,
+        is_active:      true,
+        product_id:     productId,
+        source:         'product_import',
+      }
+
+      if (existingCoupon) {
+        await supabase
+          .from('coupons')
+          .update(couponData)
+          .eq('id', existingCoupon.id)
+      } else {
+        await supabase
+          .from('coupons')
+          .insert(couponData)
+      }
     }
   }
 
