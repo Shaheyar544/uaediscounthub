@@ -183,6 +183,9 @@ export async function POST(req: NextRequest) {
                         : {}
   const tags        = Array.isArray(body.tags) ? (body.tags as string[]) : []
 
+  const rating      = body.rating ? parseFloat(String(body.rating)) : null
+  const ratingCount = (body.rating_count || body.reviews_count) ? parseInt(String(body.rating_count || body.reviews_count), 10) : null
+
   // Check for existing product by SKU (ASIN)
   let productId: string | null = null
   let finalSlug: string | null = null
@@ -224,6 +227,10 @@ export async function POST(req: NextRequest) {
       tags:             tags.length > 0 ? tags : null,
       sku:              asin,
       asin:             asin, // keep both for compat
+      average_rating:   rating,
+      rating:           rating,
+      review_count:     ratingCount,
+      rating_count:     ratingCount,
       updated_at:       new Date().toISOString(),
     }
 
@@ -243,10 +250,19 @@ export async function POST(req: NextRequest) {
     productId = newProduct.id
     finalSlug = newProduct.slug
   } else {
-    // Update existing product metadata/timestamp
-    await supabase.from('products').update({ 
-      updated_at: new Date().toISOString() 
-    }).eq('id', productId)
+    // Update existing product metadata/timestamp & rating fields if provided
+    const updateData: Record<string, any> = {
+      updated_at: new Date().toISOString()
+    }
+    if (rating !== null) {
+      updateData.average_rating = rating
+      updateData.rating = rating
+    }
+    if (ratingCount !== null) {
+      updateData.review_count = ratingCount
+      updateData.rating_count = ratingCount
+    }
+    await supabase.from('products').update(updateData).eq('id', productId)
   }
 
   // 7. Upsert store price row + record price history
