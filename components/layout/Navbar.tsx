@@ -4,6 +4,7 @@ import { getDictionary } from '@/i18n/dictionaries'
 import { Search, Bell, Moon, Sun, Monitor } from 'lucide-react'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { createClient } from '@/utils/supabase/server'
+import { SearchInput } from '@/components/layout/SearchInput'
 
 export async function Navbar({ locale }: { locale: Locale }) {
     const dict = await getDictionary(locale);
@@ -64,13 +65,7 @@ export async function Navbar({ locale }: { locale: Locale }) {
                 </ul>
 
                 <div className="nav-search flex-1 max-w-[340px] relative">
-                    <Search className="nav-search-icon absolute left-3 top-1/2 -translate-y-1/2 w-[15px] h-[15px] text-muted-foreground" />
-                    <input
-                        type="text"
-                        placeholder="Search Products & Deals..."
-                        suppressHydrationWarning
-                        className="w-full h-9.5 border-1.5 border-border rounded-full pl-9.5 pr-3.5 font-body text-[13.5px] bg-secondary text-foreground outline-none transition-all focus:border-primary focus:bg-white focus:ring-3 focus:ring-primary/12"
-                    />
+                    <SearchInput placeholder={dict.common.search} locale={locale} />
                 </div>
 
                 <div className="nav-right ml-auto flex items-center gap-2.5">
