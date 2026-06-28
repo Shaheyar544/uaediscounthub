@@ -2,6 +2,7 @@ import { sanitizeRichHtml } from '@/lib/sanitize-html'
 import { createClient } from '@/utils/supabase/server'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
+import AboutUsLayout from '@/components/AboutUsLayout'
 
 interface Params {
   locale: string
@@ -14,6 +15,16 @@ export async function generateMetadata({
   params: Promise<Params>
 }): Promise<Metadata> {
   const { locale, slug } = await params
+
+  if (slug === 'about') {
+    return {
+      title: locale === 'ar' ? 'من نحن - UAEDiscountHub' : 'About Us - UAEDiscountHub',
+      description: locale === 'ar'
+        ? 'منصة مقارنة الأسعار والعروض الرائدة في الإمارات، نساعد المتسوقين على إيجاد أفضل صفقات التقنية عبر كبرى تجار التجزئة في الوقت الفعلي.'
+        : 'Learn more about UAEDiscountHub, the leading price comparison, deal tracking, and smart coupon platform in the UAE and GCC.'
+    }
+  }
+
   const supabase = await createClient()
 
   const { data: page } = await supabase
@@ -43,6 +54,11 @@ export default async function DynamicPage({
   params: Promise<Params>
 }) {
   const { locale, slug } = await params
+
+  if (slug === 'about') {
+    return <AboutUsLayout locale={locale} />
+  }
+
   const supabase = await createClient()
 
   const { data: page } = await supabase
@@ -78,3 +94,4 @@ export default async function DynamicPage({
     </div>
   )
 }
+
