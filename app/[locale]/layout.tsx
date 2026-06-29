@@ -11,6 +11,7 @@ import { ThemeProvider } from '@/components/theme-provider'
 import { AnalyticsProvider } from '@/components/analytics/AnalyticsProvider'
 import { createClient } from '@/utils/supabase/server'
 import { CompareBar } from '@/components/compare/CompareBar'
+import { CookieConsent } from '@/components/layout/CookieConsent'
 
 const syne = Syne({ subsets: ['latin'], variable: '--font-syne' })
 const dmSans = DM_Sans({ subsets: ['latin'], variable: '--font-dm-sans' })
@@ -138,6 +139,7 @@ export default async function RootLayout({
             <Footer locale={locale as Locale} />
             <MobileBottomNav />
             <CompareBar locale={locale} />
+            <CookieConsent locale={locale} />
           </AnalyticsProvider>
         </ThemeProvider>
       </body>
