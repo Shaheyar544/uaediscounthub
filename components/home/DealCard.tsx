@@ -73,22 +73,40 @@ export function DealCard({
         </button>
       </div>
 
-      <div className="relative aspect-[4/3] w-full bg-white flex items-center justify-center overflow-hidden">
-        {image_url ? (
-          <Image
-            src={image_url}
-            alt={name}
-            fill
-            className="object-contain p-4 transition-transform duration-500 group-hover:scale-110"
-            sizes="(max-width: 640px) 50vw, 25vw"
-            unoptimized
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gray-50 text-gray-300 text-xs font-bold text-center p-4 uppercase">
-            {name}
+      {/* Sanitized image URL resolver */}
+      {(() => {
+        const getImageUrl = (url: string | null | undefined): string | null => {
+          if (!url) return null
+          const cleanUrl = url.trim()
+          if (cleanUrl.startsWith('http://') || cleanUrl.startsWith('https://') || cleanUrl.startsWith('/')) {
+            return cleanUrl
+          }
+          // If it's a relative filename from R2 bucket, prefix it
+          if (!cleanUrl.includes('/') && (cleanUrl.endsWith('.jpg') || cleanUrl.endsWith('.png') || cleanUrl.endsWith('.webp') || cleanUrl.endsWith('.jpeg'))) {
+            return `https://media.uaediscounthub.com/products/${cleanUrl}`
+          }
+          return null
+        }
+
+        const finalImageUrl = getImageUrl(image_url)
+
+        return (
+          <div className="relative aspect-[4/3] w-full bg-white flex items-center justify-center overflow-hidden p-4">
+            {finalImageUrl ? (
+              <img
+                src={finalImageUrl}
+                alt={name}
+                className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-110"
+                loading="lazy"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center bg-gray-50 text-gray-300 text-xs font-bold text-center p-4 uppercase">
+                {name}
+              </div>
+            )}
           </div>
-        )}
-      </div>
+        )
+      })()}
 
       <div className="p-4 flex flex-col gap-2">
         <div className="flex items-center justify-between">

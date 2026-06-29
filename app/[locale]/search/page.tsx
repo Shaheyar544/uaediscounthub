@@ -86,7 +86,11 @@ export default async function SearchPage({
                         const original = best?.original_price ?? 0
                         const discount = Math.round(best?.discount_percent ?? 0)
                         const store = best?.stores?.name ?? 'Multiple Stores'
-                        const imageUrl = product.image_url || (product.images as any)?.[0]?.url
+                        const imageUrl = product.image_url || 
+                            (typeof product.images?.[0] === 'string' 
+                                ? product.images[0] 
+                                : (product.images?.[0] as any)?.url) || 
+                            null
                         return (
                             <DealCard
                                 key={product.id}
