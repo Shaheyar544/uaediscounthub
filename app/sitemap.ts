@@ -153,7 +153,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         {
             url: baseUrl,
             lastModified: new Date(),
-            changeFrequency: 'daily',
+            changeFrequency: 'daily' as const,
             priority: 1,
         },
         ...(['en', 'ar'] as const).flatMap((lang) => {
@@ -166,7 +166,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
                 {
                     url: homeUrl,
                     lastModified: new Date(),
-                    changeFrequency: 'daily',
+                    changeFrequency: 'daily' as const,
                     priority: 1,
                     alternates: {
                         languages: {
@@ -178,7 +178,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
                 {
                     url: dealsUrl,
                     lastModified: new Date(),
-                    changeFrequency: 'daily',
+                    changeFrequency: 'daily' as const,
                     priority: 0.9,
                     alternates: {
                         languages: {
@@ -190,7 +190,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
                 {
                     url: couponsUrl,
                     lastModified: new Date(),
-                    changeFrequency: 'daily',
+                    changeFrequency: 'daily' as const,
                     priority: 0.9,
                     alternates: {
                         languages: {
@@ -202,7 +202,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
                 {
                     url: blogUrl,
                     lastModified: new Date(),
-                    changeFrequency: 'weekly',
+                    changeFrequency: 'weekly' as const,
                     priority: 0.9,
                     alternates: {
                         languages: {
