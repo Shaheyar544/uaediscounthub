@@ -4,15 +4,25 @@ import { Metadata } from 'next'
 
 export const revalidate = 900 // 15-min ISR
 
-export const metadata: Metadata = {
-  title: 'UAE Coupon Codes & Promo Codes 2025 | UAE Discount Hub',
-  description:
-    'Find verified coupon codes for Amazon UAE, Noon, Sharaf DG, Carrefour & more. Updated daily. Copy & save instantly.',
-  openGraph: {
-    title: 'UAE Coupon Codes & Promo Codes 2025',
-    description: "Verified promo codes for UAE's top stores — updated daily.",
-    type: 'website',
-  },
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>
+}): Promise<Metadata> {
+  const { locale } = await params
+  return {
+    title: 'UAE Coupon Codes & Promo Codes 2025 | UAE Discount Hub',
+    description:
+      'Find verified coupon codes for Amazon UAE, Noon, Sharaf DG, Carrefour & more. Updated daily. Copy & save instantly.',
+    openGraph: {
+      title: 'UAE Coupon Codes & Promo Codes 2025',
+      description: "Verified promo codes for UAE's top stores — updated daily.",
+      type: 'website',
+    },
+    alternates: {
+      canonical: `/${locale}/coupons`,
+    },
+  }
 }
 
 export default async function CouponsPage({

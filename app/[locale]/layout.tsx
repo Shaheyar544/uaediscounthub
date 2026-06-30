@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Syne, DM_Sans, Cairo } from 'next/font/google'
+import { Outfit, DM_Sans, Cairo } from 'next/font/google'
 import Script from 'next/script'
 import '../globals.css'
 import { Locale } from '@/i18n/config'
@@ -13,14 +13,13 @@ import { createClient } from '@/utils/supabase/server'
 import { CompareBar } from '@/components/compare/CompareBar'
 import { CookieConsent } from '@/components/layout/CookieConsent'
 
-const syne = Syne({ subsets: ['latin'], variable: '--font-syne' })
+const outfit = Outfit({ subsets: ['latin'], variable: '--font-outfit' })
 const dmSans = DM_Sans({ subsets: ['latin'], variable: '--font-dm-sans' })
 const cairo = Cairo({ subsets: ['arabic'], variable: '--font-cairo' })
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://uaediscounthub.com'),
   alternates: {
-    canonical: '/',
     languages: {
       'en-AE': '/en',
       'ar-AE': '/ar',
@@ -99,7 +98,7 @@ export default async function RootLayout({
       lang={locale}
       dir={dir}
       data-scroll-behavior="smooth"
-      className={`${syne.variable} ${dmSans.variable} ${cairo.variable}`}
+      className={`${outfit.variable} ${dmSans.variable} ${cairo.variable}`}
       suppressHydrationWarning
     >
       <body className="min-h-screen bg-background text-foreground font-body antialiased" suppressHydrationWarning>

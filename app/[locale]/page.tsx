@@ -12,8 +12,23 @@ import { RecentlyViewed }       from '@/components/home/RecentlyViewed'
 import { createClient }         from '@/utils/supabase/server'
 import Image                    from 'next/image'
 
+import type { Metadata } from 'next'
+
 // ISR: revalidate every 5 minutes — much faster than force-dynamic
 export const revalidate = 300
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>
+}): Promise<Metadata> {
+  const { locale } = await params
+  return {
+    alternates: {
+      canonical: `/${locale}`,
+    },
+  }
+}
 
 const R2_HOST = 'media.uaediscounthub.com'
 

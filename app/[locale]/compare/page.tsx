@@ -3,6 +3,22 @@ import Image from 'next/image'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Check, X, ExternalLink, ArrowRight, Store, BarChart2 } from 'lucide-react'
+import type { Metadata } from 'next'
+
+export async function generateMetadata({
+    params,
+}: {
+    params: Promise<{ locale: string }>
+}): Promise<Metadata> {
+    const { locale } = await params
+    return {
+        title: 'Compare Prices Side-by-Side | UAEDiscountHub',
+        description: 'Compare prices of your favorite tech products across Noon, Amazon UAE, Carrefour and more in real time.',
+        alternates: {
+            canonical: `/${locale}/compare`,
+        },
+    }
+}
 
 export default async function ComparePage({
     params,
