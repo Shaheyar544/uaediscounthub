@@ -211,6 +211,13 @@ export default async function ProductPage({
               {product.model && (
                 <p className="text-sm text-gray-500 font-medium">Model: {product.model}</p>
               )}
+
+              {/* SKU / ASIN */}
+              {(product.sku || product.asin) && (
+                <p className="text-sm text-gray-500 font-medium mt-1">
+                  {locale === 'ar' ? 'رمز المنتج (SKU):' : 'SKU:'} <span className="font-mono text-gray-700 font-semibold">{product.sku || product.asin}</span>
+                </p>
+              )}
             </div>
             <div className="flex gap-2.5 shrink-0 pt-2">
               <ShareButton

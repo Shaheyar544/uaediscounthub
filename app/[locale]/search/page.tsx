@@ -28,7 +28,9 @@ export default async function SearchPage({
             `name_en.ilike.%${term}%`,
             `name_ar.ilike.%${term}%`,
             `description_en.ilike.%${term}%`,
-            `description_ar.ilike.%${term}%`
+            `description_ar.ilike.%${term}%`,
+            `sku.ilike.%${term}%`,
+            `asin.ilike.%${term}%`
         ]).join(',')
         
         const { data, error } = await queryBuilder
