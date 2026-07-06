@@ -24,32 +24,15 @@ function chunkArray<T>(array: T[], size: number): T[][] {
 // Delay helper to prevent throttling
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-export async function POST(req: NextRequest) {
+// Separate asynchronous background sync runner
+async function performSync(storeId: string) {
   const startTime = Date.now();
-
-  // 1. Auth check
-  if (!isAuthorized(req)) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
   const supabase = createAdminClient();
 
-  // 2. Find Amazon UAE store ID
-  const { data: amazonStore } = await supabase
-    .from('stores')
-    .select('id')
-    .ilike('name', '%amazon%')
-    .single();
-
-  const storeId = amazonStore?.id ?? null;
-  if (!storeId) {
-    return NextResponse.json({ error: 'Amazon store not found in database' }, { status: 404 });
-  }
-
   try {
-    // 3. Fetch unique ASINs from products (stored in sku) and deals
+    // 3. Fetch unique ASINs from products (stored in sku and/or asin) and deals
     const [productsResult, dealsResult] = await Promise.all([
-      supabase.from('products').select('id, sku').not('sku', 'is', null),
+      supabase.from('products').select('id, sku, asin'),
       supabase.from('deals').select('id, asin').not('asin', 'is', null)
     ]);
 
@@ -57,18 +40,30 @@ export async function POST(req: NextRequest) {
     if (dealsResult.error) throw new Error(`Fetch deals failed: ${dealsResult.error.message}`);
 
     const productMap = new Map<string, string[]>(); // ASIN -> ProductId[]
-    productsResult.data.forEach(p => {
-      if (p.sku) {
+    const asinRegex = /^[A-Z0-9]{10}$/i;
+
+    productsResult.data?.forEach(p => {
+      if (p.sku && asinRegex.test(p.sku)) {
         const skuUpper = p.sku.toUpperCase();
         const existing = productMap.get(skuUpper) || [];
         existing.push(p.id);
         productMap.set(skuUpper, existing);
       }
+      if (p.asin && asinRegex.test(p.asin)) {
+        const asinUpper = p.asin.toUpperCase();
+        const existing = productMap.get(asinUpper) || [];
+        if (!existing.includes(p.id)) {
+          existing.push(p.id);
+          productMap.set(asinUpper, existing);
+        }
+      }
     });
 
     const dealAsins = new Set<string>();
-    dealsResult.data.forEach(d => {
-      if (d.asin) dealAsins.add(d.asin.toUpperCase());
+    dealsResult.data?.forEach(d => {
+      if (d.asin && asinRegex.test(d.asin)) {
+        dealAsins.add(d.asin.toUpperCase());
+      }
     });
 
     // Merge unique, valid Amazon ASINs (exactly 10 alphanumeric characters)
@@ -80,11 +75,8 @@ export async function POST(req: NextRequest) {
     console.log(`[cron/update-prices] Found ${allAsins.length} unique Amazon ASINs to update.`);
 
     if (allAsins.length === 0) {
-      return NextResponse.json({
-        success: true,
-        message: 'No active Amazon products or deals found to update.',
-        updated: 0
-      });
+      console.log('[cron/update-prices] No active Amazon products or deals found to update.');
+      return;
     }
 
     // 4. Chunk ASINs into batches of 10 (Amazon API maximum)
@@ -211,16 +203,9 @@ export async function POST(req: NextRequest) {
       duration_ms: durationMs
     });
 
-    return NextResponse.json({
-      success: true,
-      message: `Completed sync. Updated ${successCount} products/deals.`,
-      updated: successCount,
-      errors: errors.length > 0 ? errors : null
-    });
-
+    console.log(`[cron/update-prices] Successfully completed background sync. Updated ${successCount} items.`);
   } catch (error: any) {
-    console.error('[cron/update-prices] Fatal error:', error.message);
-    
+    console.error('[cron/update-prices] Fatal error in background sync:', error.message);
     // Log fatal error to sync logs
     const durationMs = Date.now() - startTime;
     await supabase.from('api_sync_logs').insert({
@@ -231,10 +216,48 @@ export async function POST(req: NextRequest) {
       error_message: error.message,
       duration_ms: durationMs
     });
-
-    return NextResponse.json({
-      success: false,
-      error: error.message
-    }, { status: 500 });
   }
+}
+
+export async function POST(req: NextRequest) {
+  // 1. Auth check
+  if (!isAuthorized(req)) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  const supabase = createAdminClient();
+
+  // 2. Find Amazon UAE store ID (limit(1).maybeSingle() protects against cardinality errors)
+  const { data: amazonStore } = await supabase
+    .from('stores')
+    .select('id')
+    .ilike('name', '%amazon%')
+    .limit(1)
+    .maybeSingle();
+
+  const storeId = amazonStore?.id ?? null;
+  if (!storeId) {
+    return NextResponse.json({ error: 'Amazon store not found in database' }, { status: 404 });
+  }
+
+  // Trigger sync asynchronously in the background so HTTP connection returns immediately
+  try {
+    const { waitUntil } = require('next/server');
+    if (typeof waitUntil === 'function') {
+      waitUntil(performSync(storeId));
+    } else {
+      performSync(storeId).catch(err => {
+        console.error('[cron/update-prices] Background sync error:', err.message);
+      });
+    }
+  } catch (e) {
+    performSync(storeId).catch(err => {
+      console.error('[cron/update-prices] Background sync error:', err.message);
+    });
+  }
+
+  return NextResponse.json({
+    success: true,
+    message: 'Amazon price sync successfully initiated in background.'
+  });
 }

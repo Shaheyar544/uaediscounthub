@@ -5,9 +5,19 @@ import { Zap, Tag, ShoppingBag, ChevronRight } from 'lucide-react'
 
 export const revalidate = 300
 
-export const metadata: Metadata = {
-  title: 'Best Deals in UAE | UAEDiscountHub',
-  description: 'Shop the best deals and discounts in UAE. Lightning deals, coupon offers, and exclusive price drops on top tech products.',
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>
+}): Promise<Metadata> {
+  const { locale } = await params
+  return {
+    title: 'Best Deals in UAE | UAEDiscountHub',
+    description: 'Shop the best deals and discounts in UAE. Lightning deals, coupon offers, and exclusive price drops on top tech products.',
+    alternates: {
+      canonical: `/${locale}/deals`,
+    },
+  }
 }
 
 interface Deal {

@@ -224,7 +224,10 @@ export default async function ProductPage({
                 title={product.name_en || product.name || ''}
                 price={bestPrice.price}
               />
-              <button className="w-10 h-10 border border-border rounded-full flex items-center justify-center text-muted-foreground hover:bg-red-50 hover:text-red-500 hover:border-red-200 transition-all">
+              <button 
+                aria-label="Add to wishlist"
+                className="w-10 h-10 border border-border rounded-full flex items-center justify-center text-muted-foreground hover:bg-red-50 hover:text-red-500 hover:border-red-200 transition-all"
+              >
                 <Heart className="w-4 h-4" />
               </button>
             </div>

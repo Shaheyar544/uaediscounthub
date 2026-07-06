@@ -2,10 +2,10 @@
 
 import { motion } from 'framer-motion'
 import Image from 'next/image'
-import Link from 'next/link'
 import { Star, Heart, ShoppingCart, BarChart2 } from 'lucide-react'
 import { useHasMounted } from '@/hooks/use-has-mounted'
 import { useCompare } from '@/hooks/use-compare'
+import { useRouter } from 'next/navigation'
 
 interface DealCardProps {
   id: string
@@ -28,6 +28,7 @@ export function DealCard({
   store = 'Amazon AE', badge,
   locale = 'en',
 }: DealCardProps) {
+  const router = useRouter()
   const hasMounted = useHasMounted()
   const { isInCompare, addToCompare, removeFromCompare } = useCompare()
   const isCompared = isInCompare(id)
@@ -40,11 +41,20 @@ export function DealCard({
     else addToCompare(id)
   }
 
+  const handleCardClick = (e: React.MouseEvent) => {
+    const target = e.target as HTMLElement
+    if (target.closest('button')) {
+      return
+    }
+    router.push(`/${locale}/product/${slug}`)
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 15 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
+      onClick={handleCardClick}
       className="group relative bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-xl hover:shadow-blue-100/50 hover:-translate-y-1 transition-all duration-300 cursor-pointer"
     >
       {discountPercent > 0 && (
@@ -55,6 +65,7 @@ export function DealCard({
 
       <div className="absolute top-3 right-3 z-20 flex flex-col gap-2">
         <button
+          aria-label="Add to wishlist"
           className={`w-8 h-8 bg-white/90 backdrop-blur-md border border-gray-100 rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-white transition-all shadow-sm ${!hasMounted ? 'opacity-0' : 'opacity-100'}`}
         >
           <Heart className="w-4 h-4" />
@@ -65,7 +76,7 @@ export function DealCard({
           title={isCompared ? "Remove from Compare" : "Add to Compare"}
           className={`w-8 h-8 rounded-full flex items-center justify-center border transition-all shadow-sm ${!hasMounted ? 'opacity-0' : 'opacity-100'} ${
             isCompared 
-              ? 'bg-blue-600 border-blue-600 text-white' 
+               ? 'bg-blue-600 border-blue-600 text-white' 
               : 'bg-white/90 backdrop-blur-md border-gray-100 text-gray-400 hover:text-blue-600 hover:bg-white'
           }`}
         >
@@ -120,7 +131,7 @@ export function DealCard({
         </div>
 
         <h3 className="text-[13px] font-bold text-gray-800 leading-snug line-clamp-2 group-hover:text-blue-600 transition-colors min-h-[40px]">
-          <Link href={`/${locale}/product/${slug}`}>{name}</Link>
+          {name}
         </h3>
 
         <div className="flex items-center justify-between">
@@ -149,12 +160,11 @@ export function DealCard({
               </span>
             )}
           </div>
-          <Link
-            href={`/${locale}/product/${slug}`}
+          <div
             className="w-9 h-9 bg-blue-600 text-white rounded-xl flex items-center justify-center hover:bg-blue-700 hover:-translate-y-0.5 transition-all shadow-sm"
           >
             <ShoppingCart className="w-4 h-4" />
-          </Link>
+          </div>
         </div>
       </div>
     </motion.div>

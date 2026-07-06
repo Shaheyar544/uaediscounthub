@@ -80,6 +80,7 @@ export async function Navbar({ locale }: { locale: Locale }) {
 
                     <button
                         suppressHydrationWarning
+                        aria-label="Notifications"
                         className="nav-btn h-9 px-2 border-1.5 border-border rounded-full flex items-center justify-center hover:border-primary hover:text-primary hover:bg-primary/5 transition-all"
                     >
                         <Bell className="w-4.5 h-4.5" />
