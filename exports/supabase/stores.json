@@ -1,0 +1,114 @@
+[
+  {
+    "id": "63a7593f-9541-4286-8186-8247282a438a",
+    "slug": "amazon-ae",
+    "name": "Amazon UAE",
+    "name_ar": "أمازون الإمارات",
+    "logo_url": "https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg",
+    "base_url": "https://www.amazon.ae",
+    "affiliate_base_url": "https://www.amazon.ae",
+    "supports_cod": true,
+    "supports_tabby": false,
+    "supports_tamara": false,
+    "countries": [
+      "AE",
+      "SA",
+      "QA",
+      "KW",
+      "BH",
+      "OM"
+    ],
+    "is_active": true,
+    "display_order": 1,
+    "created_at": "2026-03-09T20:38:57.567759+00:00",
+    "is_featured": true
+  },
+  {
+    "id": "7edda798-f91d-4694-839c-09719872dfc2",
+    "slug": "noon",
+    "name": "Noon",
+    "name_ar": "نون",
+    "logo_url": "https://media.uaediscounthub.com/products/1773711481811-noonpng.webp",
+    "base_url": "https://www.noon.com/uae-en",
+    "affiliate_base_url": "https://www.noon.com/uae-en/",
+    "supports_cod": true,
+    "supports_tabby": true,
+    "supports_tamara": true,
+    "countries": [
+      "AE",
+      "SA",
+      "QA",
+      "KW",
+      "BH",
+      "OM"
+    ],
+    "is_active": true,
+    "display_order": 2,
+    "created_at": "2026-03-09T20:38:57.567759+00:00",
+    "is_featured": true
+  },
+  {
+    "id": "343f99b9-8fb8-42f0-9c1b-778f26a5b5db",
+    "slug": "sharaf-dg",
+    "name": "Sharaf DG",
+    "name_ar": "شرف DG",
+    "logo_url": "https://media.uaediscounthub.com/products/1773711534392-sharafdg.webp",
+    "base_url": "https://www.sharafdg.com",
+    "affiliate_base_url": "https://www.sharafdg.com/",
+    "supports_cod": true,
+    "supports_tabby": true,
+    "supports_tamara": false,
+    "countries": [
+      "AE"
+    ],
+    "is_active": true,
+    "display_order": 3,
+    "created_at": "2026-03-09T20:38:57.567759+00:00",
+    "is_featured": true
+  },
+  {
+    "id": "96ebf504-9c8b-4a8d-81c1-e97217c9a066",
+    "slug": "carrefour",
+    "name": "Carrefour",
+    "name_ar": "كارفور",
+    "logo_url": "https://media.uaediscounthub.com/products/1773711620433-carrefour.webp",
+    "base_url": "https://www.carrefouruae.com",
+    "affiliate_base_url": "https://www.carrefouruae.com/",
+    "supports_cod": true,
+    "supports_tabby": false,
+    "supports_tamara": false,
+    "countries": [
+      "AE",
+      "QA",
+      "KW",
+      "BH"
+    ],
+    "is_active": true,
+    "display_order": 4,
+    "created_at": "2026-03-09T20:38:57.567759+00:00",
+    "is_featured": true
+  },
+  {
+    "id": "e2ff8e55-e3b4-43db-b169-96ac36cd6483",
+    "slug": "jarir",
+    "name": "Jarir",
+    "name_ar": "جرير",
+    "logo_url": "https://media.uaediscounthub.com/products/1773711663290-jarir.webp",
+    "base_url": "https://www.jarir.com",
+    "affiliate_base_url": "https://www.jarir.com/",
+    "supports_cod": false,
+    "supports_tabby": false,
+    "supports_tamara": false,
+    "countries": [
+      "SA",
+      "QA",
+      "KW",
+      "BH",
+      "OM"
+    ],
+    "is_active": true,
+    "display_order": 5,
+    "created_at": "2026-03-09T20:38:57.567759+00:00",
+    "is_featured": true
+  }
+]

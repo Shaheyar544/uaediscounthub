@@ -1,19 +1,19 @@
 import { createClient } from '@/utils/supabase/server'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { PlusCircle, Trash2, ShieldCheck, Zap, TrendingUp, Tag, Clock } from 'lucide-react'
+import { PlusCircle, ShieldCheck, TrendingUp, Tag, Clock, Upload } from 'lucide-react'
 import Link from 'next/link'
-import { deleteCoupon, toggleCouponActive, verifyCoupon } from './actions'
-import { formatDistanceToNow } from 'date-fns'
+import { CouponRegistryTable } from '@/components/admin/coupons/CouponRegistryTable'
+import { CouponOfTheDayCard, type CouponOfTheDay } from '@/components/admin/coupons/CouponOfTheDayCard'
 
 export default async function AdminCouponsPage({ params }: { params: Promise<{ locale: string }> }) {
     const { locale } = await params
     const supabase = await createClient()
+    const now = new Date().toISOString()
 
     const { data: coupons } = await supabase
         .from('coupons')
         .select('*, stores ( name, slug )')
+        .or(`expires_at.is.null,expires_at.gt.${now}`)
         .order('created_at', { ascending: false })
 
     const totalActive = coupons?.filter((c) => c.is_active).length ?? 0
@@ -24,123 +24,39 @@ export default async function AdminCouponsPage({ params }: { params: Promise<{ l
         const inDays = (new Date(c.expires_at).getTime() - Date.now()) / 86400000
         return inDays >= 0 && inDays <= 3
     }).length ?? 0
+    const couponOfTheDay = [...(coupons ?? [])].sort((a, b) => {
+        const score = (coupon: typeof a) => (coupon.is_verified ? 1_000_000 : 0) + (coupon.is_exclusive ? 100_000 : 0) + (coupon.click_count ?? 0)
+        return score(b) - score(a)
+    })[0] ?? null
 
     return (
         <div className="space-y-8">
-            <div className="flex justify-between items-center">
-                <div>
-                    <h1 className="text-3xl font-bold tracking-tight">Coupons Registry</h1>
-                    <p className="text-muted-foreground">Manage promo codes, track performance, and verify submissions.</p>
-                </div>
-                <Link href={`/${locale}/admin/coupons/new`}>
-                    <Button className="flex items-center space-x-2">
-                        <PlusCircle className="w-4 h-4" />
-                        <span>Add Coupon</span>
-                    </Button>
-                </Link>
+            <div className="flex flex-col gap-5 border-b pb-6 lg:flex-row lg:items-end lg:justify-between">
+                <div className="max-w-2xl"><p className="text-xs font-black uppercase tracking-[0.18em] text-primary">Coupon operations</p><h1 className="mt-2 text-3xl font-black tracking-tight sm:text-4xl">Coupons Registry</h1><p className="mt-2 text-muted-foreground">Manage offers, spotlight the strongest code, and keep the catalogue ready to convert.</p></div>
+                <div className="flex flex-wrap items-center gap-2"><Link href={'/' + locale + '/admin/coupons/import'}><Button variant="outline"><Upload aria-hidden="true" />Import Coupons</Button></Link><Link href={`/${locale}/admin/coupons/new`}><Button><PlusCircle aria-hidden="true" />Add Coupon</Button></Link></div>
             </div>
 
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <CouponOfTheDayCard coupon={couponOfTheDay as CouponOfTheDay | null} locale={locale} />
+
+            <section aria-label="Coupon performance overview" className="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-4">
                 {[
                     { icon: <Tag className="w-5 h-5" />, value: totalActive, label: 'Active Coupons', color: '#0A84FF', bg: '#0A84FF1A' },
                     { icon: <ShieldCheck className="w-5 h-5" />, value: totalVerified, label: 'Verified', color: '#00C875', bg: '#00C8751A' },
                     { icon: <TrendingUp className="w-5 h-5" />, value: totalClicks.toLocaleString(), label: 'Total Clicks', color: '#A855F7', bg: '#A855F71A' },
                     { icon: <Clock className="w-5 h-5" />, value: expiringSoon, label: 'Expiring in 3 days', color: '#FF6B00', bg: '#FF6B001A' },
                 ].map((stat, i) => (
-                    <div key={i} className="rounded-xl border bg-card p-5 flex items-center gap-4">
-                        <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ backgroundColor: stat.bg, color: stat.color }}>
+                    <div key={i} className="group rounded-2xl border bg-card p-4 shadow-sm transition-colors hover:border-primary/30 hover:bg-muted/30 sm:p-5">
+                        <div className="flex items-center gap-3"><div className="flex size-10 shrink-0 items-center justify-center rounded-xl" style={{ backgroundColor: stat.bg, color: stat.color }}>
                             {stat.icon}
-                        </div>
-                        <div>
-                            <p className="text-2xl font-extrabold leading-tight" style={{ color: stat.color }}>{stat.value}</p>
+                        </div><div>
+                            <p className="text-2xl font-black leading-tight" style={{ color: stat.color }}>{stat.value}</p>
                             <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide">{stat.label}</p>
-                        </div>
+                        </div></div>
                     </div>
                 ))}
-            </div>
+            </section>
 
-            <div className="rounded-xl border bg-card overflow-hidden shadow-sm">
-                <Table>
-                    <TableHeader className="bg-muted/50">
-                        <TableRow>
-                            <TableHead>Code</TableHead>
-                            <TableHead>Store</TableHead>
-                            <TableHead>Title</TableHead>
-                            <TableHead>Discount</TableHead>
-                            <TableHead>Clicks</TableHead>
-                            <TableHead>Expires</TableHead>
-                            <TableHead>Status</TableHead>
-                            <TableHead className="text-right">Actions</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {(!coupons || coupons.length === 0) ? (
-                            <TableRow>
-                                <TableCell colSpan={8} className="h-24 text-center text-muted-foreground">
-                                    No coupons found. Add your first coupon →
-                                </TableCell>
-                            </TableRow>
-                        ) : (
-                            coupons.map((coupon) => {
-                                const isExpired = coupon.expires_at && new Date(coupon.expires_at) < new Date()
-                                const expiryText = coupon.expires_at
-                                    ? isExpired ? 'Expired' : formatDistanceToNow(new Date(coupon.expires_at), { addSuffix: true })
-                                    : '—'
-                                return (
-                                    <TableRow key={coupon.id} className={isExpired ? 'opacity-50' : ''}>
-                                        <TableCell className="font-mono font-bold text-primary tracking-wider">
-                                            {coupon.code}
-                                            {coupon.is_exclusive && (
-                                                <span className="ml-2 inline-flex items-center gap-0.5 text-[10px] font-bold text-[#FF6B00] bg-[#FF6B00]/10 px-1.5 py-0.5 rounded-full">
-                                                    <Zap className="w-2.5 h-2.5" />EXCL
-                                                </span>
-                                            )}
-                                        </TableCell>
-                                        <TableCell className="font-medium text-sm">{(coupon.stores as any)?.name ?? 'Unknown'}</TableCell>
-                                        <TableCell className="text-sm max-w-[200px] truncate">{coupon.title_en}</TableCell>
-                                        <TableCell>
-                                            <Badge variant="secondary" className="font-bold">
-                                                {coupon.discount_type === 'percent' ? `${coupon.discount_value}% OFF` : `AED ${coupon.discount_value} OFF`}
-                                            </Badge>
-                                        </TableCell>
-                                        <TableCell className="text-sm font-semibold">{(coupon.click_count ?? 0).toLocaleString()}</TableCell>
-                                        <TableCell className={`text-sm font-medium ${isExpired ? 'text-destructive' : 'text-muted-foreground'}`}>{expiryText}</TableCell>
-                                        <TableCell>
-                                            <div className="flex items-center gap-1.5 flex-wrap">
-                                                <Badge variant={coupon.is_active ? 'default' : 'destructive'}>
-                                                    {coupon.is_active ? 'Active' : 'Inactive'}
-                                                </Badge>
-                                                {coupon.is_verified && (
-                                                    <Badge variant="outline" className="text-[#00C875] border-[#00C875]/40">
-                                                        <ShieldCheck className="w-3 h-3 mr-1" />Verified
-                                                    </Badge>
-                                                )}
-                                            </div>
-                                        </TableCell>
-                                        <TableCell className="text-right">
-                                            <div className="flex items-center justify-end gap-1">
-                                                {!coupon.is_verified && (
-                                                    <form action={async () => { "use server"; await verifyCoupon(coupon.id, locale) }}>
-                                                        <Button variant="ghost" size="sm" className="h-8 text-[#00C875] hover:bg-[#00C875]/10 text-xs font-bold">Verify</Button>
-                                                    </form>
-                                                )}
-                                                <form action={async () => { "use server"; await toggleCouponActive(coupon.id, !coupon.is_active, locale) }}>
-                                                    <Button variant="ghost" size="sm" className="h-8 text-xs font-bold">{coupon.is_active ? 'Disable' : 'Enable'}</Button>
-                                                </form>
-                                                <form action={async () => { "use server"; await deleteCoupon(coupon.id, locale) }}>
-                                                    <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:bg-destructive/10">
-                                                        <Trash2 className="w-4 h-4" />
-                                                    </Button>
-                                                </form>
-                                            </div>
-                                        </TableCell>
-                                    </TableRow>
-                                )
-                            })
-                        )}
-                    </TableBody>
-                </Table>
-            </div>
+            <CouponRegistryTable coupons={coupons ?? []} locale={locale} />
         </div>
     )
 }

@@ -247,6 +247,7 @@ export function PostEditor({ initialPost, categories }: PostEditorProps) {
 
   return (
     <div className="flex flex-col -m-8">
+      <h1 className="sr-only">{initialPost?.id ? 'Edit Blog Post' : 'Write New Post'}</h1>
       {/* Editor Topbar */}
       <div className="sticky top-0 z-50 bg-white border-b-[1.5px] border-[#DDE3EF] px-7 py-3 flex items-center justify-between gap-3">
         <button onClick={() => router.back()} className="flex items-center gap-1.5 text-[12px] font-semibold text-[#8A94A6] hover:text-[#0D1117] transition-colors">
@@ -281,7 +282,7 @@ export function PostEditor({ initialPost, categories }: PostEditorProps) {
       </div>
 
       {/* Editor Main Content Area */}
-      <div className="p-7 grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-5 max-w-[1600px] mx-auto w-full">
+      <div className="w-full p-7 grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_320px] gap-5">
         
         {/* Left Column: Editor & Main Metadata */}
         <div className="space-y-4">

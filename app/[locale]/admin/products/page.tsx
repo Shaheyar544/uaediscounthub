@@ -72,7 +72,7 @@ export default async function AdminProductsPage({
   return (
     <div style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 700, color: '#0D1117', margin: 0 }}>
             Products Registry
@@ -102,7 +102,7 @@ export default async function AdminProductsPage({
       </div>
 
       {/* Filter bar */}
-      <div style={{ display: 'flex', gap: 6, marginBottom: 20, alignItems: 'center' }}>
+      <div className="mb-5 flex flex-wrap items-center gap-2">
         {filters.map((f) => {
           const active = (status ?? 'all') === f
           const displayLabel = f === 'archived' ? 'trash' : f
@@ -127,7 +127,7 @@ export default async function AdminProductsPage({
             </Link>
           )
         })}
-        <form method="get" action={`/${locale}/admin/products`} style={{ marginLeft: 'auto', display: 'flex', gap: 6 }}>
+        <form method="get" action={`/${locale}/admin/products`} className="flex w-full flex-wrap gap-2 sm:ms-auto sm:w-auto">
           {status && status !== 'all' && <input type="hidden" name="status" value={status} />}
           <input
             name="q"
@@ -140,8 +140,8 @@ export default async function AdminProductsPage({
               fontSize: 12,
               color: '#0D1117',
               outline: 'none',
-              width: 200,
             }}
+            className="w-full sm:w-[200px]"
           />
           <button
             type="submit"

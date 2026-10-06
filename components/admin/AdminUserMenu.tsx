@@ -39,26 +39,26 @@ export function AdminUserMenu({ email, locale }: AdminUserMenuProps) {
     <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen(prev => !prev)}
-        className="flex items-center gap-2 bg-[#F6F8FC] border border-[#DDE3EF] rounded-xl px-3 py-2 hover:bg-[#eef0f6] transition-colors"
+        className="flex min-h-10 items-center gap-2 rounded-xl border bg-card px-3 py-2 text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         aria-label="User menu"
       >
         <div className="w-7 h-7 rounded-full bg-[#0057FF] flex items-center justify-center text-white font-bold text-[11px] flex-shrink-0">
           {initial}
         </div>
         <div className="hidden md:block text-left">
-          <div className="text-[12px] font-bold text-[#0D1117] leading-none">{username}</div>
-          <div className="text-[10px] text-[#8A94A6] mt-0.5">Administrator</div>
+          <div className="text-[12px] font-bold leading-none">{username}</div>
+          <div className="mt-0.5 text-[10px] text-muted-foreground">Administrator</div>
         </div>
         <ChevronDown
           size={13}
-          className={`text-[#8A94A6] transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+          className={`text-muted-foreground transition-transform duration-200 motion-reduce:transition-none ${open ? 'rotate-180' : ''}`}
         />
       </button>
 
       {open && (
-        <div className="absolute top-[calc(100%+8px)] right-0 bg-white rounded-[14px] shadow-2xl border border-[#DDE3EF] w-52 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
-          <div className="p-3 border-b border-[#DDE3EF] bg-[#F6F8FC]">
-            <div className="text-[12px] font-bold text-[#0D1117] truncate">{email}</div>
+        <div className="absolute end-0 top-[calc(100%+8px)] z-50 w-52 overflow-hidden rounded-[14px] border bg-popover text-popover-foreground shadow-2xl animate-in fade-in slide-in-from-top-2 duration-150 motion-reduce:animate-none">
+          <div className="border-b bg-muted/50 p-3">
+            <div className="truncate text-[12px] font-bold">{email}</div>
             <div className="text-[10px] text-[#0057FF] font-bold mt-0.5">✓ Administrator</div>
           </div>
 
@@ -68,7 +68,7 @@ export function AdminUserMenu({ email, locale }: AdminUserMenuProps) {
                 setOpen(false)
                 router.push(`/${locale}/admin/profile`)
               }}
-              className="w-full flex items-center gap-2.5 px-3 py-2.5 text-[13px] text-[#0D1117] hover:bg-[#F6F8FC] rounded-lg transition-colors text-left"
+              className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-start text-[13px] hover:bg-muted transition-colors"
             >
               <User size={14} className="text-[#8A94A6]" />
               My Profile
@@ -77,7 +77,7 @@ export function AdminUserMenu({ email, locale }: AdminUserMenuProps) {
             <div className="border-t border-[#DDE3EF] mt-1 pt-1">
               <button
                 onClick={handleSignOut}
-                className="w-full flex items-center gap-2.5 px-3 py-2.5 text-[13px] text-[#FF3B30] hover:bg-[#FFF0EF] rounded-lg transition-colors text-left"
+              className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-start text-[13px] text-destructive hover:bg-destructive/10 transition-colors"
               >
                 <LogOut size={14} />
                 Sign Out

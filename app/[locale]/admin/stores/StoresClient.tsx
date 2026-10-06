@@ -6,7 +6,7 @@ import { createClient } from '@/utils/supabase/client'
 import { 
   Plus, Search, Edit3, Trash2, Store, CheckCircle, 
   XCircle, Loader2, Save, X, ImageIcon, ExternalLink,
-  ShoppingBag, Star
+  ShoppingBag, Star, Upload
 } from 'lucide-react'
 import { ImageUpload } from '@/components/admin/ImageUpload'
 
@@ -239,12 +239,17 @@ export default function StoresClient({ locale }: { locale: string }) {
           <h1 className="text-[22px] font-extrabold text-[#0D1117]">Stores Management</h1>
           <p className="text-[13px] text-[#8A94A6] mt-1">Manage retail partners and featured marketplaces</p>
         </div>
-        <button 
-          onClick={() => handleOpenModal()}
-          className="flex items-center gap-2 bg-[#0057FF] text-white px-5 py-2 rounded-[8px] font-bold text-[13px] hover:bg-[#0047dd] transition-all shadow-[0_4px_12px_rgba(0,87,255,0.2)]"
-        >
-          <Plus size={16} /> Add Store
-        </button>
+        <div className="flex items-center gap-2">
+          <Link href={`/${locale}/admin/stores/import`} className="flex items-center gap-2 border border-[#DDE3EF] bg-white px-4 py-2 rounded-[8px] font-bold text-[13px] text-[#4B5675] hover:border-[#0057FF] hover:text-[#0057FF] transition-all">
+            <Upload size={16} /> Import Stores
+          </Link>
+          <button
+            onClick={() => handleOpenModal()}
+            className="flex items-center gap-2 bg-[#0057FF] text-white px-5 py-2 rounded-[8px] font-bold text-[13px] hover:bg-[#0047dd] transition-all shadow-[0_4px_12px_rgba(0,87,255,0.2)]"
+          >
+            <Plus size={16} /> Add Store
+          </button>
+        </div>
       </div>
 
       {error && (

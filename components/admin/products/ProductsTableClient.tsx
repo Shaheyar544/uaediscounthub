@@ -141,8 +141,8 @@ export function ProductsTableClient({ products, locale, storeCounts, currentStat
       )}
 
       {/* Table */}
-      <div style={{ background: '#fff', border: '1.5px solid #DDE3EF', borderRadius: 14, overflow: 'hidden' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+      <div className="min-w-0 max-w-full overflow-x-auto" style={{ background: '#fff', border: '1.5px solid #DDE3EF', borderRadius: 14 }}>
+        <table style={{ width: '100%', minWidth: 760, borderCollapse: 'collapse' }}>
           <thead>
             <tr style={{ background: '#F6F8FC', borderBottom: '1.5px solid #DDE3EF' }}>
               <th style={{ padding: '10px 16px', width: 40 }}>

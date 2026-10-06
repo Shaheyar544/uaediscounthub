@@ -1,0 +1,136 @@
+﻿Page	Route	Viewport	ActualUrl	Heading	ViewportWidth	DocumentWidth	Overflow	Screenshot	AXSnapshot	Status
+dashboard	/en/admin	1920x1080	http://localhost:3000/en/admin	Affiliate intelligence, at a glance.	1920	1920	False	qa/screenshots/dashboard__1920x1080.png	qa/admin-ax-snapshots/dashboard__1920x1080.txt	VALID
+dashboard	/en/admin	1440x900	http://localhost:3000/en/admin	Affiliate intelligence, at a glance.	1440	1440	False	qa/screenshots/dashboard__1440x900.png	qa/admin-ax-snapshots/dashboard__1440x900.txt	VALID
+dashboard	/en/admin	1280x800	http://localhost:3000/en/admin	Affiliate intelligence, at a glance.	1280	1280	False	qa/screenshots/dashboard__1280x800.png	qa/admin-ax-snapshots/dashboard__1280x800.txt	VALID
+dashboard	/en/admin	1024x768	http://localhost:3000/en/admin	Affiliate intelligence, at a glance.	1024	1024	False	qa/screenshots/dashboard__1024x768.png	qa/admin-ax-snapshots/dashboard__1024x768.txt	VALID
+dashboard	/en/admin	834x1194	http://localhost:3000/en/admin	Affiliate intelligence, at a glance.	834	834	False	qa/screenshots/dashboard__834x1194.png	qa/admin-ax-snapshots/dashboard__834x1194.txt	VALID
+dashboard	/en/admin	768x1024	http://localhost:3000/en/admin	Affiliate intelligence, at a glance.	768	768	False	qa/screenshots/dashboard__768x1024.png	qa/admin-ax-snapshots/dashboard__768x1024.txt	VALID
+dashboard	/en/admin	430x932	http://localhost:3000/en/admin	Affiliate intelligence, at a glance.	430	492	True	qa/screenshots/dashboard__430x932.png	qa/admin-ax-snapshots/dashboard__430x932.txt	VALID
+dashboard	/en/admin	390x844	http://localhost:3000/en/admin	Affiliate intelligence, at a glance.	390	492	True	qa/screenshots/dashboard__390x844.png	qa/admin-ax-snapshots/dashboard__390x844.txt	VALID
+dashboard	/en/admin	375x812	http://localhost:3000/en/admin	Affiliate intelligence, at a glance.	375	492	True	qa/screenshots/dashboard__375x812.png	qa/admin-ax-snapshots/dashboard__375x812.txt	VALID
+products	/en/admin/products	1920x1080	http://localhost:3000/en/admin/products	Products Registry	1920	1920	False	qa/screenshots/products__1920x1080.png	qa/admin-ax-snapshots/products__1920x1080.txt	VALID
+products	/en/admin/products	1440x900	http://localhost:3000/en/admin/products	Products Registry	1440	1440	False	qa/screenshots/products__1440x900.png	qa/admin-ax-snapshots/products__1440x900.txt	VALID
+products	/en/admin/products	1280x800	http://localhost:3000/en/admin/products	Products Registry	1280	1280	False	qa/screenshots/products__1280x800.png	qa/admin-ax-snapshots/products__1280x800.txt	VALID
+products	/en/admin/products	1024x768	http://localhost:3000/en/admin/products	Products Registry	1024	1121	True	qa/screenshots/products__1024x768.png	qa/admin-ax-snapshots/products__1024x768.txt	VALID
+products	/en/admin/products	834x1194	http://localhost:3000/en/admin/products	Products Registry	834	890	True	qa/screenshots/products__834x1194.png	qa/admin-ax-snapshots/products__834x1194.txt	VALID
+products	/en/admin/products	768x1024	http://localhost:3000/en/admin/products	Products Registry	768	857	True	qa/screenshots/products__768x1024.png	qa/admin-ax-snapshots/products__768x1024.txt	VALID
+products	/en/admin/products	430x932	http://localhost:3000/en/admin/products	Products Registry	430	680	True	qa/screenshots/products__430x932.png	qa/admin-ax-snapshots/products__430x932.txt	VALID
+products	/en/admin/products	390x844	http://localhost:3000/en/admin/products	Products Registry	390	660	True	qa/screenshots/products__390x844.png	qa/admin-ax-snapshots/products__390x844.txt	VALID
+products	/en/admin/products	375x812	http://localhost:3000/en/admin/products	Products Registry	375	653	True	qa/screenshots/products__375x812.png	qa/admin-ax-snapshots/products__375x812.txt	VALID
+deals	/en/admin/deals	1920x1080	http://localhost:3000/en/admin/deals	Deals Registry	1920	1920	False	qa/screenshots/deals__1920x1080.png	qa/admin-ax-snapshots/deals__1920x1080.txt	VALID
+deals	/en/admin/deals	1440x900	http://localhost:3000/en/admin/deals	Deals Registry	1440	1440	False	qa/screenshots/deals__1440x900.png	qa/admin-ax-snapshots/deals__1440x900.txt	VALID
+deals	/en/admin/deals	1280x800	http://localhost:3000/en/admin/deals	Deals Registry	1280	1280	False	qa/screenshots/deals__1280x800.png	qa/admin-ax-snapshots/deals__1280x800.txt	VALID
+deals	/en/admin/deals	1024x768	http://localhost:3000/en/admin/deals	Deals Registry	1024	1084	True	qa/screenshots/deals__1024x768.png	qa/admin-ax-snapshots/deals__1024x768.txt	VALID
+deals	/en/admin/deals	834x1194	http://localhost:3000/en/admin/deals	Deals Registry	834	853	True	qa/screenshots/deals__834x1194.png	qa/admin-ax-snapshots/deals__834x1194.txt	VALID
+deals	/en/admin/deals	768x1024	http://localhost:3000/en/admin/deals	Deals Registry	768	820	True	qa/screenshots/deals__768x1024.png	qa/admin-ax-snapshots/deals__768x1024.txt	VALID
+deals	/en/admin/deals	430x932	http://localhost:3000/en/admin/deals	Deals Registry	430	643	True	qa/screenshots/deals__430x932.png	qa/admin-ax-snapshots/deals__430x932.txt	VALID
+deals	/en/admin/deals	390x844	http://localhost:3000/en/admin/deals	Deals Registry	390	623	True	qa/screenshots/deals__390x844.png	qa/admin-ax-snapshots/deals__390x844.txt	VALID
+deals	/en/admin/deals	375x812	http://localhost:3000/en/admin/deals	Deals Registry	375	615	True	qa/screenshots/deals__375x812.png	qa/admin-ax-snapshots/deals__375x812.txt	VALID
+coupons	/en/admin/coupons	1920x1080	http://localhost:3000/en/admin/coupons	Coupons Registry	1920	1920	False	qa/screenshots/coupons__1920x1080.png	qa/admin-ax-snapshots/coupons__1920x1080.txt	VALID
+coupons	/en/admin/coupons	1440x900	http://localhost:3000/en/admin/coupons	Coupons Registry	1440	1451	True	qa/screenshots/coupons__1440x900.png	qa/admin-ax-snapshots/coupons__1440x900.txt	VALID
+coupons	/en/admin/coupons	1280x800	http://localhost:3000/en/admin/coupons	Coupons Registry	1280	1371	True	qa/screenshots/coupons__1280x800.png	qa/admin-ax-snapshots/coupons__1280x800.txt	VALID
+coupons	/en/admin/coupons	1024x768	http://localhost:3000/en/admin/coupons	Coupons Registry	1024	1243	True	qa/screenshots/coupons__1024x768.png	qa/admin-ax-snapshots/coupons__1024x768.txt	VALID
+coupons	/en/admin/coupons	834x1194	http://localhost:3000/en/admin/coupons	Coupons Registry	834	1012	True	qa/screenshots/coupons__834x1194.png	qa/admin-ax-snapshots/coupons__834x1194.txt	VALID
+coupons	/en/admin/coupons	768x1024	http://localhost:3000/en/admin/coupons	Coupons Registry	768	979	True	qa/screenshots/coupons__768x1024.png	qa/admin-ax-snapshots/coupons__768x1024.txt	VALID
+coupons	/en/admin/coupons	430x932	http://localhost:3000/en/admin/coupons	Coupons Registry	430	802	True	qa/screenshots/coupons__430x932.png	qa/admin-ax-snapshots/coupons__430x932.txt	VALID
+coupons	/en/admin/coupons	390x844	http://localhost:3000/en/admin/coupons	Coupons Registry	390	782	True	qa/screenshots/coupons__390x844.png	qa/admin-ax-snapshots/coupons__390x844.txt	VALID
+coupons	/en/admin/coupons	375x812	http://localhost:3000/en/admin/coupons	Coupons Registry	375	774	True	qa/screenshots/coupons__375x812.png	qa/admin-ax-snapshots/coupons__375x812.txt	VALID
+stores	/en/admin/stores	1920x1080	http://localhost:3000/en/admin/stores	Stores Management	1920	1920	False	qa/screenshots/stores__1920x1080.png	qa/admin-ax-snapshots/stores__1920x1080.txt	VALID
+stores	/en/admin/stores	1440x900	http://localhost:3000/en/admin/stores	Stores Management	1440	1440	False	qa/screenshots/stores__1440x900.png	qa/admin-ax-snapshots/stores__1440x900.txt	VALID
+stores	/en/admin/stores	1280x800	http://localhost:3000/en/admin/stores	Stores Management	1280	1280	False	qa/screenshots/stores__1280x800.png	qa/admin-ax-snapshots/stores__1280x800.txt	VALID
+stores	/en/admin/stores	1024x768	http://localhost:3000/en/admin/stores	Stores Management	1024	1024	False	qa/screenshots/stores__1024x768.png	qa/admin-ax-snapshots/stores__1024x768.txt	VALID
+stores	/en/admin/stores	834x1194	http://localhost:3000/en/admin/stores	Stores Management	834	834	False	qa/screenshots/stores__834x1194.png	qa/admin-ax-snapshots/stores__834x1194.txt	VALID
+stores	/en/admin/stores	768x1024	http://localhost:3000/en/admin/stores	Stores Management	768	768	False	qa/screenshots/stores__768x1024.png	qa/admin-ax-snapshots/stores__768x1024.txt	VALID
+stores	/en/admin/stores	430x932	http://localhost:3000/en/admin/stores	Stores Management	430	492	True	qa/screenshots/stores__430x932.png	qa/admin-ax-snapshots/stores__430x932.txt	VALID
+stores	/en/admin/stores	390x844	http://localhost:3000/en/admin/stores	Stores Management	390	492	True	qa/screenshots/stores__390x844.png	qa/admin-ax-snapshots/stores__390x844.txt	VALID
+stores	/en/admin/stores	375x812	http://localhost:3000/en/admin/stores	Stores Management	375	492	True	qa/screenshots/stores__375x812.png	qa/admin-ax-snapshots/stores__375x812.txt	VALID
+categories	/en/admin/categories	1920x1080	http://localhost:3000/en/admin/categories	Categories Management	1920	1920	False	qa/screenshots/categories__1920x1080.png	qa/admin-ax-snapshots/categories__1920x1080.txt	VALID
+categories	/en/admin/categories	1440x900	http://localhost:3000/en/admin/categories	Categories Management	1440	1440	False	qa/screenshots/categories__1440x900.png	qa/admin-ax-snapshots/categories__1440x900.txt	VALID
+categories	/en/admin/categories	1280x800	http://localhost:3000/en/admin/categories	Categories Management	1280	1280	False	qa/screenshots/categories__1280x800.png	qa/admin-ax-snapshots/categories__1280x800.txt	VALID
+categories	/en/admin/categories	1024x768	http://localhost:3000/en/admin/categories	Categories Management	1024	1024	False	qa/screenshots/categories__1024x768.png	qa/admin-ax-snapshots/categories__1024x768.txt	VALID
+categories	/en/admin/categories	834x1194	http://localhost:3000/en/admin/categories	Categories Management	834	834	False	qa/screenshots/categories__834x1194.png	qa/admin-ax-snapshots/categories__834x1194.txt	VALID
+categories	/en/admin/categories	768x1024	http://localhost:3000/en/admin/categories	Categories Management	768	768	False	qa/screenshots/categories__768x1024.png	qa/admin-ax-snapshots/categories__768x1024.txt	VALID
+categories	/en/admin/categories	430x932	http://localhost:3000/en/admin/categories	Categories Management	430	492	True	qa/screenshots/categories__430x932.png	qa/admin-ax-snapshots/categories__430x932.txt	VALID
+categories	/en/admin/categories	390x844	http://localhost:3000/en/admin/categories	Categories Management	390	492	True	qa/screenshots/categories__390x844.png	qa/admin-ax-snapshots/categories__390x844.txt	VALID
+categories	/en/admin/categories	375x812	http://localhost:3000/en/admin/categories	Categories Management	375	492	True	qa/screenshots/categories__375x812.png	qa/admin-ax-snapshots/categories__375x812.txt	VALID
+newsletters	/en/admin/newsletters	1920x1080	http://localhost:3000/en/admin/newsletters	Newsletter Leads	1920	1920	False	qa/screenshots/newsletters__1920x1080.png	qa/admin-ax-snapshots/newsletters__1920x1080.txt	VALID
+newsletters	/en/admin/newsletters	1440x900	http://localhost:3000/en/admin/newsletters	Newsletter Leads	1440	1440	False	qa/screenshots/newsletters__1440x900.png	qa/admin-ax-snapshots/newsletters__1440x900.txt	VALID
+newsletters	/en/admin/newsletters	1280x800	http://localhost:3000/en/admin/newsletters	Newsletter Leads	1280	1280	False	qa/screenshots/newsletters__1280x800.png	qa/admin-ax-snapshots/newsletters__1280x800.txt	VALID
+newsletters	/en/admin/newsletters	1024x768	http://localhost:3000/en/admin/newsletters	Newsletter Leads	1024	1024	False	qa/screenshots/newsletters__1024x768.png	qa/admin-ax-snapshots/newsletters__1024x768.txt	VALID
+newsletters	/en/admin/newsletters	834x1194	http://localhost:3000/en/admin/newsletters	Newsletter Leads	834	834	False	qa/screenshots/newsletters__834x1194.png	qa/admin-ax-snapshots/newsletters__834x1194.txt	VALID
+newsletters	/en/admin/newsletters	768x1024	http://localhost:3000/en/admin/newsletters	Newsletter Leads	768	768	False	qa/screenshots/newsletters__768x1024.png	qa/admin-ax-snapshots/newsletters__768x1024.txt	VALID
+newsletters	/en/admin/newsletters	430x932	http://localhost:3000/en/admin/newsletters	Newsletter Leads	430	492	True	qa/screenshots/newsletters__430x932.png	qa/admin-ax-snapshots/newsletters__430x932.txt	VALID
+newsletters	/en/admin/newsletters	390x844	http://localhost:3000/en/admin/newsletters	Newsletter Leads	390	492	True	qa/screenshots/newsletters__390x844.png	qa/admin-ax-snapshots/newsletters__390x844.txt	VALID
+newsletters	/en/admin/newsletters	375x812	http://localhost:3000/en/admin/newsletters	Newsletter Leads	375	492	True	qa/screenshots/newsletters__375x812.png	qa/admin-ax-snapshots/newsletters__375x812.txt	VALID
+users	/en/admin/users	1920x1080	http://localhost:3000/en/admin/users	Registered Users	1920	1920	False	qa/screenshots/users__1920x1080.png	qa/admin-ax-snapshots/users__1920x1080.txt	VALID
+users	/en/admin/users	1440x900	http://localhost:3000/en/admin/users	Registered Users	1440	1440	False	qa/screenshots/users__1440x900.png	qa/admin-ax-snapshots/users__1440x900.txt	VALID
+users	/en/admin/users	1280x800	http://localhost:3000/en/admin/users	Registered Users	1280	1280	False	qa/screenshots/users__1280x800.png	qa/admin-ax-snapshots/users__1280x800.txt	VALID
+users	/en/admin/users	1024x768	http://localhost:3000/en/admin/users	Registered Users	1024	1024	False	qa/screenshots/users__1024x768.png	qa/admin-ax-snapshots/users__1024x768.txt	VALID
+users	/en/admin/users	834x1194	http://localhost:3000/en/admin/users	Registered Users	834	834	False	qa/screenshots/users__834x1194.png	qa/admin-ax-snapshots/users__834x1194.txt	VALID
+users	/en/admin/users	768x1024	http://localhost:3000/en/admin/users	Registered Users	768	768	False	qa/screenshots/users__768x1024.png	qa/admin-ax-snapshots/users__768x1024.txt	VALID
+users	/en/admin/users	430x932	http://localhost:3000/en/admin/users	Registered Users	430	541	True	qa/screenshots/users__430x932.png	qa/admin-ax-snapshots/users__430x932.txt	VALID
+users	/en/admin/users	390x844	http://localhost:3000/en/admin/users	Registered Users	390	521	True	qa/screenshots/users__390x844.png	qa/admin-ax-snapshots/users__390x844.txt	VALID
+users	/en/admin/users	375x812	http://localhost:3000/en/admin/users	Registered Users	375	513	True	qa/screenshots/users__375x812.png	qa/admin-ax-snapshots/users__375x812.txt	VALID
+pages	/en/admin/pages	1920x1080	http://localhost:3000/en/admin/pages	Pages Management	1920	1920	False	qa/screenshots/pages__1920x1080.png	qa/admin-ax-snapshots/pages__1920x1080.txt	VALID
+pages	/en/admin/pages	1440x900	http://localhost:3000/en/admin/pages	Pages Management	1440	1440	False	qa/screenshots/pages__1440x900.png	qa/admin-ax-snapshots/pages__1440x900.txt	VALID
+pages	/en/admin/pages	1280x800	http://localhost:3000/en/admin/pages	Pages Management	1280	1280	False	qa/screenshots/pages__1280x800.png	qa/admin-ax-snapshots/pages__1280x800.txt	VALID
+pages	/en/admin/pages	1024x768	http://localhost:3000/en/admin/pages	Pages Management	1024	1024	False	qa/screenshots/pages__1024x768.png	qa/admin-ax-snapshots/pages__1024x768.txt	VALID
+pages	/en/admin/pages	834x1194	http://localhost:3000/en/admin/pages	Pages Management	834	834	False	qa/screenshots/pages__834x1194.png	qa/admin-ax-snapshots/pages__834x1194.txt	VALID
+pages	/en/admin/pages	768x1024	http://localhost:3000/en/admin/pages	Pages Management	768	768	False	qa/screenshots/pages__768x1024.png	qa/admin-ax-snapshots/pages__768x1024.txt	VALID
+pages	/en/admin/pages	430x932	http://localhost:3000/en/admin/pages	Pages Management	430	492	True	qa/screenshots/pages__430x932.png	qa/admin-ax-snapshots/pages__430x932.txt	VALID
+pages	/en/admin/pages	390x844	http://localhost:3000/en/admin/pages	Pages Management	390	492	True	qa/screenshots/pages__390x844.png	qa/admin-ax-snapshots/pages__390x844.txt	VALID
+pages	/en/admin/pages	375x812	http://localhost:3000/en/admin/pages	Pages Management	375	492	True	qa/screenshots/pages__375x812.png	qa/admin-ax-snapshots/pages__375x812.txt	VALID
+blog	/en/admin/blog	1920x1080	http://localhost:3000/en/admin/blog	Blog Posts	1920	1920	False	qa/screenshots/blog__1920x1080.png	qa/admin-ax-snapshots/blog__1920x1080.txt	VALID
+blog	/en/admin/blog	1440x900	http://localhost:3000/en/admin/blog	Blog Posts	1440	1440	False	qa/screenshots/blog__1440x900.png	qa/admin-ax-snapshots/blog__1440x900.txt	VALID
+blog	/en/admin/blog	1280x800	http://localhost:3000/en/admin/blog	Blog Posts	1280	1280	False	qa/screenshots/blog__1280x800.png	qa/admin-ax-snapshots/blog__1280x800.txt	VALID
+blog	/en/admin/blog	1024x768	http://localhost:3000/en/admin/blog	Blog Posts	1024	1024	False	qa/screenshots/blog__1024x768.png	qa/admin-ax-snapshots/blog__1024x768.txt	VALID
+blog	/en/admin/blog	834x1194	http://localhost:3000/en/admin/blog	Blog Posts	834	834	False	qa/screenshots/blog__834x1194.png	qa/admin-ax-snapshots/blog__834x1194.txt	VALID
+blog	/en/admin/blog	768x1024	http://localhost:3000/en/admin/blog	Blog Posts	768	768	False	qa/screenshots/blog__768x1024.png	qa/admin-ax-snapshots/blog__768x1024.txt	VALID
+blog	/en/admin/blog	430x932	http://localhost:3000/en/admin/blog	Blog Posts	430	519	True	qa/screenshots/blog__430x932.png	qa/admin-ax-snapshots/blog__430x932.txt	VALID
+blog	/en/admin/blog	390x844	http://localhost:3000/en/admin/blog	Blog Posts	390	499	True	qa/screenshots/blog__390x844.png	qa/admin-ax-snapshots/blog__390x844.txt	VALID
+blog	/en/admin/blog	375x812	http://localhost:3000/en/admin/blog	Blog Posts	375	492	True	qa/screenshots/blog__375x812.png	qa/admin-ax-snapshots/blog__375x812.txt	VALID
+blog-new	/en/admin/blog/new	1920x1080	http://localhost:3000/en/admin/blog/new		1920	1920	False	qa/screenshots/blog-new__1920x1080.png	qa/admin-ax-snapshots/blog-new__1920x1080.txt	INVALID
+blog-new	/en/admin/blog/new	1440x900	http://localhost:3000/en/admin/blog/new		1440	1440	False	qa/screenshots/blog-new__1440x900.png	qa/admin-ax-snapshots/blog-new__1440x900.txt	INVALID
+blog-new	/en/admin/blog/new	1280x800	http://localhost:3000/en/admin/blog/new		1280	1280	False	qa/screenshots/blog-new__1280x800.png	qa/admin-ax-snapshots/blog-new__1280x800.txt	INVALID
+blog-new	/en/admin/blog/new	1024x768	http://localhost:3000/en/admin/blog/new		1024	1024	False	qa/screenshots/blog-new__1024x768.png	qa/admin-ax-snapshots/blog-new__1024x768.txt	INVALID
+blog-new	/en/admin/blog/new	834x1194	http://localhost:3000/en/admin/blog/new		834	834	False	qa/screenshots/blog-new__834x1194.png	qa/admin-ax-snapshots/blog-new__834x1194.txt	INVALID
+blog-new	/en/admin/blog/new	768x1024	http://localhost:3000/en/admin/blog/new		768	768	False	qa/screenshots/blog-new__768x1024.png	qa/admin-ax-snapshots/blog-new__768x1024.txt	INVALID
+blog-new	/en/admin/blog/new	430x932	http://localhost:3000/en/admin/blog/new		430	492	True	qa/screenshots/blog-new__430x932.png	qa/admin-ax-snapshots/blog-new__430x932.txt	INVALID
+blog-new	/en/admin/blog/new	390x844	http://localhost:3000/en/admin/blog/new		390	492	True	qa/screenshots/blog-new__390x844.png	qa/admin-ax-snapshots/blog-new__390x844.txt	INVALID
+blog-new	/en/admin/blog/new	375x812	http://localhost:3000/en/admin/blog/new		375	492	True	qa/screenshots/blog-new__375x812.png	qa/admin-ax-snapshots/blog-new__375x812.txt	INVALID
+ad-widgets	/en/admin/blog/ad-widgets	1920x1080	http://localhost:3000/en/admin/blog/ad-widgets	Ad Widgets	1920	1920	False	qa/screenshots/ad-widgets__1920x1080.png	qa/admin-ax-snapshots/ad-widgets__1920x1080.txt	VALID
+ad-widgets	/en/admin/blog/ad-widgets	1440x900	http://localhost:3000/en/admin/blog/ad-widgets	Ad Widgets	1440	1440	False	qa/screenshots/ad-widgets__1440x900.png	qa/admin-ax-snapshots/ad-widgets__1440x900.txt	VALID
+ad-widgets	/en/admin/blog/ad-widgets	1280x800	http://localhost:3000/en/admin/blog/ad-widgets	Ad Widgets	1280	1280	False	qa/screenshots/ad-widgets__1280x800.png	qa/admin-ax-snapshots/ad-widgets__1280x800.txt	VALID
+ad-widgets	/en/admin/blog/ad-widgets	1024x768	http://localhost:3000/en/admin/blog/ad-widgets	Ad Widgets	1024	1024	False	qa/screenshots/ad-widgets__1024x768.png	qa/admin-ax-snapshots/ad-widgets__1024x768.txt	VALID
+ad-widgets	/en/admin/blog/ad-widgets	834x1194	http://localhost:3000/en/admin/blog/ad-widgets	Ad Widgets	834	834	False	qa/screenshots/ad-widgets__834x1194.png	qa/admin-ax-snapshots/ad-widgets__834x1194.txt	VALID
+ad-widgets	/en/admin/blog/ad-widgets	768x1024	http://localhost:3000/en/admin/blog/ad-widgets	Ad Widgets	768	768	False	qa/screenshots/ad-widgets__768x1024.png	qa/admin-ax-snapshots/ad-widgets__768x1024.txt	VALID
+ad-widgets	/en/admin/blog/ad-widgets	430x932	http://localhost:3000/en/admin/blog/ad-widgets	Ad Widgets	430	492	True	qa/screenshots/ad-widgets__430x932.png	qa/admin-ax-snapshots/ad-widgets__430x932.txt	VALID
+ad-widgets	/en/admin/blog/ad-widgets	390x844	http://localhost:3000/en/admin/blog/ad-widgets	Ad Widgets	390	492	True	qa/screenshots/ad-widgets__390x844.png	qa/admin-ax-snapshots/ad-widgets__390x844.txt	VALID
+ad-widgets	/en/admin/blog/ad-widgets	375x812	http://localhost:3000/en/admin/blog/ad-widgets	Ad Widgets	375	492	True	qa/screenshots/ad-widgets__375x812.png	qa/admin-ax-snapshots/ad-widgets__375x812.txt	VALID
+settings	/en/admin/settings	1920x1080	http://localhost:3000/en/admin/settings	Platform Settings	1920	1920	False	qa/screenshots/settings__1920x1080.png	qa/admin-ax-snapshots/settings__1920x1080.txt	VALID
+settings	/en/admin/settings	1440x900	http://localhost:3000/en/admin/settings	Platform Settings	1440	1440	False	qa/screenshots/settings__1440x900.png	qa/admin-ax-snapshots/settings__1440x900.txt	VALID
+settings	/en/admin/settings	1280x800	http://localhost:3000/en/admin/settings	Platform Settings	1280	1280	False	qa/screenshots/settings__1280x800.png	qa/admin-ax-snapshots/settings__1280x800.txt	VALID
+settings	/en/admin/settings	1024x768	http://localhost:3000/en/admin/settings	Platform Settings	1024	1024	False	qa/screenshots/settings__1024x768.png	qa/admin-ax-snapshots/settings__1024x768.txt	VALID
+settings	/en/admin/settings	834x1194	http://localhost:3000/en/admin/settings	Platform Settings	834	834	False	qa/screenshots/settings__834x1194.png	qa/admin-ax-snapshots/settings__834x1194.txt	VALID
+settings	/en/admin/settings	768x1024	http://localhost:3000/en/admin/settings	Platform Settings	768	768	False	qa/screenshots/settings__768x1024.png	qa/admin-ax-snapshots/settings__768x1024.txt	VALID
+settings	/en/admin/settings	430x932	http://localhost:3000/en/admin/settings	Platform Settings	430	492	True	qa/screenshots/settings__430x932.png	qa/admin-ax-snapshots/settings__430x932.txt	VALID
+settings	/en/admin/settings	390x844	http://localhost:3000/en/admin/settings	Platform Settings	390	492	True	qa/screenshots/settings__390x844.png	qa/admin-ax-snapshots/settings__390x844.txt	VALID
+settings	/en/admin/settings	375x812	http://localhost:3000/en/admin/settings	Platform Settings	375	492	True	qa/screenshots/settings__375x812.png	qa/admin-ax-snapshots/settings__375x812.txt	VALID
+api-sandbox	/en/admin/api-sandbox	1920x1080	http://localhost:3000/en/admin/api-sandbox	API Integration Tester	1920	1920	False	qa/screenshots/api-sandbox__1920x1080.png	qa/admin-ax-snapshots/api-sandbox__1920x1080.txt	VALID
+api-sandbox	/en/admin/api-sandbox	1440x900	http://localhost:3000/en/admin/api-sandbox	API Integration Tester	1440	1440	False	qa/screenshots/api-sandbox__1440x900.png	qa/admin-ax-snapshots/api-sandbox__1440x900.txt	VALID
+api-sandbox	/en/admin/api-sandbox	1280x800	http://localhost:3000/en/admin/api-sandbox	API Integration Tester	1280	1280	False	qa/screenshots/api-sandbox__1280x800.png	qa/admin-ax-snapshots/api-sandbox__1280x800.txt	VALID
+api-sandbox	/en/admin/api-sandbox	1024x768	http://localhost:3000/en/admin/api-sandbox	API Integration Tester	1024	1024	False	qa/screenshots/api-sandbox__1024x768.png	qa/admin-ax-snapshots/api-sandbox__1024x768.txt	VALID
+api-sandbox	/en/admin/api-sandbox	834x1194	http://localhost:3000/en/admin/api-sandbox	API Integration Tester	834	834	False	qa/screenshots/api-sandbox__834x1194.png	qa/admin-ax-snapshots/api-sandbox__834x1194.txt	VALID
+api-sandbox	/en/admin/api-sandbox	768x1024	http://localhost:3000/en/admin/api-sandbox	API Integration Tester	768	768	False	qa/screenshots/api-sandbox__768x1024.png	qa/admin-ax-snapshots/api-sandbox__768x1024.txt	VALID
+api-sandbox	/en/admin/api-sandbox	430x932	http://localhost:3000/en/admin/api-sandbox	API Integration Tester	430	492	True	qa/screenshots/api-sandbox__430x932.png	qa/admin-ax-snapshots/api-sandbox__430x932.txt	VALID
+api-sandbox	/en/admin/api-sandbox	390x844	http://localhost:3000/en/admin/api-sandbox	API Integration Tester	390	492	True	qa/screenshots/api-sandbox__390x844.png	qa/admin-ax-snapshots/api-sandbox__390x844.txt	VALID
+api-sandbox	/en/admin/api-sandbox	375x812	http://localhost:3000/en/admin/api-sandbox	API Integration Tester	375	492	True	qa/screenshots/api-sandbox__375x812.png	qa/admin-ax-snapshots/api-sandbox__375x812.txt	VALID
+profile	/en/admin/profile	1920x1080	http://localhost:3000/en/admin/profile	My Profile	1920	1920	False	qa/screenshots/profile__1920x1080.png	qa/admin-ax-snapshots/profile__1920x1080.txt	VALID
+profile	/en/admin/profile	1440x900	http://localhost:3000/en/admin/profile	My Profile	1440	1440	False	qa/screenshots/profile__1440x900.png	qa/admin-ax-snapshots/profile__1440x900.txt	VALID
+profile	/en/admin/profile	1280x800	http://localhost:3000/en/admin/profile	My Profile	1280	1280	False	qa/screenshots/profile__1280x800.png	qa/admin-ax-snapshots/profile__1280x800.txt	VALID
+profile	/en/admin/profile	1024x768	http://localhost:3000/en/admin/profile	My Profile	1024	1024	False	qa/screenshots/profile__1024x768.png	qa/admin-ax-snapshots/profile__1024x768.txt	VALID
+profile	/en/admin/profile	834x1194	http://localhost:3000/en/admin/profile	My Profile	834	834	False	qa/screenshots/profile__834x1194.png	qa/admin-ax-snapshots/profile__834x1194.txt	VALID
+profile	/en/admin/profile	768x1024	http://localhost:3000/en/admin/profile	My Profile	768	768	False	qa/screenshots/profile__768x1024.png	qa/admin-ax-snapshots/profile__768x1024.txt	VALID
+profile	/en/admin/profile	430x932	http://localhost:3000/en/admin/profile	My Profile	430	492	True	qa/screenshots/profile__430x932.png	qa/admin-ax-snapshots/profile__430x932.txt	VALID
+profile	/en/admin/profile	390x844	http://localhost:3000/en/admin/profile	My Profile	390	492	True	qa/screenshots/profile__390x844.png	qa/admin-ax-snapshots/profile__390x844.txt	VALID
+profile	/en/admin/profile	375x812	http://localhost:3000/en/admin/profile	My Profile	375	492	True	qa/screenshots/profile__375x812.png	qa/admin-ax-snapshots/profile__375x812.txt	VALID

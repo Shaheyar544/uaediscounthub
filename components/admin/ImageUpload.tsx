@@ -12,6 +12,9 @@ interface ImageUploadProps {
   label?: string
   description?: string
   folder?: string
+  entityName?: string
+  allowManualUrl?: boolean
+  onUploadingChange?: (uploading: boolean) => void
 }
 
 // Helper to format bytes into KB or MB
@@ -20,11 +23,11 @@ function formatSize(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(2)} MB`
 }
 
-export function ImageUpload({ value, onChange, label, description, folder = 'stores' }: ImageUploadProps) {
+export function ImageUpload({ value, onChange, label, description, folder = 'stores', entityName = 'image', allowManualUrl = true, onUploadingChange }: ImageUploadProps) {
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [showUrlInput, setShowUrlInput] = useState(!value)
-  const [optimizedSize, setOptimizedSize] = useState<number | null>(null) // ✅ NEW
+  const [optimizedSize, setOptimizedSize] = useState<number | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -45,7 +48,8 @@ export function ImageUpload({ value, onChange, label, description, folder = 'sto
 
     setError(null)
     setUploading(true)
-    setOptimizedSize(null) // ✅ Reset size on new upload
+    onUploadingChange?.(true)
+    setOptimizedSize(null)
 
     try {
       const formData = new FormData()
@@ -66,7 +70,6 @@ export function ImageUpload({ value, onChange, label, description, folder = 'sto
       onChange(data.url)
       setShowUrlInput(false)
 
-      // ✅ Save optimized file size from API response
       if (data.file_size) {
         setOptimizedSize(data.file_size)
       }
@@ -76,13 +79,19 @@ export function ImageUpload({ value, onChange, label, description, folder = 'sto
       setError(err.message || 'Failed to upload image')
     } finally {
       setUploading(false)
+      onUploadingChange?.(false)
     }
   }
 
   const removeImage = () => {
     onChange('')
     setShowUrlInput(true)
-    setOptimizedSize(null) // ✅ Clear size on remove
+    setOptimizedSize(null)
+  }
+
+  const replaceImage = () => {
+    setShowUrlInput(true)
+    window.setTimeout(() => fileInputRef.current?.click(), 0)
   }
 
   return (
@@ -94,44 +103,43 @@ export function ImageUpload({ value, onChange, label, description, folder = 'sto
       )}
 
       {value && !showUrlInput ? (
-        <div className="relative group w-full aspect-video md:aspect-[2/1] bg-[#F6F8FC] rounded-xl border-[1.5px] border-[#DDE3EF] overflow-hidden flex items-center justify-center p-4 shadow-sm">
-          <img 
-            src={value} 
-            alt="Upload Preview" 
-            className="max-w-full max-h-full object-contain transition-transform duration-300 group-hover:scale-105" 
-          />
-          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-            <Button 
-              type="button" 
-              variant="destructive" 
+        <div className="space-y-3">
+          <div className="relative group w-full aspect-video md:aspect-[2/1] bg-[#F6F8FC] rounded-xl border-[1.5px] border-[#DDE3EF] overflow-hidden flex items-center justify-center p-4 shadow-sm">
+            <img
+              src={value}
+              alt={`${entityName} preview`}
+              className="max-w-full max-h-full object-contain transition-transform duration-300 group-hover:scale-105"
+            />
+
+            {optimizedSize !== null && (
+              <div className="absolute bottom-2 right-2 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-md border border-[#DDE3EF] shadow-sm">
+                <span className="text-[9px] font-bold text-[#00C48C] flex items-center gap-1 uppercase tracking-tighter">
+                  <CheckCircle2 size={10} /> Optimized WebP
+                  <span className="text-[#DDE3EF]">•</span>
+                  <span className="text-[#8A94A6]">{formatSize(optimizedSize)}</span>
+                </span>
+              </div>
+            )}
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm" 
+              onClick={replaceImage}
+              className="h-8 rounded-full px-3 text-[11px] font-bold bg-white text-[#0D1117] hover:bg-white/90"
+            >
+              <Upload size={14} className="mr-1" /> Replace image
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
               size="sm" 
               onClick={removeImage}
               className="h-8 rounded-full px-3 text-[11px] font-bold"
             >
               <X size={14} className="mr-1" /> Remove
             </Button>
-            <Button 
-              type="button" 
-              variant="secondary" 
-              size="sm" 
-              onClick={() => setShowUrlInput(true)}
-              className="h-8 rounded-full px-3 text-[11px] font-bold bg-white text-[#0D1117] hover:bg-white/90"
-            >
-              Edit URL
-            </Button>
-          </div>
-
-          {/* ✅ UPDATED BADGE: Shows "Optimized WebP • 42.3 KB" */}
-          <div className="absolute bottom-2 right-2 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-md border border-[#DDE3EF] shadow-sm">
-            <span className="text-[9px] font-bold text-[#00C48C] flex items-center gap-1 uppercase tracking-tighter">
-              <CheckCircle2 size={10} /> Optimized WebP
-              {optimizedSize && (
-                <>
-                  <span className="text-[#DDE3EF]">•</span>
-                  <span className="text-[#8A94A6]">{formatSize(optimizedSize)}</span>
-                </>
-              )}
-            </span>
           </div>
         </div>
       ) : (
@@ -164,13 +172,13 @@ export function ImageUpload({ value, onChange, label, description, folder = 'sto
                 <div className="w-12 h-12 rounded-full bg-[#E8F0FF] flex items-center justify-center text-[#0057FF] mb-2">
                   <Upload size={24} />
                 </div>
-                <span className="text-[14px] font-bold text-[#0D1117]">Click to upload store logo</span>
-                <span className="text-[11px] text-[#8A94A6]">JPG, PNG or WebP (Max 2MB)</span>
+                <span className="text-[14px] font-bold text-[#0D1117]">Click to upload {entityName}</span>
+                <span className="text-[11px] text-[#8A94A6]">JPG, PNG or WebP · Converted to WebP · Max 10MB</span>
               </div>
             )}
           </div>
 
-          <div className="relative">
+          {allowManualUrl && <><div className="relative">
             <div className="absolute inset-0 flex items-center">
               <span className="w-full border-t border-[#DDE3EF]"></span>
             </div>
@@ -200,7 +208,7 @@ export function ImageUpload({ value, onChange, label, description, folder = 'sto
                 Preview
               </Button>
             )}
-          </div>
+          </div></>}
         </div>
       )}
 

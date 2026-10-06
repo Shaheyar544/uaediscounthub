@@ -1,0 +1,582 @@
+[
+  {
+    "id": "03dc9f83-451e-4f88-ac3b-edba3618de5a",
+    "store_id": "63a7593f-9541-4286-8186-8247282a438a",
+    "sync_type": "price_update",
+    "status": "failed",
+    "records_updated": 0,
+    "error_message": "29 products failed to update",
+    "duration_ms": 115103,
+    "synced_at": "2026-05-18T19:33:42.041541+00:00"
+  },
+  {
+    "id": "1e6c2542-7353-4ddb-9bde-c0917129df54",
+    "store_id": "63a7593f-9541-4286-8186-8247282a438a",
+    "sync_type": "price_update",
+    "status": "failed",
+    "records_updated": 0,
+    "error_message": "29 products failed to update",
+    "duration_ms": 69998,
+    "synced_at": "2026-05-18T19:41:22.397195+00:00"
+  },
+  {
+    "id": "8fdb9ae6-e5b6-41da-bf7b-9dc8188222c4",
+    "store_id": "63a7593f-9541-4286-8186-8247282a438a",
+    "sync_type": "price_update",
+    "status": "partial",
+    "records_updated": 36,
+    "error_message": "Batch 1 Error: Amazon API Error (400); Product Price Update Error (B08WB1Y5Y2): null value in column \"affiliate_url\" of relation \"product_store_prices\" violates not-null constraint; Product Price Update Error (B0DXW278KB): null value in column \"affiliate_url\" of relation \"product_store_prices\" violates not-null constraint; Product Price Update Error (B0CY2Q7PHJ): null value in column \"affiliate_url\" of relation \"product_store_prices\" violates not-null constraint; Product Price Update Error (B019AW2OY8): null value in column \"affiliate_url\" of relation \"product_store_prices\" violates not-null constraint",
+    "duration_ms": 32906,
+    "synced_at": "2026-06-18T12:06:13.635957+00:00"
+  },
+  {
+    "id": "16ad97a0-17da-471e-bdc6-69528f9aaf5c",
+    "store_id": "63a7593f-9541-4286-8186-8247282a438a",
+    "sync_type": "price_update",
+    "status": "success",
+    "records_updated": 43,
+    "error_message": null,
+    "duration_ms": 42402,
+    "synced_at": "2026-06-18T12:07:41.129006+00:00"
+  },
+  {
+    "id": "7694c2f1-43e3-40a4-92d4-a71d36961041",
+    "store_id": "63a7593f-9541-4286-8186-8247282a438a",
+    "sync_type": "price_update",
+    "status": "success",
+    "records_updated": 42,
+    "error_message": null,
+    "duration_ms": 49811,
+    "synced_at": "2026-06-19T19:24:01.35447+00:00"
+  },
+  {
+    "id": "a37c58e5-2418-4064-89db-65ad09ddb117",
+    "store_id": "63a7593f-9541-4286-8186-8247282a438a",
+    "sync_type": "price_update",
+    "status": "success",
+    "records_updated": 42,
+    "error_message": null,
+    "duration_ms": 57564,
+    "synced_at": "2026-06-19T19:25:48.393731+00:00"
+  },
+  {
+    "id": "12f04ce8-20cf-4b81-8c33-30e146e26c7c",
+    "store_id": "63a7593f-9541-4286-8186-8247282a438a",
+    "sync_type": "price_update",
+    "status": "success",
+    "records_updated": 49,
+    "error_message": null,
+    "duration_ms": 61854,
+    "synced_at": "2026-06-30T13:03:41.834031+00:00"
+  },
+  {
+    "id": "3dee6dd5-713c-4250-8f44-7a90dd116203",
+    "store_id": "63a7593f-9541-4286-8186-8247282a438a",
+    "sync_type": "price_update",
+    "status": "success",
+    "records_updated": 46,
+    "error_message": null,
+    "duration_ms": 59385,
+    "synced_at": "2026-06-30T13:17:19.35139+00:00"
+  },
+  {
+    "id": "b1bcbefa-16ec-43af-b461-180f6fc0f4f5",
+    "store_id": "63a7593f-9541-4286-8186-8247282a438a",
+    "sync_type": "price_update",
+    "status": "success",
+    "records_updated": 46,
+    "error_message": null,
+    "duration_ms": 58907,
+    "synced_at": "2026-06-30T13:19:14.587447+00:00"
+  },
+  {
+    "id": "3babc624-2401-4fc3-8ef3-bce2d2d9341d",
+    "store_id": "63a7593f-9541-4286-8186-8247282a438a",
+    "sync_type": "price_update",
+    "status": "success",
+    "records_updated": 49,
+    "error_message": null,
+    "duration_ms": 66484,
+    "synced_at": "2026-06-30T13:30:31.039223+00:00"
+  },
+  {
+    "id": "346796bd-93dc-4550-8575-bc9e08e01423",
+    "store_id": "63a7593f-9541-4286-8186-8247282a438a",
+    "sync_type": "price_update",
+    "status": "success",
+    "records_updated": 49,
+    "error_message": null,
+    "duration_ms": 63087,
+    "synced_at": "2026-06-30T16:01:19.767712+00:00"
+  },
+  {
+    "id": "da7adc6a-d27a-46e2-b924-c6c8fd2e33ea",
+    "store_id": "63a7593f-9541-4286-8186-8247282a438a",
+    "sync_type": "price_update",
+    "status": "success",
+    "records_updated": 48,
+    "error_message": null,
+    "duration_ms": 66182,
+    "synced_at": "2026-06-30T20:01:21.097436+00:00"
+  },
+  {
+    "id": "bc43b179-1523-4f09-82a5-ba033f48d867",
+    "store_id": "63a7593f-9541-4286-8186-8247282a438a",
+    "sync_type": "price_update",
+    "status": "success",
+    "records_updated": 49,
+    "error_message": null,
+    "duration_ms": 63844,
+    "synced_at": "2026-07-01T00:01:21.465938+00:00"
+  },
+  {
+    "id": "f381417e-e224-4392-b139-cd08af51b3cb",
+    "store_id": "63a7593f-9541-4286-8186-8247282a438a",
+    "sync_type": "price_update",
+    "status": "success",
+    "records_updated": 49,
+    "error_message": null,
+    "duration_ms": 73713,
+    "synced_at": "2026-07-01T04:01:29.709492+00:00"
+  },
+  {
+    "id": "277997d1-80af-466c-b859-57376f3674f9",
+    "store_id": "63a7593f-9541-4286-8186-8247282a438a",
+    "sync_type": "price_update",
+    "status": "success",
+    "records_updated": 49,
+    "error_message": null,
+    "duration_ms": 65543,
+    "synced_at": "2026-07-01T08:01:19.724562+00:00"
+  },
+  {
+    "id": "66a19cc5-748a-4bc1-8675-8e98a1879ebe",
+    "store_id": "63a7593f-9541-4286-8186-8247282a438a",
+    "sync_type": "price_update",
+    "status": "success",
+    "records_updated": 49,
+    "error_message": null,
+    "duration_ms": 69588,
+    "synced_at": "2026-07-01T12:01:26.096062+00:00"
+  },
+  {
+    "id": "9bc11d4c-11ee-4510-a493-6d1305cb7190",
+    "store_id": "63a7593f-9541-4286-8186-8247282a438a",
+    "sync_type": "price_update",
+    "status": "success",
+    "records_updated": 48,
+    "error_message": null,
+    "duration_ms": 65953,
+    "synced_at": "2026-07-01T16:01:21.306214+00:00"
+  },
+  {
+    "id": "f685a590-074b-44e0-943c-fbd8104f1c4e",
+    "store_id": "63a7593f-9541-4286-8186-8247282a438a",
+    "sync_type": "price_update",
+    "status": "success",
+    "records_updated": 51,
+    "error_message": null,
+    "duration_ms": 81237,
+    "synced_at": "2026-07-01T20:01:36.166679+00:00"
+  },
+  {
+    "id": "a59f40cc-dd65-49bb-9035-1788b6a88457",
+    "store_id": "63a7593f-9541-4286-8186-8247282a438a",
+    "sync_type": "price_update",
+    "status": "success",
+    "records_updated": 51,
+    "error_message": null,
+    "duration_ms": 99198,
+    "synced_at": "2026-07-02T00:01:57.525827+00:00"
+  },
+  {
+    "id": "61007a83-296d-4aa4-967a-8ebd884a9702",
+    "store_id": "63a7593f-9541-4286-8186-8247282a438a",
+    "sync_type": "price_update",
+    "status": "success",
+    "records_updated": 52,
+    "error_message": null,
+    "duration_ms": 70828,
+    "synced_at": "2026-07-02T16:01:33.461709+00:00"
+  },
+  {
+    "id": "78bdf94f-4f0b-43ef-9187-33cc4d190443",
+    "store_id": "63a7593f-9541-4286-8186-8247282a438a",
+    "sync_type": "price_update",
+    "status": "success",
+    "records_updated": 52,
+    "error_message": null,
+    "duration_ms": 73027,
+    "synced_at": "2026-07-02T20:01:37.298048+00:00"
+  },
+  {
+    "id": "4c49bb1a-dd4f-4d1f-bd40-2450c73db98d",
+    "store_id": "63a7593f-9541-4286-8186-8247282a438a",
+    "sync_type": "price_update",
+    "status": "success",
+    "records_updated": 52,
+    "error_message": null,
+    "duration_ms": 74615,
+    "synced_at": "2026-07-03T00:01:35.392488+00:00"
+  },
+  {
+    "id": "eca506a8-fa57-4721-b3d5-748a04ace1a8",
+    "store_id": "63a7593f-9541-4286-8186-8247282a438a",
+    "sync_type": "price_update",
+    "status": "success",
+    "records_updated": 51,
+    "error_message": null,
+    "duration_ms": 69049,
+    "synced_at": "2026-07-03T08:01:26.65252+00:00"
+  },
+  {
+    "id": "4235dcd1-454c-4027-94f8-4720a0fc0c4b",
+    "store_id": "63a7593f-9541-4286-8186-8247282a438a",
+    "sync_type": "price_update",
+    "status": "success",
+    "records_updated": 54,
+    "error_message": null,
+    "duration_ms": 75711,
+    "synced_at": "2026-07-03T12:01:36.600741+00:00"
+  },
+  {
+    "id": "9e3280fd-2e6c-4e5f-8084-6a9406d8e567",
+    "store_id": "63a7593f-9541-4286-8186-8247282a438a",
+    "sync_type": "price_update",
+    "status": "success",
+    "records_updated": 55,
+    "error_message": null,
+    "duration_ms": 71883,
+    "synced_at": "2026-07-03T16:01:31.686388+00:00"
+  },
+  {
+    "id": "e149d72b-c4be-41b1-931e-a4993130646c",
+    "store_id": "63a7593f-9541-4286-8186-8247282a438a",
+    "sync_type": "price_update",
+    "status": "success",
+    "records_updated": 55,
+    "error_message": null,
+    "duration_ms": 75799,
+    "synced_at": "2026-07-03T20:01:34.703707+00:00"
+  },
+  {
+    "id": "1ec289cd-b588-4000-8a6f-ac093cfce349",
+    "store_id": "63a7593f-9541-4286-8186-8247282a438a",
+    "sync_type": "price_update",
+    "status": "success",
+    "records_updated": 55,
+    "error_message": null,
+    "duration_ms": 91296,
+    "synced_at": "2026-07-04T00:01:53.353118+00:00"
+  },
+  {
+    "id": "e84c31cd-933d-4a55-8a86-527cc93e8e49",
+    "store_id": "63a7593f-9541-4286-8186-8247282a438a",
+    "sync_type": "price_update",
+    "status": "success",
+    "records_updated": 56,
+    "error_message": null,
+    "duration_ms": 79462,
+    "synced_at": "2026-07-05T20:01:47.296818+00:00"
+  },
+  {
+    "id": "4c89f924-5f69-4b16-a6d8-26a9158c95be",
+    "store_id": "63a7593f-9541-4286-8186-8247282a438a",
+    "sync_type": "price_update",
+    "status": "success",
+    "records_updated": 56,
+    "error_message": null,
+    "duration_ms": 76432,
+    "synced_at": "2026-07-06T00:01:45.377834+00:00"
+  },
+  {
+    "id": "44e4785e-f7da-4088-b8e4-cb60ff01b397",
+    "store_id": "63a7593f-9541-4286-8186-8247282a438a",
+    "sync_type": "price_update",
+    "status": "success",
+    "records_updated": 56,
+    "error_message": null,
+    "duration_ms": 83920,
+    "synced_at": "2026-07-06T04:01:54.318444+00:00"
+  },
+  {
+    "id": "a8bb30d1-d793-469f-9c88-59da3383b3f8",
+    "store_id": "63a7593f-9541-4286-8186-8247282a438a",
+    "sync_type": "price_update",
+    "status": "success",
+    "records_updated": 56,
+    "error_message": null,
+    "duration_ms": 73856,
+    "synced_at": "2026-07-06T08:01:44.231171+00:00"
+  },
+  {
+    "id": "ce7a0f78-b03f-42dd-b9b1-e5016b4869d9",
+    "store_id": "63a7593f-9541-4286-8186-8247282a438a",
+    "sync_type": "price_update",
+    "status": "success",
+    "records_updated": 56,
+    "error_message": null,
+    "duration_ms": 71715,
+    "synced_at": "2026-07-06T12:01:44.883422+00:00"
+  },
+  {
+    "id": "0cdc4d6c-e0a9-4443-81c7-5af90d772101",
+    "store_id": "63a7593f-9541-4286-8186-8247282a438a",
+    "sync_type": "price_update",
+    "status": "success",
+    "records_updated": 56,
+    "error_message": null,
+    "duration_ms": 73137,
+    "synced_at": "2026-07-06T16:01:40.615972+00:00"
+  },
+  {
+    "id": "56aba5c7-4c55-4ebe-8c1f-222bcbe3a8b4",
+    "store_id": "63a7593f-9541-4286-8186-8247282a438a",
+    "sync_type": "price_update",
+    "status": "success",
+    "records_updated": 56,
+    "error_message": null,
+    "duration_ms": 101563,
+    "synced_at": "2026-07-06T20:02:11.795328+00:00"
+  },
+  {
+    "id": "c3b739c7-1d28-44a6-9141-3c82dcfc0254",
+    "store_id": "63a7593f-9541-4286-8186-8247282a438a",
+    "sync_type": "price_update",
+    "status": "success",
+    "records_updated": 56,
+    "error_message": null,
+    "duration_ms": 83902,
+    "synced_at": "2026-07-07T00:01:57.709972+00:00"
+  },
+  {
+    "id": "c6446543-71d5-43fb-8ef2-e9f7d50e06fb",
+    "store_id": "63a7593f-9541-4286-8186-8247282a438a",
+    "sync_type": "price_update",
+    "status": "success",
+    "records_updated": 56,
+    "error_message": null,
+    "duration_ms": 74970,
+    "synced_at": "2026-07-07T04:01:48.289449+00:00"
+  },
+  {
+    "id": "ed4af8c0-6afe-41be-9cf0-b78de22e789f",
+    "store_id": "63a7593f-9541-4286-8186-8247282a438a",
+    "sync_type": "price_update",
+    "status": "success",
+    "records_updated": 56,
+    "error_message": null,
+    "duration_ms": 92050,
+    "synced_at": "2026-07-07T08:02:01.175584+00:00"
+  },
+  {
+    "id": "d5cf534b-2895-4482-aea5-1e361a4eee6e",
+    "store_id": "63a7593f-9541-4286-8186-8247282a438a",
+    "sync_type": "price_update",
+    "status": "success",
+    "records_updated": 56,
+    "error_message": null,
+    "duration_ms": 73808,
+    "synced_at": "2026-07-07T12:01:47.414069+00:00"
+  },
+  {
+    "id": "57089e8c-90cc-4405-8c82-7ddaa43512d4",
+    "store_id": "63a7593f-9541-4286-8186-8247282a438a",
+    "sync_type": "price_update",
+    "status": "success",
+    "records_updated": 56,
+    "error_message": null,
+    "duration_ms": 75918,
+    "synced_at": "2026-07-07T16:01:50.050109+00:00"
+  },
+  {
+    "id": "c9a1c769-edf4-43d1-83e5-42a01cdbb6a6",
+    "store_id": "63a7593f-9541-4286-8186-8247282a438a",
+    "sync_type": "price_update",
+    "status": "success",
+    "records_updated": 57,
+    "error_message": null,
+    "duration_ms": 80718,
+    "synced_at": "2026-07-07T20:01:52.640745+00:00"
+  },
+  {
+    "id": "fa64626c-71ff-4203-a7c7-ef99289239c7",
+    "store_id": "63a7593f-9541-4286-8186-8247282a438a",
+    "sync_type": "price_update",
+    "status": "success",
+    "records_updated": 57,
+    "error_message": null,
+    "duration_ms": 72920,
+    "synced_at": "2026-07-08T00:01:42.756167+00:00"
+  },
+  {
+    "id": "fdd967a6-793e-4041-819d-80788c1ad9e0",
+    "store_id": "63a7593f-9541-4286-8186-8247282a438a",
+    "sync_type": "price_update",
+    "status": "success",
+    "records_updated": 57,
+    "error_message": null,
+    "duration_ms": 73055,
+    "synced_at": "2026-07-08T04:01:43.907106+00:00"
+  },
+  {
+    "id": "589bb91e-f348-40f8-9708-0be9c8127e6a",
+    "store_id": "63a7593f-9541-4286-8186-8247282a438a",
+    "sync_type": "price_update",
+    "status": "success",
+    "records_updated": 56,
+    "error_message": null,
+    "duration_ms": 72874,
+    "synced_at": "2026-07-08T08:01:43.844191+00:00"
+  },
+  {
+    "id": "1c6d0864-df0d-44be-b730-85d7b8843e7d",
+    "store_id": "63a7593f-9541-4286-8186-8247282a438a",
+    "sync_type": "price_update",
+    "status": "success",
+    "records_updated": 55,
+    "error_message": null,
+    "duration_ms": 79497,
+    "synced_at": "2026-07-08T12:01:56.582844+00:00"
+  },
+  {
+    "id": "d0611023-53b1-4ff1-a633-91890dbdac89",
+    "store_id": "63a7593f-9541-4286-8186-8247282a438a",
+    "sync_type": "price_update",
+    "status": "success",
+    "records_updated": 55,
+    "error_message": null,
+    "duration_ms": 89634,
+    "synced_at": "2026-07-08T16:02:03.908838+00:00"
+  },
+  {
+    "id": "28af5664-ab92-4646-8ec0-d680f0a6212b",
+    "store_id": "63a7593f-9541-4286-8186-8247282a438a",
+    "sync_type": "price_update",
+    "status": "success",
+    "records_updated": 54,
+    "error_message": null,
+    "duration_ms": 71368,
+    "synced_at": "2026-07-08T20:01:47.769284+00:00"
+  },
+  {
+    "id": "1f1b0345-51c7-41bc-8eba-5957d61b1a26",
+    "store_id": "63a7593f-9541-4286-8186-8247282a438a",
+    "sync_type": "price_update",
+    "status": "success",
+    "records_updated": 55,
+    "error_message": null,
+    "duration_ms": 76408,
+    "synced_at": "2026-07-09T00:01:50.511792+00:00"
+  },
+  {
+    "id": "0293f4f1-2762-4849-b416-4f1a11e4bc48",
+    "store_id": "63a7593f-9541-4286-8186-8247282a438a",
+    "sync_type": "price_update",
+    "status": "success",
+    "records_updated": 56,
+    "error_message": null,
+    "duration_ms": 78568,
+    "synced_at": "2026-07-09T04:01:56.92494+00:00"
+  },
+  {
+    "id": "c48b443d-4ebb-46a6-b3ad-eabe5f798e0b",
+    "store_id": "63a7593f-9541-4286-8186-8247282a438a",
+    "sync_type": "price_update",
+    "status": "success",
+    "records_updated": 56,
+    "error_message": null,
+    "duration_ms": 84759,
+    "synced_at": "2026-07-09T08:02:02.265119+00:00"
+  },
+  {
+    "id": "c667f725-ec74-4cf9-b067-e5d583ae5da1",
+    "store_id": "63a7593f-9541-4286-8186-8247282a438a",
+    "sync_type": "price_update",
+    "status": "success",
+    "records_updated": 56,
+    "error_message": null,
+    "duration_ms": 90234,
+    "synced_at": "2026-07-09T12:01:55.202612+00:00"
+  },
+  {
+    "id": "942b5f96-98df-4c60-9cf5-59d1c8c90168",
+    "store_id": "63a7593f-9541-4286-8186-8247282a438a",
+    "sync_type": "price_update",
+    "status": "success",
+    "records_updated": 56,
+    "error_message": null,
+    "duration_ms": 80175,
+    "synced_at": "2026-07-09T16:01:43.184246+00:00"
+  },
+  {
+    "id": "c807ea5f-80b1-4a2b-9334-205f509c93cc",
+    "store_id": "63a7593f-9541-4286-8186-8247282a438a",
+    "sync_type": "price_update",
+    "status": "success",
+    "records_updated": 56,
+    "error_message": null,
+    "duration_ms": 74557,
+    "synced_at": "2026-07-09T20:01:33.490111+00:00"
+  },
+  {
+    "id": "6ee26563-5d6e-4937-9098-f49aeb72c9bb",
+    "store_id": "63a7593f-9541-4286-8186-8247282a438a",
+    "sync_type": "price_update",
+    "status": "success",
+    "records_updated": 56,
+    "error_message": null,
+    "duration_ms": 76240,
+    "synced_at": "2026-07-10T00:01:38.726641+00:00"
+  },
+  {
+    "id": "559b1eac-3a43-4285-84da-dccc6bb3f912",
+    "store_id": "63a7593f-9541-4286-8186-8247282a438a",
+    "sync_type": "price_update",
+    "status": "success",
+    "records_updated": 56,
+    "error_message": null,
+    "duration_ms": 77550,
+    "synced_at": "2026-07-10T04:01:36.660807+00:00"
+  },
+  {
+    "id": "03840e49-1aea-493d-acf1-1767cd261a3f",
+    "store_id": "63a7593f-9541-4286-8186-8247282a438a",
+    "sync_type": "price_update",
+    "status": "success",
+    "records_updated": 55,
+    "error_message": null,
+    "duration_ms": 77952,
+    "synced_at": "2026-07-10T08:01:40.57676+00:00"
+  },
+  {
+    "id": "65ca9b85-62db-4831-914e-0a450567c4c7",
+    "store_id": "63a7593f-9541-4286-8186-8247282a438a",
+    "sync_type": "price_update",
+    "status": "success",
+    "records_updated": 55,
+    "error_message": null,
+    "duration_ms": 75177,
+    "synced_at": "2026-07-10T12:01:41.725194+00:00"
+  },
+  {
+    "id": "a1e1cebf-8db7-40ed-98e4-7a3a10217426",
+    "store_id": "63a7593f-9541-4286-8186-8247282a438a",
+    "sync_type": "price_update",
+    "status": "success",
+    "records_updated": 55,
+    "error_message": null,
+    "duration_ms": 72196,
+    "synced_at": "2026-07-10T20:01:34.822862+00:00"
+  },
+  {
+    "id": "b4c1f69f-1148-486c-b6d5-44d03aad3c3d",
+    "store_id": "63a7593f-9541-4286-8186-8247282a438a",
+    "sync_type": "price_update",
+    "status": "success",
+    "records_updated": 55,
+    "error_message": null,
+    "duration_ms": 73546,
+    "synced_at": "2026-07-11T00:01:37.682302+00:00"
+  }
+]

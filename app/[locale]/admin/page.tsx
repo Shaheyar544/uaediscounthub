@@ -1,94 +1,55 @@
-import { Locale } from '@/i18n/config'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import Link from 'next/link'
+import { AlertTriangle, ArrowUpRight, BadgeDollarSign, ChartNoAxesCombined, CircleCheck, ExternalLink, MousePointer2, PackagePlus, Plus, Tags, Users, Zap } from 'lucide-react'
 import { createClient } from '@/utils/supabase/server'
-import { DollarSign, Tag, Users, Activity, AlertTriangle } from 'lucide-react'
 import { AmazonCreatorsAPI } from '@/lib/amazon-creators-api'
 
-export default async function AdminDashboard({
-    params
-}: {
-    params: Promise<{ locale: string }>
-}) {
-    const supabase = await createClient()
-    const isManualMode = AmazonCreatorsAPI.isManualMode()
+type Metric = { label: string; value: string; detail: string; icon: typeof MousePointer2; tone: string; href: string }
 
-    // Fetch simple aggregate counts
-    const { count: usersCount } = await supabase.from('profiles').select('*', { count: 'exact', head: true })
-    const { count: productsCount } = await supabase.from('products').select('*', { count: 'exact', head: true })
-    const { count: clicksCount } = await supabase.from('affiliate_clicks').select('*', { count: 'exact', head: true })
+function MetricCard({ metric }: { metric: Metric }) {
+  const Icon = metric.icon
+  return <Link href={metric.href} className="block rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-ring"><article className="rounded-2xl border bg-card p-4 shadow-sm transition-shadow hover:shadow-md sm:p-5"><div className="flex items-start justify-between gap-3"><p className="text-sm font-medium text-muted-foreground">{metric.label}</p><span className={`grid size-9 place-items-center rounded-xl ${metric.tone}`}><Icon className="size-4" aria-hidden="true" /></span></div><p className="mt-4 font-display text-2xl font-extrabold tracking-tight tabular-nums sm:text-3xl">{metric.value}</p><p className="mt-1.5 flex items-center gap-1 text-xs text-muted-foreground">{metric.detail}<ArrowUpRight className="size-3" aria-hidden="true" /></p></article></Link>
+}
 
-    return (
-        <div className="space-y-8">
-            <div className="flex items-center justify-between gap-4">
-                <div>
-                    <h1 className="text-3xl font-bold tracking-tight">Dashboard Overview</h1>
-                    <p className="text-muted-foreground">Monitor your GCC affiliate network performance.</p>
-                </div>
-                {isManualMode && (
-                    <div className="flex items-center gap-3 bg-amber-50 border border-amber-200 text-amber-800 px-4 py-2.5 rounded-xl shadow-sm animate-in fade-in slide-in-from-right-4 duration-500">
-                        <AlertTriangle size={18} className="text-amber-600 animate-pulse" />
-                        <div>
-                            <div className="text-[13px] font-bold leading-tight">Automation Suspended</div>
-                            <div className="text-[11px] font-medium opacity-80">Manual Entry Mode is Active</div>
-                        </div>
-                    </div>
-                )}
-            </div>
+export default async function AdminDashboard({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params
+  const supabase = await createClient()
+  const isManualMode = AmazonCreatorsAPI.isManualMode()
+  const [usersResult, productsResult, clicksResult, dealsResult, couponsResult, storesResult] = await Promise.all([
+    supabase.from('profiles').select('*', { count: 'exact', head: true }), supabase.from('products').select('*', { count: 'exact', head: true }),
+    supabase.from('affiliate_clicks').select('id, store_id'), supabase.from('deals').select('id, title, click_count, is_active, created_at, stores(name), products(name_en, name)').order('created_at', { ascending: false }).limit(8),
+    supabase.from('coupons').select('id, store_id, is_active, expires_at'), supabase.from('stores').select('id, name, logo_url').order('name'),
+  ])
+  const clicks = clicksResult.data ?? [], deals = dealsResult.data ?? [], coupons = couponsResult.data ?? [], stores = storesResult.data ?? []
+  const activeDeals = deals.filter((deal: any) => deal.is_active).length
+  const activeCoupons = coupons.filter((coupon: any) => coupon.is_active).length
+  const formatNumber = (value: number) => new Intl.NumberFormat(locale === 'ar' ? 'ar-AE' : 'en-AE').format(value)
+  const metrics: Metric[] = [
+    { label: 'Affiliate revenue', value: '—', detail: 'Connect a commission feed to report revenue', icon: BadgeDollarSign, tone: 'bg-violet-500/10 text-violet-600 dark:text-violet-400', href: `/${locale}/admin/settings` },
+    { label: 'Affiliate clicks', value: formatNumber(clicks.length), detail: 'Recorded outbound click events', icon: MousePointer2, tone: 'bg-blue-500/10 text-blue-600 dark:text-blue-400', href: `/${locale}/admin/deals` },
+    { label: 'Conversions', value: '—', detail: 'No conversion events received yet', icon: CircleCheck, tone: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400', href: `/${locale}/admin/settings` },
+    { label: 'Conversion rate', value: '—', detail: 'Available when conversions are connected', icon: ChartNoAxesCombined, tone: 'bg-amber-500/10 text-amber-600 dark:text-amber-400', href: `/${locale}/admin/settings` },
+    { label: 'Active deals', value: formatNumber(activeDeals), detail: `${formatNumber(deals.length)} recent deals in the registry`, icon: Zap, tone: 'bg-orange-500/10 text-orange-600 dark:text-orange-400', href: `/${locale}/admin/deals` },
+    { label: 'Active coupons', value: formatNumber(activeCoupons), detail: `${formatNumber(coupons.length)} coupons in the registry`, icon: Tags, tone: 'bg-cyan-500/10 text-cyan-600 dark:text-cyan-400', href: `/${locale}/admin/coupons` },
+    { label: 'Tracked products', value: formatNumber(productsResult.count ?? 0), detail: 'Products available for deal operations', icon: PackagePlus, tone: 'bg-pink-500/10 text-pink-600 dark:text-pink-400', href: `/${locale}/admin/products` },
+    { label: 'Registered users', value: formatNumber(usersResult.count ?? 0), detail: 'Application profiles', icon: Users, tone: 'bg-slate-500/10 text-slate-600 dark:text-slate-400', href: `/${locale}/admin/users` },
+  ]
+  const storePerformance = stores.map((store: any) => ({ ...store, storeDeals: deals.filter((deal: any) => deal.stores?.name === store.name).length, storeCoupons: coupons.filter((coupon: any) => coupon.store_id === store.id).length, storeClicks: clicks.filter((click: any) => click.store_id === store.id).length })).sort((a: any, b: any) => b.storeClicks - a.storeClicks || b.storeDeals - a.storeDeals).slice(0, 5)
+  const now = Date.now()
+  const expiringCoupons = coupons.filter((coupon: any) => coupon.is_active && coupon.expires_at && new Date(coupon.expires_at).getTime() >= now && new Date(coupon.expires_at).getTime() - now <= 48 * 60 * 60 * 1000).length
+  const inactiveRecentDeals = deals.filter((deal: any) => !deal.is_active).length
+  const actionItems = [
+    ...(expiringCoupons ? [{ count: expiringCoupons, label: 'Active coupons expire within 48 hours', detail: 'Review validity or extend expiry before the offer becomes unavailable.', href: '/coupons' }] : []),
+    ...(inactiveRecentDeals ? [{ count: inactiveRecentDeals, label: 'Recent deals are inactive', detail: 'Review their availability and publish or archive them.', href: '/deals' }] : []),
+    ...(isManualMode ? [{ count: 1, label: 'Automation is paused', detail: 'Manual mode is active; review automation settings before the next feed run.', href: '/settings' }] : []),
+    ...(clicks.length === 0 ? [{ count: 1, label: 'No outbound click events recorded', detail: 'Validate affiliate tracking before relying on performance reporting.', href: '/settings' }] : []),
+  ]
 
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-                        <CardTitle className="text-sm font-medium">Total Revenue (Ref)</CardTitle>
-                        <DollarSign className="w-4 h-4 text-muted-foreground" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">AED --</div>
-                        <p className="text-xs text-muted-foreground">Requires API sync</p>
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-                        <CardTitle className="text-sm font-medium">Affiliate Clicks</CardTitle>
-                        <Activity className="w-4 h-4 text-muted-foreground" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">{clicksCount || 0}</div>
-                        <p className="text-xs text-muted-foreground">Total out-bound clicks</p>
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-                        <CardTitle className="text-sm font-medium">Active Products</CardTitle>
-                        <Tag className="w-4 h-4 text-muted-foreground" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">{productsCount || 0}</div>
-                        <p className="text-xs text-muted-foreground">Tracked in database</p>
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-                        <CardTitle className="text-sm font-medium">Registered Users</CardTitle>
-                        <Users className="w-4 h-4 text-muted-foreground" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">{usersCount || 0}</div>
-                        <p className="text-xs text-muted-foreground">Active platform members</p>
-                    </CardContent>
-                </Card>
-            </div>
-
-            {/* Chart Placeholder */}
-            <Card className="col-span-4">
-                <CardHeader>
-                    <CardTitle>Overview Activity</CardTitle>
-                </CardHeader>
-                <CardContent className="pl-2">
-                    <div className="h-[250px] w-full flex items-center justify-center border-dashed border-2 rounded-xl bg-muted/20 text-muted-foreground">
-                        Activity Chart (Implement Recharts)
-                    </div>
-                </CardContent>
-            </Card>
-        </div>
-    )
+  return <div className="space-y-6 lg:space-y-8">
+    <section className="flex flex-col justify-between gap-5 lg:flex-row lg:items-end"><div><p className="text-sm font-semibold text-primary">Operations overview</p><h1 className="mt-1 text-3xl font-extrabold tracking-tight sm:text-4xl">Affiliate intelligence, at a glance.</h1><p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground sm:text-base">Monitor deal operations, outbound activity, catalog health, and the systems that support UAE Discount Hub.</p></div><div className="flex flex-wrap gap-2"><Link href={`/${locale}/admin/deals`} className="inline-flex h-10 items-center gap-2 rounded-xl border bg-card px-4 text-sm font-semibold transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><ExternalLink className="size-4" aria-hidden="true" />Manage deals</Link><Link href={`/${locale}/admin/products/new`} className="inline-flex h-10 items-center gap-2 rounded-xl bg-primary px-4 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><Plus className="size-4" aria-hidden="true" />Add product</Link></div></section>
+    {isManualMode && <div role="status" className="flex items-start gap-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm text-amber-950 dark:text-amber-100"><AlertTriangle className="mt-0.5 size-5 shrink-0 text-amber-600" aria-hidden="true" /><div><p className="font-bold">Automation is paused</p><p className="mt-0.5 text-amber-800/85 dark:text-amber-100/80">Manual entry mode is active. Product and affiliate updates require an explicit admin action.</p></div></div>}
+    <section aria-labelledby="action-center-title" className="rounded-2xl border bg-card p-5 shadow-sm"><div className="flex flex-wrap items-start justify-between gap-3"><div><p className="text-xs font-bold uppercase tracking-[0.14em] text-primary">Action center</p><h2 id="action-center-title" className="mt-1 text-lg font-bold">Prioritize the work that needs attention.</h2></div><p className="text-xs text-muted-foreground">Based on currently available operational data</p></div><div className="mt-4 grid gap-2 md:grid-cols-2">{actionItems.length ? actionItems.map((item) => <Link key={item.label} href={`/${locale}/admin${item.href}`} className="group flex min-h-20 items-center gap-3 rounded-xl border bg-muted/30 p-3 transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><span className="grid size-9 shrink-0 place-items-center rounded-lg bg-amber-500/15 text-sm font-extrabold text-amber-700 dark:text-amber-400">{item.count}</span><span className="min-w-0 flex-1"><span className="block text-sm font-semibold">{item.label}</span><span className="mt-0.5 block text-xs leading-5 text-muted-foreground">{item.detail}</span></span><ArrowUpRight className="size-4 shrink-0 text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 motion-reduce:transition-none" aria-hidden="true" /></Link>) : <div className="rounded-xl border border-dashed p-4 text-sm text-muted-foreground md:col-span-2"><span className="font-semibold text-foreground">No immediate operational actions.</span> Catalog, deal, coupon, and automation checks have nothing actionable in the currently loaded records.</div>}</div></section>
+    <section aria-label="Key performance indicators" className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">{metrics.map((metric) => <MetricCard key={metric.label} metric={metric} />)}</section>
+    <section className="grid gap-6 xl:grid-cols-[minmax(0,1.55fr)_minmax(320px,0.85fr)]"><article className="rounded-2xl border bg-card shadow-sm"><div className="flex flex-col gap-3 border-b p-5 sm:flex-row sm:items-center sm:justify-between"><div><h2 className="text-lg font-bold">Revenue & affiliate performance</h2><p className="mt-1 text-sm text-muted-foreground">Commission, conversions, and EPC appear here when a network feed is connected.</p></div><span className="inline-flex w-fit items-center rounded-lg bg-muted px-2.5 py-1.5 text-xs font-semibold text-muted-foreground">Last 30 days</span></div><div className="flex min-h-72 flex-col items-center justify-center px-6 py-10 text-center"><div className="grid size-12 place-items-center rounded-2xl bg-blue-500/10 text-blue-600 dark:text-blue-400"><ChartNoAxesCombined className="size-6" aria-hidden="true" /></div><h3 className="mt-4 font-bold">Analytics feed not connected</h3><p className="mt-1 max-w-sm text-sm leading-6 text-muted-foreground">Outbound clicks are tracked. Connect conversion and commission events to unlock revenue, conversion rate, and EPC reporting.</p></div></article><article className="rounded-2xl border bg-card p-5 shadow-sm"><div className="flex items-start justify-between gap-4"><div><h2 className="text-lg font-bold">Store performance</h2><p className="mt-1 text-sm text-muted-foreground">Activity from the current data set.</p></div><Link href={`/${locale}/admin/stores`} className="text-sm font-semibold text-primary hover:underline">View stores</Link></div><div className="mt-5 divide-y">{storePerformance.length ? storePerformance.map((store: any) => <div key={store.id} className="flex items-center gap-3 py-3 first:pt-0"><div className="grid size-9 shrink-0 place-items-center rounded-xl bg-muted text-xs font-extrabold text-muted-foreground">{store.name?.slice(0, 2).toUpperCase()}</div><div className="min-w-0 flex-1"><p className="truncate text-sm font-semibold">{store.name}</p><p className="text-xs text-muted-foreground">{formatNumber(store.storeClicks)} clicks · {formatNumber(store.storeDeals)} deals · {formatNumber(store.storeCoupons)} coupons</p></div><ArrowUpRight className="size-4 text-muted-foreground" aria-hidden="true" /></div>) : <p className="py-8 text-center text-sm text-muted-foreground">No stores are available yet.</p>}</div></article></section>
+    <section className="grid gap-6 xl:grid-cols-[minmax(0,1.55fr)_minmax(320px,0.85fr)]"><article className="overflow-hidden rounded-2xl border bg-card shadow-sm"><div className="flex flex-col gap-3 border-b p-5 sm:flex-row sm:items-center sm:justify-between"><div><h2 className="text-lg font-bold">Recent deal operations</h2><p className="mt-1 text-sm text-muted-foreground">Newest records from the live deals registry.</p></div><Link href={`/${locale}/admin/deals`} className="text-sm font-semibold text-primary hover:underline">Open registry</Link></div><div className="overflow-x-auto"><table className="w-full min-w-[620px] text-sm"><thead className="bg-muted/50 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground"><tr><th className="px-5 py-3">Deal</th><th className="px-5 py-3">Store</th><th className="px-5 py-3 text-right">Clicks</th><th className="px-5 py-3 text-right">Status</th></tr></thead><tbody className="divide-y">{deals.length ? deals.slice(0, 5).map((deal: any) => <tr key={deal.id} className="hover:bg-muted/30"><td className="px-5 py-4 font-semibold">{deal.title || deal.products?.name_en || deal.products?.name || 'Untitled deal'}</td><td className="px-5 py-4 text-muted-foreground">{deal.stores?.name || 'Unassigned'}</td><td className="px-5 py-4 text-right font-semibold tabular-nums">{formatNumber(deal.click_count ?? 0)}</td><td className="px-5 py-4 text-right"><span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${deal.is_active ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400' : 'bg-slate-500/10 text-slate-600 dark:text-slate-300'}`}>{deal.is_active ? 'Active' : 'Inactive'}</span></td></tr>) : <tr><td colSpan={4} className="px-5 py-12 text-center text-muted-foreground">No deals have been created yet.</td></tr>}</tbody></table></div></article><aside className="rounded-2xl border bg-card p-5 shadow-sm"><div className="flex items-start justify-between gap-4"><div><h2 className="text-lg font-bold">System health</h2><p className="mt-1 text-sm text-muted-foreground">Operational readiness checks.</p></div><span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-2.5 py-1 text-xs font-bold text-emerald-700 dark:text-emerald-400"><span className="size-1.5 rounded-full bg-current" />Online</span></div><div className="mt-5 space-y-4"><div className="rounded-xl bg-muted/50 p-3"><p className="text-sm font-semibold">Catalog coverage</p><p className="mt-1 text-xs text-muted-foreground">{formatNumber(productsResult.count ?? 0)} products across {formatNumber(stores.length)} stores</p></div><div className="rounded-xl bg-muted/50 p-3"><p className="text-sm font-semibold">Affiliate tracking</p><p className="mt-1 text-xs text-muted-foreground">{formatNumber(clicks.length)} outbound events recorded</p></div><div className="rounded-xl bg-muted/50 p-3"><p className="text-sm font-semibold">Manual controls</p><p className="mt-1 text-xs text-muted-foreground">{isManualMode ? 'Manual entry mode is active' : 'Automation mode is available'}</p></div></div></aside></section>
+  </div>
 }

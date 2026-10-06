@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>UAE Discount Hub — Admin Redesign</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<style>
+  :root{
+    --bg:#f6f8fb; --panel:#fff; --panel-2:#fbfcfe; --text:#111827; --muted:#6b7280;
+    --line:#e7eaf0; --blue:#2563eb; --blue-2:#1d4ed8; --green:#16a34a; --amber:#d97706;
+    --red:#dc2626; --purple:#7c3aed; --sidebar:#0b1220; --sidebar-2:#111827;
+    --shadow:0 10px 30px rgba(15,23,42,.06); --radius:16px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+  button,input,select{font:inherit}
+  button{cursor:pointer}
+  .app{min-height:100vh;display:flex}
+  .sidebar{position:fixed;inset:0 auto 0 0;width:248px;background:linear-gradient(180deg,#0b1220,#101827);color:#cbd5e1;padding:18px 14px;display:flex;flex-direction:column;z-index:20}
+  .brand{display:flex;align-items:center;gap:10px;padding:8px 10px 20px;color:#fff;font-weight:800;font-size:16px}
+  .brand-dot{width:10px;height:10px;border-radius:50%;background:#3b82f6;box-shadow:0 0 0 5px rgba(59,130,246,.14)}
+  .brand small{display:block;color:#64748b;font-weight:500;font-size:10px;margin-top:2px}
+  .section-label{font-size:10px;text-transform:uppercase;letter-spacing:.11em;color:#64748b;padding:15px 11px 7px}
+  .nav{display:grid;gap:4px}
+  .nav a{display:flex;align-items:center;gap:11px;color:#94a3b8;text-decoration:none;padding:10px 11px;border-radius:10px;font-size:13px;font-weight:600}
+  .nav a:hover{background:rgba(255,255,255,.06);color:#fff}
+  .nav a.active{background:#2563eb;color:#fff;box-shadow:0 7px 18px rgba(37,99,235,.24)}
+  .icon{width:18px;text-align:center;font-size:15px;flex:0 0 18px}
+  .side-bottom{margin-top:auto;border-top:1px solid rgba(255,255,255,.07);padding-top:12px}
+  .main{margin-left:248px;width:calc(100% - 248px);min-width:0}
+  .topbar{height:68px;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 30px;position:sticky;top:0;z-index:15}
+  .crumb{font-size:13px;color:var(--muted)} .crumb strong{color:var(--text)}
+  .top-actions{display:flex;align-items:center;gap:10px}
+  .search{width:260px;border:1px solid var(--line);background:#f8fafc;border-radius:10px;padding:9px 12px;outline:none}
+  .circle{width:36px;height:36px;border:1px solid var(--line);background:#fff;border-radius:10px;display:grid;place-items:center}
+  .avatar{width:34px;height:34px;border-radius:50%;background:#2563eb;color:#fff;display:grid;place-items:center;font-weight:800;font-size:12px}
+  .profile{display:flex;align-items:center;gap:8px;padding-left:5px}.profile b{font-size:12px}.profile span{display:block;font-size:10px;color:var(--muted)}
+  .content{padding:28px 30px 42px;max-width:1540px;margin:auto}
+  .hero{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:22px}
+  .hero h1{font-size:25px;line-height:1.15;margin:0 0 7px;letter-spacing:-.03em}
+  .hero p{margin:0;color:var(--muted);font-size:13px}
+  .hero-actions{display:flex;gap:9px}
+  .btn{border:1px solid var(--line);background:#fff;border-radius:10px;padding:9px 13px;font-size:12px;font-weight:700;color:#334155}
+  .btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}
+  .btn:hover{filter:brightness(.98)}
+  .grid4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+  .metric{padding:18px}
+  .metric-top{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:12px;font-weight:700}
+  .metric-icon{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:#eff6ff;color:#2563eb}
+  .metric-value{font-size:25px;font-weight:800;letter-spacing:-.03em;margin-top:14px}
+  .metric-bottom{display:flex;justify-content:space-between;margin-top:8px;font-size:11px;color:var(--muted)}
+  .up{color:var(--green);font-weight:800}.down{color:var(--red);font-weight:800}
+  .main-grid{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(300px,.85fr);gap:15px;margin-top:15px}
+  .panel-head{display:flex;justify-content:space-between;align-items:center;padding:18px 18px 0}
+  .panel-head h2{font-size:14px;margin:0}.panel-head p{font-size:11px;color:var(--muted);margin:4px 0 0}
+  .chart-wrap{padding:14px 16px 16px;height:315px}
+  .select{border:1px solid var(--line);border-radius:8px;background:#fff;padding:7px 9px;font-size:11px;color:#475569}
+  .store-list{padding:10px 18px 16px}
+  .store{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid #eef0f4}
+  .store:last-child{border-bottom:0}
+  .store-logo{width:34px;height:34px;border:1px solid var(--line);border-radius:9px;display:grid;place-items:center;font-size:11px;font-weight:900;background:#f8fafc}
+  .store-main{flex:1;min-width:0}.store-main b{font-size:12px}.store-main span{display:block;font-size:10px;color:var(--muted);margin-top:2px}
+  .status{font-size:10px;font-weight:800;padding:4px 7px;border-radius:999px;background:#ecfdf3;color:#15803d}.status.warn{background:#fff7ed;color:#c2410c}
+  .section-grid{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(300px,.9fr);gap:15px;margin-top:15px}
+  .table-wrap{overflow:auto;padding:8px 18px 18px}
+  table{width:100%;border-collapse:collapse;min-width:680px}
+  th{text-align:left;color:#94a3b8;font-size:10px;text-transform:uppercase;letter-spacing:.08em;padding:10px 8px;border-bottom:1px solid var(--line)}
+  td{padding:12px 8px;border-bottom:1px solid #f0f2f5;font-size:12px;vertical-align:middle}
+  td strong{font-size:12px}
+  .product{display:flex;align-items:center;gap:10px}.thumb{width:38px;height:38px;border-radius:9px;background:#f1f5f9;display:grid;place-items:center;font-size:17px}
+  .sub{display:block;color:var(--muted);font-size:10px;margin-top:2px}
+  .mini-progress{width:92px;height:6px;border-radius:99px;background:#eef2f7;overflow:hidden}.mini-progress i{display:block;height:100%;background:#2563eb;border-radius:99px}
+  .activity{padding:7px 18px 18px}
+  .activity-item{display:flex;gap:11px;padding:13px 0;border-bottom:1px solid #f0f2f5}.activity-item:last-child{border:0}
+  .dot{width:8px;height:8px;border-radius:50%;background:#2563eb;margin-top:5px;box-shadow:0 0 0 5px #eff6ff;flex:0 0 auto}
+  .activity-item b{font-size:11px}.activity-item span{display:block;color:var(--muted);font-size:10px;margin-top:3px}
+  .health{padding:16px 18px}.health-row{display:flex;justify-content:space-between;font-size:11px;margin-bottom:8px}.health-bar{height:8px;background:#eef2f7;border-radius:99px;overflow:hidden}.health-bar i{display:block;height:100%;width:96%;background:#16a34a;border-radius:99px}
+  .quick{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;padding:0 18px 18px}.quick button{text-align:left;padding:12px;border:1px solid var(--line);background:#fff;border-radius:11px}.quick b{display:block;font-size:11px}.quick span{display:block;color:var(--muted);font-size:9px;margin-top:3px}
+  .mobile-menu{display:none}
+  @media(max-width:1100px){.grid4{grid-template-columns:repeat(2,1fr)}.main-grid,.section-grid{grid-template-columns:1fr}.search{width:190px}}
+  @media(max-width:760px){
+    .sidebar{transform:translateX(-100%);transition:.2s}.sidebar.open{transform:translateX(0)}
+    .main{margin-left:0;width:100%}.mobile-menu{display:grid}
+    .topbar{padding:0 16px}.content{padding:20px 16px}.hero{gap:15px;flex-direction:column}.hero-actions{width:100%}
+    .hero-actions .btn{flex:1}.search{display:none}.grid4{grid-template-columns:1fr 1fr}
+  }
+  @media(max-width:500px){.grid4{grid-template-columns:1fr}.top-actions .circle{display:none}.metric-value{font-size:22px}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><span class="brand-dot"></span><div>UAE Discount Hub<small>Admin Control Center</small></div></div>
+
+    <div class="section-label">Workspace</div>
+    <nav class="nav">
+      <a class="active" href="#"><span class="icon">⌂</span>Overview</a>
+      <a href="#"><span class="icon">▣</span>Products</a>
+      <a href="#"><span class="icon">◇</span>Categories</a>
+      <a href="#"><span class="icon">▤</span>Stores</a>
+      <a href="#"><span class="icon">%</span>Coupons</a>
+      <a href="#"><span class="icon">⚡</span>Deals</a>
+      <a href="#"><span class="icon">✉</span>Newsletter</a>
+      <a href="#"><span class="icon">♙</span>Users</a>
+    </nav>
+
+    <div class="section-label">Content</div>
+    <nav class="nav">
+      <a href="#"><span class="icon">▧</span>Pages</a>
+      <a href="#"><span class="icon">✎</span>Blog Posts</a>
+      <a href="#"><span class="icon">＋</span>Write New Post</a>
+      <a href="#"><span class="icon">▦</span>Ad Widgets</a>
+    </nav>
+
+    <div class="section-label">System</div>
+    <nav class="nav">
+      <a href="#"><span class="icon">⚙</span>Settings</a>
+      <a href="#"><span class="icon">⌁</span>API Sandbox</a>
+      <a href="#"><span class="icon">●</span>My Profile</a>
+    </nav>
+
+    <div class="side-bottom">
+      <nav class="nav"><a href="#"><span class="icon">↪</span>Sign out</a></nav>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div style="display:flex;align-items:center;gap:10px">
+        <button class="circle mobile-menu" onclick="toggleSidebar()">☰</button>
+        <div class="crumb">Admin / <strong>Overview</strong></div>
+      </div>
+      <div class="top-actions">
+        <input class="search" placeholder="Search products, coupons, stores…" />
+        <button class="circle" title="Theme">☼</button>
+        <button class="circle" title="Notifications">♢</button>
+        <div class="profile"><div class="avatar">A</div><div><b>admin</b><span>Administrator</span></div></div>
+      </div>
+    </header>
+
+    <section class="content">
+      <div class="hero">
+        <div>
+          <h1>Good afternoon, Admin 👋</h1>
+          <p>Here's what is happening across your affiliate network today.</p>
+        </div>
+        <div class="hero-actions">
+          <button class="btn">Export Report</button>
+          <button class="btn primary">+ Add Deal</button>
+        </div>
+      </div>
+
+      <div class="grid4">
+        <article class="card metric">
+          <div class="metric-top"><span>Affiliate Revenue</span><span class="metric-icon">AED</span></div>
+          <div class="metric-value">AED 18,426</div>
+          <div class="metric-bottom"><span class="up">↑ 14.8%</span><span>vs last 30 days</span></div>
+        </article>
+        <article class="card metric">
+          <div class="metric-top"><span>Affiliate Clicks</span><span class="metric-icon">↗</span></div>
+          <div class="metric-value">128,540</div>
+          <div class="metric-bottom"><span class="up">↑ 8.2%</span><span>vs last 30 days</span></div>
+        </article>
+        <article class="card metric">
+          <div class="metric-top"><span>Conversions</span><span class="metric-icon">✓</span></div>
+          <div class="metric-value">3,284</div>
+          <div class="metric-bottom"><span class="up">↑ 11.4%</span><span>2.55% conversion rate</span></div>
+        </article>
+        <article class="card metric">
+          <div class="metric-top"><span>Active Deals</span><span class="metric-icon">⚡</span></div>
+          <div class="metric-value">1,284</div>
+          <div class="metric-bottom"><span class="up">+86</span><span>updated today</span></div>
+        </article>
+      </div>
+
+      <div class="main-grid">
+        <section class="card">
+          <div class="panel-head">
+            <div><h2>Revenue & Affiliate Performance</h2><p>Clicks, conversions and commission revenue</p></div>
+            <select class="select"><option>Last 30 days</option><option>Last 7 days</option><option>Last 90 days</option></select>
+          </div>
+          <div class="chart-wrap"><canvas id="revenueChart"></canvas></div>
+        </section>
+
+        <section class="card">
+          <div class="panel-head"><div><h2>Store Performance</h2><p>Top affiliate partners</p></div><button class="btn">View all</button></div>
+          <div class="store-list">
+            <div class="store"><div class="store-logo">AMZ</div><div class="store-main"><b>Amazon UAE</b><span>42,180 clicks</span></div><strong>AED 6.8K</strong></div>
+            <div class="store"><div class="store-logo">NOON</div><div class="store-main"><b>Noon</b><span>31,442 clicks</span></div><strong>AED 4.9K</strong></div>
+            <div class="store"><div class="store-logo">SDG</div><div class="store-main"><b>Sharaf DG</b><span>18,230 clicks</span></div><strong>AED 2.7K</strong></div>
+            <div class="store"><div class="store-logo">CRF</div><div class="store-main"><b>Carrefour</b><span>12,901 clicks</span></div><strong>AED 1.8K</strong></div>
+            <div class="store"><div class="store-logo">JAR</div><div class="store-main"><b>Jarir</b><span>9,880 clicks</span></div><strong>AED 1.2K</strong></div>
+          </div>
+        </section>
+      </div>
+
+      <div class="section-grid">
+        <section class="card">
+          <div class="panel-head"><div><h2>Top Performing Deals</h2><p>Highest click and conversion activity</p></div><button class="btn">Manage Deals</button></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Deal</th><th>Store</th><th>Clicks</th><th>Conv.</th><th>Revenue</th><th>Trend</th></tr></thead>
+              <tbody>
+                <tr><td><div class="product"><div class="thumb">📱</div><div><strong>iPhone 15 Pro Max</strong><span class="sub">Tech • Featured</span></div></div></td><td>Amazon UAE</td><td>14,280</td><td>4.8%</td><td><strong>AED 2,840</strong></td><td><div class="mini-progress"><i style="width:88%"></i></div></td></tr>
+                <tr><td><div class="product"><div class="thumb">🎧</div><div><strong>AirPods Pro 2</strong><span class="sub">Audio • Coupon</span></div></div></td><td>Noon</td><td>11,940</td><td>4.1%</td><td><strong>AED 1,960</strong></td><td><div class="mini-progress"><i style="width:74%"></i></div></td></tr>
+                <tr><td><div class="product"><div class="thumb">💻</div><div><strong>MacBook Air M3</strong><span class="sub">Computers • Deal</span></div></div></td><td>Sharaf DG</td><td>9,610</td><td>3.7%</td><td><strong>AED 1,540</strong></td><td><div class="mini-progress"><i style="width:62%"></i></div></td></tr>
+                <tr><td><div class="product"><div class="thumb">🍳</div><div><strong>Ninja Air Fryer</strong><span class="sub">Home • Price Drop</span></div></div></td><td>Amazon UAE</td><td>8,320</td><td>3.2%</td><td><strong>AED 1,180</strong></td><td><div class="mini-progress"><i style="width:51%"></i></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <aside class="card">
+          <div class="panel-head"><div><h2>System Health</h2><p>Data pipeline & affiliate integrations</p></div><span class="status">Healthy</span></div>
+          <div class="health"><div class="health-row"><span>Overall sync health</span><b>96%</b></div><div class="health-bar"><i></i></div></div>
+          <div class="activity">
+            <div class="activity-item"><span class="dot"></span><div><b>Amazon feed synced</b><span>2 minutes ago • 1,842 products</span></div></div>
+            <div class="activity-item"><span class="dot"></span><div><b>Noon feed synced</b><span>8 minutes ago • 934 products</span></div></div>
+            <div class="activity-item"><span class="dot"></span><div><b>Coupon verification complete</b><span>22 minutes ago • 126 codes checked</span></div></div>
+            <div class="activity-item"><span class="dot"></span><div><b>3 deals need review</b><span>Content moderation queue</span></div></div>
+          </div>
+          <div class="panel-head" style="padding-top:0"><div><h2>Quick Actions</h2></div></div>
+          <div class="quick">
+            <button><b>+ New Product</b><span>Create affiliate listing</span></button>
+            <button><b>🏷 New Coupon</b><span>Add verified code</span></button>
+            <button><b>↻ Sync Stores</b><span>Run feed sync</span></button>
+            <button><b>✎ New Post</b><span>Publish content</span></button>
+          </div>
+        </aside>
+      </div>
+    </section>
+  </main>
+</div>
+<script>
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open')}
+const ctx=document.getElementById('revenueChart');
+new Chart(ctx,{
+  type:'line',
+  data:{
+    labels:['Aug 04','Aug 07','Aug 10','Aug 13','Aug 16','Aug 19','Aug 22','Aug 25','Aug 28','Aug 31','Sep 02'],
+    datasets:[
+      {label:'Revenue (AED)',data:[820,1050,980,1320,1480,1260,1760,1890,1710,2140,2480],borderColor:'#2563eb',backgroundColor:'rgba(37,99,235,.08)',fill:true,tension:.38,borderWidth:2,pointRadius:2},
+      {label:'Clicks (k)',data:[7,9,8,12,13,11,15,16,15,18,21],borderColor:'#7c3aed',backgroundColor:'transparent',fill:false,tension:.38,borderWidth:2,pointRadius:2,yAxisID:'y1'}
+    ]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{position:'bottom',labels:{boxWidth:9,usePointStyle:true,font:{size:10}}}},
+    scales:{
+      x:{grid:{display:false},ticks:{font:{size:9},color:'#94a3b8'}},
+      y:{beginAtZero:true,grid:{color:'#eef1f5'},ticks:{font:{size:9},color:'#94a3b8'}},
+      y1:{position:'right',beginAtZero:true,grid:{drawOnChartArea:false},ticks:{font:{size:9},color:'#94a3b8'}}
+    }
+  }
+});
+</script>
+</body>
+</html>

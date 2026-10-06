@@ -203,7 +203,7 @@ export function ProfileClient({
   }
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className="w-full">
       <div className="mb-8">
         <h1 className="text-[22px] font-extrabold text-[#0D1117]">My Profile</h1>
         <p className="text-[13px] text-[#8A94A6] mt-1">Manage your admin account settings</p>

@@ -1,0 +1,173 @@
+﻿[info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[log] [HMR] connected
+[info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[log] [HMR] connected
+[log] [Fast Refresh] rebuilding
+[log] [Fast Refresh] done in 107ms
+[info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[log] [HMR] connected
+[info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[log] [HMR] connected
+[log] [Fast Refresh] rebuilding
+[log] [Fast Refresh] done in 141ms
+[info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[log] [HMR] connected
+[log] [Fast Refresh] rebuilding
+[log] [Fast Refresh] done in 160ms
+[info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[log] [HMR] connected
+[log] [Fast Refresh] rebuilding
+[log] [Fast Refresh] done in 117ms
+[info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[log] [HMR] connected
+[log] [Fast Refresh] rebuilding
+[log] [Fast Refresh] done in 119ms
+[info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[log] [HMR] connected
+[log] [Fast Refresh] rebuilding
+[log] [Fast Refresh] done in 165ms
+[info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[log] [HMR] connected
+[log] [Fast Refresh] rebuilding
+[log] [Fast Refresh] done in 131ms
+[info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[log] [HMR] connected
+[log] [Fast Refresh] rebuilding
+[log] [Fast Refresh] done in 118ms
+[info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[log] [HMR] connected
+[log] [Fast Refresh] rebuilding
+[log] [Fast Refresh] done in 154ms
+[info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[log] [HMR] connected
+[log] [Fast Refresh] rebuilding
+[log] [Fast Refresh] done in 121ms
+[info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[log] [HMR] connected
+[error] Critical error in fetchStores: {message: "TypeError: Failed to fetch", details: "TypeError: Failed to fetch
+    at http://localhostΓÇªt:3000/_next/static/chunks/_d0417b5d._.js:564:62)", hint: "", code: ""}
+[info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[log] [HMR] connected
+[info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[log] [HMR] connected
+[log] [Fast Refresh] rebuilding
+[log] [Fast Refresh] done in 134ms
+[info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[log] [HMR] connected
+[log] [Fast Refresh] rebuilding
+[log] [Fast Refresh] done in 123ms
+[info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[log] [HMR] connected
+[log] [Fast Refresh] rebuilding
+[log] [Fast Refresh] done in 164ms
+[info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[log] [HMR] connected
+[log] [Fast Refresh] rebuilding
+[log] [Fast Refresh] done in 1333ms
+[log] [Fast Refresh] rebuilding
+[log] [Fast Refresh] done in 163ms
+[info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[log] [HMR] connected
+[warning] [tiptap warn]: Duplicate extension names found: ['link']. This can lead to issues.
+[log] [Fast Refresh] rebuilding
+[log] [Fast Refresh] done in 124ms
+[info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[log] [HMR] connected
+[info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[log] [HMR] connected
+[error] A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+%s%s https://react.dev/link/hydration-mismatch 
+
+  ...
+    <div className="grid grid-...">
+      <SectionCard title="General Id..." desc="Site name,..." icon={<Globe>}>
+        <div className={"bg-white..."}>
+          <div>
+          <div className="p-6">
+            <div className="space-y-5">
+              <Field>
+              <Field>
+              <Field>
+              <Field>
+              <div className="grid grid-...">
+                <div>
+                  <FieldLabel>
+                  <ImageUpload value="" onChange={function onChange} folder="settings" description="200├ù50px P...">
+                    <div className="space-y-4">
+                      <div className="space-y-3">
+                        <div>
+                        <div>
+                        <div className="flex gap-2">
+                          <div className="relative f...">
+                            <Image>
+                            <Input placeholder="https://me..." value="" onChange={function onChange} ...>
+                              <Input type={undefined} data-slot="input" className="w-full min..." ...>
+                                <FieldControl ref={null} type={undefined} data-slot="input" className="w-full min..." ...>
+                                  <input
++                                   id="base-ui-_R_2ekr1iatpetabmt9etb_"
+-                                   id="base-ui-_R_9qjc69bn5rl9erl9etb_"
+                                    disabled={false}
+                                    name={undefined}
+                                    ref={function}
+                                    aria-labelledby={undefined}
+                                    autoFocus={false}
+                                    value=""
+                                    onChange={function}
+                                    onFocus={function onFocus}
+                                    onBlur={function onBlur}
+                                    onKeyDown={function onKeyDown}
+                                    type={undefined}
+                                    data-slot="input"
+                                    placeholder="https://media.uaediscounthub.com/..."
+                                    className="w-full min-w-0 border bg-transparent px-2.5 py-1 transition-colors outl..."
+                                  >
+                      ...
+                <div>
+                  <FieldLabel>
+                  <ImageUpload value="" onChange={function onChange} folder="settings" description="32├ù32px IC...">
+                    <div className="space-y-4">
+                      <div className="space-y-3">
+                        <div>
+                        <div>
+                        <div className="flex gap-2">
+                          <div className="relative f...">
+                            <Image>
+                            <Input placeholder="https://me..." value="" onChange={function onChange} ...>
+                              <Input type={undefined} data-slot="input" className="w-full min..." ...>
+                                <FieldControl ref={null} type={undefined} data-slot="input" className="w-full min..." ...>
+                                  <input
++                                   id="base-ui-_R_2elb1iatpetabmt9etb_"
+-                                   id="base-ui-_R_9qlc69bn5rl9erl9etb_"
+                                    disabled={false}
+                                    name={undefined}
+                                    ref={function}
+                                    aria-labelledby={undefined}
+                                    autoFocus={false}
+                                    value=""
+                                    onChange={function}
+                                    onFocus={function onFocus}
+                                    onBlur={function onBlur}
+                                    onKeyDown={function onKeyDown}
+                                    type={undefined}
+                                    data-slot="input"
+                                    placeholder="https://media.uaediscounthub.com/..."
+                                    className="w-full min-w-0 border bg-transparent px-2.5 py-1 transition-colors outl..."
+                                  >
+                      ...
+      ...
+
+[info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[log] [HMR] connected
+[log] [Fast Refresh] rebuilding
+[log] [Fast Refresh] done in 201ms
+[info] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[log] [HMR] connected

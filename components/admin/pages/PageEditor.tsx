@@ -262,7 +262,7 @@ export function PageEditor({ initialData, locale }: PageEditorProps) {
 
       {/* Editor Area */}
       <div className="flex-1 overflow-y-auto p-8 bg-[#F6F8FC]">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6">
+        <div className="w-full grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_320px] gap-6">
           <div className="space-y-6">
             {/* Title + Slug */}
             <div className="bg-white rounded-[14px] border-[1.5px] border-[#DDE3EF] p-8 shadow-sm space-y-6">

@@ -331,7 +331,7 @@ export function ProductForm({ initialData, stores, categories, locale }: Product
   // ── Render ────────────────────────────────────────────────────────────────
 
   return (
-    <div className="max-w-5xl mx-auto pb-28">
+    <div className="w-full pb-28">
 
       {/* Page header */}
       <div className="flex items-center gap-3 mb-8">
@@ -929,7 +929,7 @@ export function ProductForm({ initialData, stores, categories, locale }: Product
 
       {/* ══ Sticky Action Bar ══════════════════════════════════════════════════ */}
       <div className="fixed bottom-0 left-0 right-0 z-30 bg-white border-t border-[#DDE3EF] shadow-[0_-4px_20px_rgba(0,0,0,0.06)]">
-        <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between gap-3">
+        <div className="w-full px-6 py-4 flex items-center justify-between gap-3">
           <div>
             {isEditing && (
               <button

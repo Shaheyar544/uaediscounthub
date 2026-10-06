@@ -14,6 +14,10 @@ import {
   Check,
   TrendingUp,
   Tag,
+  ArrowDown,
+  CalendarDays,
+  Copy,
+  Sparkles,
 } from 'lucide-react'
 import Image from 'next/image'
 import { CouponCardV2 } from './CouponCardV2'
@@ -102,6 +106,7 @@ export function CouponsPageClient({
     sort: 'popular',
   })
   const [filtersOpen, setFiltersOpen] = useState(false)
+  const [featuredCopied, setFeaturedCopied] = useState(false)
 
   const updateFilter = useCallback(
     <K extends keyof FilterState>(key: K, val: FilterState[K]) => {
@@ -169,6 +174,41 @@ export function CouponsPageClient({
       ).length
     : 0
 
+  const couponOfTheDay = useMemo(() => {
+    return [...coupons].sort((a, b) => {
+      const score = (coupon: Coupon) =>
+        (coupon.is_verified ? 1_000_000 : 0) +
+        (coupon.is_exclusive ? 100_000 : 0) +
+        (coupon.click_count ?? 0)
+      return score(b) - score(a)
+    })[0] ?? null
+  }, [coupons])
+
+  async function copyCouponOfTheDay() {
+    if (!couponOfTheDay) return
+    try {
+      await navigator.clipboard.writeText(couponOfTheDay.code)
+      setFeaturedCopied(true)
+      window.setTimeout(() => setFeaturedCopied(false), 2500)
+    } catch {
+      setFilters((previous) => ({ ...previous, search: couponOfTheDay.code }))
+    }
+  }
+
+  function showCouponOfTheDay() {
+    if (!couponOfTheDay) return
+    setFilters({
+      search: couponOfTheDay.code,
+      storeId: focusedStore?.id ?? null,
+      verified: false,
+      exclusive: false,
+      discountType: 'all',
+      sort: 'popular',
+    })
+    setFiltersOpen(false)
+    window.setTimeout(() => document.getElementById('coupon-results')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 0)
+  }
+
   // ── Active filter chips ──────────────────────────────────
   const activeFilters: { label: string; clear: () => void }[] = []
   if (filters.search)
@@ -199,6 +239,65 @@ export function CouponsPageClient({
         clear: () => updateFilter('storeId', null),
       })
   }
+
+  const StorePills = ({ duplicate = false }: { duplicate?: boolean }) => (
+    <>
+      <button
+        type="button"
+        tabIndex={duplicate ? -1 : undefined}
+        onClick={() => updateFilter('storeId', null)}
+        className={`shrink-0 flex items-center gap-2 px-3.5 py-2 rounded-full text-[13px] font-semibold border transition-all duration-200 ${
+          !filters.storeId
+            ? 'bg-primary text-white border-primary shadow-sm'
+            : 'bg-card border-border text-muted-foreground hover:border-primary/40 hover:text-foreground'
+        }`}
+      >
+        All Stores
+      </button>
+
+      {stores.map((store) => (
+        <button
+          key={`${duplicate ? 'duplicate-' : ''}${store.id}`}
+          type="button"
+          tabIndex={duplicate ? -1 : undefined}
+          onClick={() =>
+            updateFilter(
+              'storeId',
+              filters.storeId === store.id ? null : store.id
+            )
+          }
+          className={`shrink-0 flex items-center gap-2 px-3.5 py-2 rounded-full text-[13px] font-semibold border transition-all duration-200 ${
+            filters.storeId === store.id
+              ? 'bg-primary text-white border-primary shadow-sm'
+              : 'bg-card border-border text-muted-foreground hover:border-primary/40 hover:text-foreground'
+          }`}
+        >
+          {store.logo_url && (
+            <Image
+              src={store.logo_url}
+              alt=""
+              width={16}
+              height={16}
+              className="h-4 w-auto object-contain rounded-sm"
+              unoptimized
+            />
+          )}
+          {store.name}
+          {storeTrustMap[store.id] !== undefined && (
+            <span
+              className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
+                filters.storeId === store.id
+                  ? 'bg-white/20 text-white'
+                  : 'bg-secondary text-muted-foreground'
+              }`}
+            >
+              {storeTrustMap[store.id]}%
+            </span>
+          )}
+        </button>
+      ))}
+    </>
+  )
 
   return (
     <div className="w-full max-w-7xl mx-auto px-4 py-10 space-y-8">
@@ -235,59 +334,69 @@ export function CouponsPageClient({
         </div>
       )}
 
+      {/* ── Coupon of the Day ──────────────────────────────── */}
+      {couponOfTheDay && (
+        <section className="relative isolate overflow-hidden rounded-3xl border border-primary/20 bg-gradient-to-br from-[#002B91] via-[#0758F8] to-[#162968] p-5 text-white shadow-[0_18px_48px_-24px_rgba(0,87,255,0.65)] sm:p-7" aria-labelledby="coupon-of-the-day-title">
+          <div aria-hidden="true" className="absolute -right-16 -top-20 size-64 rounded-full bg-white/10 blur-3xl" />
+          <div aria-hidden="true" className="absolute -bottom-24 left-1/4 size-56 rounded-full bg-[#FF8A00]/25 blur-3xl" />
+          <div className="relative grid gap-6 lg:grid-cols-[1fr_auto] lg:items-end">
+            <div className="max-w-3xl">
+              <div className="flex flex-wrap items-center gap-2"><span className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-black uppercase tracking-[0.16em]"><Sparkles aria-hidden="true" className="size-3.5 text-[#FFD166]" />Coupon of the Day</span>{couponOfTheDay.is_verified && <span className="rounded-full bg-emerald-300/15 px-3 py-1 text-[11px] font-bold text-emerald-50 ring-1 ring-inset ring-emerald-100/25">Verified today</span>}{couponOfTheDay.is_exclusive && <span className="rounded-full bg-orange-200/15 px-3 py-1 text-[11px] font-bold text-orange-50 ring-1 ring-inset ring-orange-100/25">Exclusive offer</span>}</div>
+              <div className="mt-5 flex flex-col gap-4 sm:flex-row sm:items-center"><div className="flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-white/20 bg-white p-2 shadow-lg">{couponOfTheDay.stores?.logo_url ? <Image src={couponOfTheDay.stores.logo_url} alt="" width={44} height={44} className="size-11 object-contain" unoptimized /> : <Tag aria-hidden="true" className="size-6 text-primary" />}</div><div><p className="text-sm font-semibold text-blue-100">{couponOfTheDay.stores?.name ?? 'Featured store'}</p><h2 id="coupon-of-the-day-title" className="mt-1 text-2xl font-black tracking-tight sm:text-3xl">{couponOfTheDay.title_en}</h2></div></div>
+              <div className="mt-5 flex flex-wrap items-center gap-3 text-sm text-blue-100"><span className="inline-flex items-center gap-1.5"><CalendarDays aria-hidden="true" className="size-4 text-[#FFD166]" />{couponOfTheDay.expires_at ? `Ends ${new Intl.DateTimeFormat('en', { day: 'numeric', month: 'short' }).format(new Date(couponOfTheDay.expires_at))}` : 'No expiry date'}</span><span className="rounded-xl border border-white/20 bg-white/10 px-3 py-2 font-mono text-base font-black tracking-[0.14em] text-white">{couponOfTheDay.code}</span></div>
+            </div>
+            <div className="flex flex-wrap items-center gap-3 lg:flex-col lg:items-end"><p className="rounded-2xl bg-white px-5 py-3 text-xl font-black text-primary shadow-lg">{couponOfTheDay.discount_type === 'percent' ? `${couponOfTheDay.discount_value}% OFF` : `AED ${couponOfTheDay.discount_value} OFF`}</p><div className="flex flex-wrap gap-2"><button onClick={copyCouponOfTheDay} className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-white px-4 text-sm font-bold text-[#0037B5] shadow-sm transition-colors hover:bg-blue-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-primary"><Copy aria-hidden="true" className="size-4" />{featuredCopied ? 'Code copied' : 'Copy code'}</button><button onClick={showCouponOfTheDay} className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-white/25 bg-white/10 px-4 text-sm font-bold text-white transition-colors hover:bg-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"><ArrowDown aria-hidden="true" className="size-4" />View offer</button></div></div>
+          </div>
+        </section>
+      )}
+
+      {/* ── Quick picks ────────────────────────────────────── */}
+      {!focusedStore && coupons.length > 0 && (
+        <div className="flex flex-wrap items-center gap-2" aria-label="Quick coupon filters"><span className="mr-1 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">Quick picks</span><button onClick={() => { updateFilter('verified', true); updateFilter('exclusive', false) }} className="rounded-full border border-emerald-500/25 bg-emerald-500/10 px-3 py-1.5 text-xs font-bold text-emerald-700 transition-colors hover:bg-emerald-500/15 dark:text-emerald-300">Verified picks</button><button onClick={() => { updateFilter('exclusive', true); updateFilter('verified', false) }} className="rounded-full border border-orange-500/25 bg-orange-500/10 px-3 py-1.5 text-xs font-bold text-orange-700 transition-colors hover:bg-orange-500/15 dark:text-orange-300">Exclusive offers</button><button onClick={() => { updateFilter('sort', 'discount'); updateFilter('discountType', 'all') }} className="rounded-full border border-primary/25 bg-primary/10 px-3 py-1.5 text-xs font-bold text-primary transition-colors hover:bg-primary/15">Biggest savings</button></div>
+      )}
+
       {/* ── Store filter pills ───────────────────────────────── */}
       {!focusedStore && stores.length > 0 && (
-        <div className="flex items-center gap-2.5 overflow-x-auto pb-2 no-scrollbar -mx-4 px-4">
-          <button
-            onClick={() => updateFilter('storeId', null)}
-            className={`shrink-0 flex items-center gap-2 px-3.5 py-2 rounded-full text-[13px] font-semibold border transition-all duration-200 ${
-              !filters.storeId
-                ? 'bg-primary text-white border-primary shadow-sm'
-                : 'bg-card border-border text-muted-foreground hover:border-primary/40 hover:text-foreground'
-            }`}
-          >
-            All Stores
-          </button>
+        <div className="store-marquee-shell relative -mx-4 overflow-hidden px-4 py-1" aria-label="Browse stores">
+          <div aria-hidden="true" className="pointer-events-none absolute inset-y-0 left-0 z-10 w-8 bg-gradient-to-r from-background to-transparent" />
+          <div aria-hidden="true" className="pointer-events-none absolute inset-y-0 right-0 z-10 w-8 bg-gradient-to-l from-background to-transparent" />
+          <div className="store-marquee-track flex w-max items-center">
+            <div className="flex items-center gap-2.5 pr-2">
+              <StorePills />
+            </div>
+            <div aria-hidden="true" className="flex items-center gap-2.5 pr-2">
+              <StorePills duplicate />
+            </div>
+          </div>
+          <style jsx>{`
+            @keyframes store-marquee {
+              from { transform: translateX(0); }
+              to { transform: translateX(-50%); }
+            }
 
-          {stores.map((store) => (
-            <button
-              key={store.id}
-              onClick={() =>
-                updateFilter(
-                  'storeId',
-                  filters.storeId === store.id ? null : store.id
-                )
+            .store-marquee-track {
+              animation: store-marquee ${Math.max(stores.length * 3.2, 55)}s linear infinite;
+            }
+
+            .store-marquee-shell:hover .store-marquee-track,
+            .store-marquee-shell:focus-within .store-marquee-track {
+              animation-play-state: paused;
+            }
+
+            @media (prefers-reduced-motion: reduce) {
+              .store-marquee-shell {
+                overflow-x: auto;
               }
-              className={`shrink-0 flex items-center gap-2 px-3.5 py-2 rounded-full text-[13px] font-semibold border transition-all duration-200 ${
-                filters.storeId === store.id
-                  ? 'bg-primary text-white border-primary shadow-sm'
-                  : 'bg-card border-border text-muted-foreground hover:border-primary/40 hover:text-foreground'
-              }`}
-            >
-              {store.logo_url && (
-                <Image
-                  src={store.logo_url}
-                  alt={store.name}
-                  width={16}
-                  height={16}
-                  className="h-4 w-auto object-contain rounded-sm"
-                  unoptimized
-                />
-              )}
-              {store.name}
-              {storeTrustMap[store.id] !== undefined && (
-                <span
-                  className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
-                    filters.storeId === store.id
-                      ? 'bg-white/20 text-white'
-                      : 'bg-secondary text-muted-foreground'
-                  }`}
-                >
-                  {storeTrustMap[store.id]}%
-                </span>
-              )}
-            </button>
-          ))}
+
+              .store-marquee-track {
+                animation: none;
+              }
+
+              .store-marquee-track > [aria-hidden='true'] {
+                display: none;
+              }
+            }
+          `}</style>
         </div>
       )}
 
@@ -350,6 +459,7 @@ export function CouponsPageClient({
       <AnimatePresence>
         {filtersOpen && (
           <motion.div
+            id="coupon-results"
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}

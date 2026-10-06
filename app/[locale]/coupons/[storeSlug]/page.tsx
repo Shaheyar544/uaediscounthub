@@ -34,6 +34,7 @@ export default async function StoreCouponsPage({
 }) {
   const { locale, storeSlug } = await params
   const supabase = await createClient()
+  const now = new Date().toISOString()
 
   // ── Fetch the focused store ────────────────────────────────
   const { data: store } = await supabase
@@ -60,6 +61,7 @@ export default async function StoreCouponsPage({
     )
     .eq('store_id', store.id)
     .eq('is_active', true)
+    .or(`expires_at.is.null,expires_at.gt.${now}`)
     .order('is_verified', { ascending: false })
     .order('click_count', { ascending: false })
     .order('created_at', { ascending: false })

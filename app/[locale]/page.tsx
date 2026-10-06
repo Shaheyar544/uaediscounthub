@@ -45,6 +45,7 @@ export default async function Home({
     const { locale } = await params
     const dict       = await getDictionary(locale as Locale)
     const supabase   = await createClient()
+    const now        = new Date().toISOString()
 
     // Run all queries in parallel for speed
     const [
@@ -65,6 +66,7 @@ export default async function Home({
         .from('coupons')
         .select('id, code, title_en, description_en, discount_type, discount_value, stores(name, logo_url)')
         .eq('is_active', true)
+        .or(`expires_at.is.null,expires_at.gt.${now}`)
         .order('is_verified', { ascending: false })
         .order('click_count',  { ascending: false })
         .limit(4),

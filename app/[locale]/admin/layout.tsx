@@ -1,4 +1,7 @@
 import { AdminSidebar } from '@/components/admin/AdminSidebar'
+import { AdminMobileSidebar } from '@/components/admin/AdminMobileSidebar'
+import { AdminCommandCenter } from '@/components/admin/AdminCommandCenter'
+import { AdminAppShell } from '@/components/admin/AdminAppShell'
 import { AdminUserMenu } from '@/components/admin/AdminUserMenu'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { AdminAuthError } from '@/utils/auth/admin'
@@ -27,21 +30,24 @@ export default async function AdminLayout({
     }
 
     return (
-        <div className="flex min-h-screen bg-background text-foreground antialiased font-sans" suppressHydrationWarning>
-            <AdminSidebar locale={locale} />
-            <main className="flex-1 flex flex-col">
-                <header className="h-16 border-b bg-background/95 backdrop-blur flex items-center px-8 justify-end gap-3">
-                    {userEmail && (
-                        <AdminUserMenu email={userEmail} locale={locale} />
-                    )}
-                    <ThemeToggle />
-                </header>
-                <div className="p-8 flex-1 overflow-auto bg-muted/10">
-                    <div className="max-w-7xl">
-                        {children}
+        <AdminAppShell
+            sidebar={<AdminSidebar locale={locale} />}
+            topbar={<header className="sticky top-0 z-30 flex h-[68px] items-center justify-between border-b bg-background/95 px-4 backdrop-blur sm:px-6 lg:px-8">
+                    <div className="flex min-w-0 items-center gap-3">
+                        <AdminMobileSidebar locale={locale} />
+                        <div className="hidden min-w-0 sm:block">
+                            <p className="text-xs font-medium text-muted-foreground">Admin workspace</p>
+                            <p className="truncate text-sm font-bold">UAE Discount Hub operations</p>
+                        </div>
                     </div>
-                </div>
-            </main>
-        </div>
+                    <div className="flex items-center gap-2 sm:gap-3">
+                        <AdminCommandCenter locale={locale} />
+                        <ThemeToggle />
+                        {userEmail && <AdminUserMenu email={userEmail} locale={locale} />}
+                    </div>
+                </header>}
+        >
+            {children}
+        </AdminAppShell>
     )
 }

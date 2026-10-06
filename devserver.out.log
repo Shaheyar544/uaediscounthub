@@ -1,0 +1,18 @@
+
+> uaediscounthub@0.1.0 dev
+> next dev --hostname 127.0.0.1 --port 3000
+
+▲ Next.js 16.1.7 (Turbopack)
+- Local:         http://127.0.0.1:3000
+- Network:       http://127.0.0.1:3000
+- Environments: .env.local
+
+✓ Starting...
+✓ Ready in 8.1s
+○ Compiling /[locale] ...
+ GET /en 200 in 8.1s (compile: 6.7s, proxy.ts: 6ms, render: 1397ms)
+ GET /en 200 in 471ms (compile: 14ms, proxy.ts: 3ms, render: 454ms)
+ HEAD /en 200 in 812ms (compile: 46ms, proxy.ts: 22ms, render: 744ms)
+ GET /en 200 in 634ms (compile: 17ms, proxy.ts: 4ms, render: 613ms)
+ GET /en 200 in 1992ms (compile: 13ms, proxy.ts: 3ms, render: 1977ms)
+ GET /en 200 in 948ms (compile: 18ms, proxy.ts: 8ms, render: 923ms)

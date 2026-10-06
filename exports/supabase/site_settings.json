@@ -1,0 +1,42 @@
+[
+  {
+    "id": "global",
+    "site_name": "UAEDiscountHub",
+    "primary_domain": "https://uaediscounthub.com",
+    "site_description": "",
+    "logo_url": "",
+    "favicon_url": "",
+    "contact_email": "hello@uaediscounthub.com",
+    "whatsapp_number": "",
+    "twitter_url": "",
+    "linkedin_url": "",
+    "instagram_url": "",
+    "banner_enabled": true,
+    "banner_text": "Flash Sale – Up to 30% off on Smartphones!",
+    "banner_promo_code": "TECH30",
+    "banner_countdown": "",
+    "banner_color": "#EF4444",
+    "banner_icon": "🔥",
+    "banner_link": "",
+    "meta_title_template": "%s | UAEDiscountHub",
+    "meta_description": "Find the best tech deals in UAE. Compare prices across Amazon UAE, Noon, Sharaf DG and more.",
+    "og_image_url": "",
+    "google_analytics_id": "",
+    "google_search_console": "",
+    "robots_txt": "User-agent: *\nAllow: /\nDisallow: /admin/\nSitemap: https://uaediscounthub.com/sitemap.xml",
+    "from_email": "alerts@uaediscounthub.com",
+    "from_name": "UAEDiscountHub",
+    "sendpulse_list_id": "",
+    "amazon_associate_id": "uaediscount-21",
+    "noon_affiliate_id": "",
+    "sharaf_dg_partner_key": "",
+    "carrefour_tracking_id": "",
+    "default_currency": "AED",
+    "target_regions": [
+      "UAE"
+    ],
+    "maintenance_mode": false,
+    "newsletter_auto_sync": true,
+    "updated_at": "2026-03-19T02:25:40.247026+00:00"
+  }
+]

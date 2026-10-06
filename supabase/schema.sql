@@ -105,15 +105,19 @@ CREATE TABLE IF NOT EXISTS coupons (
   title_ar TEXT,
   description_en TEXT,
   description_ar TEXT,
+  discount_type TEXT,
   discount_value NUMERIC(10,2),
-  discount_type TEXT,       -- 'percent' | 'fixed'
-  min_spend NUMERIC(10,2),
-  max_discount NUMERIC(10,2),
-  starts_at TIMESTAMPTZ,
+  min_order_value NUMERIC(10,2),
+  max_uses INTEGER,
+  current_uses INTEGER DEFAULT 0,
   expires_at TIMESTAMPTZ,
   is_verified BOOLEAN DEFAULT FALSE,
   is_active BOOLEAN DEFAULT TRUE,
-  use_count INTEGER DEFAULT 0,
+  is_exclusive BOOLEAN DEFAULT FALSE,
+  click_count INTEGER DEFAULT 0,
+  submitted_by UUID REFERENCES profiles(id),
+  product_id UUID REFERENCES products(id) ON DELETE SET NULL,
+  source TEXT DEFAULT 'manual',
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 

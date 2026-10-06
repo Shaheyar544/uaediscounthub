@@ -1,0 +1,28 @@
+{
+  "exportedAt": "2026-08-14T22:30:24.998Z",
+  "tables": {
+    "profiles": 2,
+    "categories": 9,
+    "stores": 5,
+    "products": 66,
+    "product_prices": 0,
+    "product_store_prices": 64,
+    "coupons": 21,
+    "deals": 1,
+    "affiliate_clicks": 2,
+    "price_alerts": 0,
+    "wishlists": 0,
+    "price_history": 2955,
+    "blog_posts": 4,
+    "blog_categories": 3,
+    "blog_ad_widgets": 0,
+    "community_reports": 0,
+    "comparisons": 0,
+    "newsletter_subscribers": 0,
+    "api_sync_logs": 58,
+    "pages": 7,
+    "site_settings": 1,
+    "assets": 41
+  },
+  "failedTables": {}
+}

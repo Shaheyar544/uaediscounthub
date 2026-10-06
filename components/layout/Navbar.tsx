@@ -20,13 +20,13 @@ export async function Navbar({ locale }: { locale: Locale }) {
 
     return (
         <nav className="navbar sticky top-0 z-[100] bg-white/92 backdrop-blur-[16px] border-b border-border h-[60px] flex items-center">
-            <div className="navbar-inner max-w-[1280px] w-full mx-auto px-6 flex items-center gap-6">
-                <Link href={`/${locale}`} className="logo font-display font-extrabold text-[18px] tracking-tight text-foreground whitespace-nowrap flex items-center gap-2">
+            <div className="navbar-inner mx-auto flex w-full min-w-0 max-w-[1280px] items-center gap-3 px-4 sm:gap-6 sm:px-6">
+                <Link href={`/${locale}`} className="logo flex shrink-0 items-center gap-2 whitespace-nowrap font-display text-[16px] font-extrabold tracking-tight text-foreground sm:text-[18px]">
                     <div className="logo-dot w-2 h-2 rounded-full bg-primary flex-shrink-0" />
                     UAEDiscountHub
                 </Link>
 
-                <ul className="nav-links hidden lg:flex items-center gap-1 list-none">
+                <ul className="nav-links hidden xl:flex items-center gap-1 list-none">
                     <li>
                         <Link href={`/${locale}`} className="text-[13.5px] font-medium text-muted-foreground px-3 py-1.5 rounded-sm hover:bg-secondary hover:text-foreground transition-all">
                             {dict.common.home}
@@ -64,14 +64,14 @@ export async function Navbar({ locale }: { locale: Locale }) {
                     ))}
                 </ul>
 
-                <div className="nav-search flex-1 max-w-[340px] relative">
+                <div className="nav-search relative hidden min-w-0 flex-1 max-w-[340px] md:block">
                     <SearchInput placeholder={dict.common.search} locale={locale} />
                 </div>
 
-                <div className="nav-right ml-auto flex items-center gap-2.5">
+                <div className="nav-right ml-auto flex shrink-0 items-center gap-2 sm:gap-2.5">
                     <Link
                         href={locale === 'en' ? '/ar' : '/en'}
-                        className="nav-btn h-9 px-3.5 border-1.5 border-border rounded-full font-body text-[12px] font-medium tracking-wide flex items-center hover:border-primary hover:text-primary hover:bg-primary/5 transition-all font-mono"
+                        className="nav-btn hidden h-9 px-3.5 border-1.5 border-border rounded-full font-mono font-body text-[12px] font-medium tracking-wide transition-all hover:border-primary hover:bg-primary/5 hover:text-primary sm:flex sm:items-center"
                     >
                         {locale === 'en' ? 'عربي' : 'ENGLISH'}
                     </Link>
@@ -81,14 +81,14 @@ export async function Navbar({ locale }: { locale: Locale }) {
                     <button
                         suppressHydrationWarning
                         aria-label="Notifications"
-                        className="nav-btn h-9 px-2 border-1.5 border-border rounded-full flex items-center justify-center hover:border-primary hover:text-primary hover:bg-primary/5 transition-all"
+                        className="nav-btn hidden h-9 px-2 border-1.5 border-border rounded-full transition-all hover:border-primary hover:bg-primary/5 hover:text-primary sm:flex sm:items-center sm:justify-center"
                     >
                         <Bell className="w-4.5 h-4.5" />
                     </button>
 
                     <button
                         suppressHydrationWarning
-                        className="nav-btn h-9 px-4 bg-primary border-1.5 border-primary rounded-full text-white font-body text-[13px] font-semibold hover:bg-primary-dim hover:border-primary-dim transition-all"
+                        className="nav-btn h-9 px-3 sm:px-4 bg-primary border-1.5 border-primary rounded-full text-white font-body text-[13px] font-semibold transition-all hover:border-primary-dim hover:bg-primary-dim"
                     >
                         {dict.common.login || 'Sign In'}
                     </button>

@@ -1,0 +1,30 @@
+[
+  {
+    "id": "156a5a83-bfec-4dc7-8151-de818f9ade81",
+    "product_id": null,
+    "store_id": "e2ff8e55-e3b4-43db-b169-96ac36cd6483",
+    "coupon_id": "d23f6483-7d9d-4289-85f1-8a5bfafa5ced",
+    "deal_id": null,
+    "user_id": null,
+    "session_id": "tcg11011xh",
+    "ip_hash": "eff8e7ca506627fe",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
+    "country": null,
+    "referrer": "http://localhost:3000/en/coupons",
+    "clicked_at": "2026-03-11T20:58:23.117191+00:00"
+  },
+  {
+    "id": "3f8f9b8a-a6b4-420f-8eba-2330eae35297",
+    "product_id": null,
+    "store_id": "96ebf504-9c8b-4a8d-81c1-e97217c9a066",
+    "coupon_id": "8fc4339d-d19c-4d7b-980b-e87a7bf3779d",
+    "deal_id": null,
+    "user_id": null,
+    "session_id": "pdojz4p5fi",
+    "ip_hash": "4650b56efea20988",
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+    "country": null,
+    "referrer": "https://uaediscounthub.com/en/coupons",
+    "clicked_at": "2026-03-26T11:16:43.517826+00:00"
+  }
+]

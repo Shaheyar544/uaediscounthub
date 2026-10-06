@@ -89,7 +89,7 @@ export async function POST(request: Request) {
     }
 
     console.log('[Sync] Asset created successfully:', asset.id);
-    return Response.json({ url: r2Result.url, id: asset.id });
+    return Response.json({ url: r2Result.url, id: asset.id, file_size: buffer.length, mime_type: 'image/webp' });
 
   } catch (error: any) {
     if (error instanceof AdminAuthError) {
