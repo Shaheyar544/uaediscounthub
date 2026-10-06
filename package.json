@@ -35,7 +35,6 @@
     "@tiptap/react": "^3.20.1",
     "@tiptap/starter-kit": "^3.20.1",
     "@types/dompurify": "^3.0.5",
-    "amazon-paapi": "^1.0.7",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "csv-parse": "7.0.2",
@@ -70,6 +69,7 @@
   "overrides": {
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
-    "sharp": "^0.35.5"
+    "sharp": "^0.35.5",
+    "postcss-selector-parser": "^7.1.6"
   }
 }
