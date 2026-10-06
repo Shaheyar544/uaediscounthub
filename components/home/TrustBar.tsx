@@ -7,7 +7,7 @@ const TRUST_ITEMS = [
 
 export function TrustBar() {
   return (
-    <section className="py-10 bg-gray-50 border-t border-gray-200 -mx-4 px-4 md:-mx-6 md:px-6">
+    <section className="py-10 bg-gray-50 border border-gray-200 rounded-3xl px-4 md:px-6">
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
           {TRUST_ITEMS.map(item => (
