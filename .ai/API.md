@@ -104,6 +104,12 @@ source-of-truth:
 * **Output**: `{ url: "https://media.uaediscounthub.com/..." }`.
 * **Implementation**: `app/api/upload/image/route.ts` $\rightarrow$ `lib/r2-storage.ts`.
 
+### `GET /api/media/[...key]`
+* **Purpose**: Streams images stored in Cloudflare R2 (`uaediscounthub-media` bucket) directly with aggressive caching headers (`Cache-Control: public, max-age=31536000, immutable`).
+* **Auth**: None (Public).
+* **Implementation**: `app/api/media/[...key]/route.ts` $\rightarrow$ `@aws-sdk/client-s3`.
+
+
 ---
 
 ## 7. Public Interactivity & Tracking APIs
