@@ -11,6 +11,7 @@ import { TrustBar }             from '@/components/home/TrustBar'
 import { RecentlyViewed }       from '@/components/home/RecentlyViewed'
 import { createClient }         from '@/utils/supabase/server'
 import Image                    from 'next/image'
+import { resolveMediaUrl }      from '@/lib/media'
 
 import type { Metadata } from 'next'
 
@@ -196,7 +197,7 @@ export default async function Home({
                 key={c.id}
                 id={c.code}
                 storeName={c.stores?.name || 'Store'}
-                storeLogo={c.stores?.logo_url || '/placeholder-store.png'}
+                storeLogo={resolveMediaUrl(c.stores?.logo_url) || '/placeholder-store.png'}
                 discount={c.discount_type === 'percent' ? `${c.discount_value}% OFF` : `AED ${c.discount_value}`}
                 code={c.code}
                 description={c.description_en || 'Special discount'}

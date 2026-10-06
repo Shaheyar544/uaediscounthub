@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { useState } from 'react'
+import { resolveMediaUrl } from '@/lib/media'
 
 interface Store {
   id: string
@@ -14,6 +15,7 @@ interface Store {
 
 function StoreCard({ store, index }: { store: Store; index: number }) {
   const [logoFailed, setLogoFailed] = useState(false)
+  const resolvedLogo = resolveMediaUrl(store.logo_url)
 
   return (
     <motion.a
@@ -25,9 +27,9 @@ function StoreCard({ store, index }: { store: Store; index: number }) {
       className="group relative bg-white rounded-2xl border-2 border-gray-100 hover:border-blue-200 p-4 hover:shadow-lg hover:shadow-blue-50 transition-all duration-300 hover:-translate-y-1 overflow-hidden"
     >
       <div className="w-full h-14 flex items-center justify-center mb-3">
-        {store.logo_url && !logoFailed ? (
+        {resolvedLogo && !logoFailed ? (
           <img
-            src={store.logo_url}
+            src={resolvedLogo}
             alt={store.name}
             className="max-h-10 max-w-full object-contain"
             onError={() => setLogoFailed(true)}

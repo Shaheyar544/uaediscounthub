@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion'
 import { ShieldCheck, Tag, TrendingUp, Zap } from 'lucide-react'
 import Image from 'next/image'
+import { resolveMediaUrl } from '@/lib/media'
 
 interface StoreHeaderBannerProps {
   store: {
@@ -37,6 +38,8 @@ export function StoreHeaderBanner({
       ? 'Mostly Works'
       : 'Low Verified Rate'
 
+  const resolvedLogo = resolveMediaUrl(store.logo_url)
+
   return (
     <motion.div
       initial={{ opacity: 0, y: -12 }}
@@ -56,12 +59,17 @@ export function StoreHeaderBanner({
       <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center gap-6">
         {/* Logo */}
         <div className="w-16 h-16 bg-white rounded-2xl border border-white/10 flex items-center justify-center shrink-0 shadow-xl overflow-hidden">
-          {store.logo_url ? (
+          {resolvedLogo ? (
             <img
-              src={store.logo_url}
+              src={resolvedLogo}
               alt={store.name}
               className="w-12 h-12 object-contain p-1"
-              onError={(e) => { e.currentTarget.src = '/placeholder-store.png' }}
+              onError={(e) => {
+                const target = e.currentTarget as HTMLImageElement
+                if (!target.src.endsWith('/placeholder-store.png')) {
+                  target.src = '/placeholder-store.png'
+                }
+              }}
             />
           ) : (
             <Tag className="w-7 h-7 text-primary" />

@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Copy, Check } from 'lucide-react'
+import { resolveMediaUrl } from '@/lib/media'
 
 interface CouponCardProps {
   id: string
@@ -19,6 +20,7 @@ export function CouponCard({
   description, code, expiry, color = '#0A84FF',
 }: CouponCardProps) {
   const [copied, setCopied] = useState(false)
+  const resolvedLogo = resolveMediaUrl(storeLogo)
 
   function handleCopy() {
     navigator.clipboard.writeText(code)
@@ -39,10 +41,15 @@ export function CouponCard({
       {/* Store header */}
       <div className="p-4 pb-0 flex items-center gap-2">
         <img
-          src={storeLogo || '/placeholder-store.png'}
+          src={resolvedLogo || '/placeholder-store.png'}
           alt={storeName}
           className="w-8 h-8 object-contain rounded"
-          onError={e => { (e.currentTarget as HTMLImageElement).src = '/placeholder-store.png' }}
+          onError={e => {
+            const target = e.currentTarget as HTMLImageElement
+            if (!target.src.endsWith('/placeholder-store.png')) {
+              target.src = '/placeholder-store.png'
+            }
+          }}
         />
         <span className="font-bold text-sm text-gray-700">{storeName}</span>
       </div>

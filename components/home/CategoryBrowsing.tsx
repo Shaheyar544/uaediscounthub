@@ -53,8 +53,8 @@ export function CategoryBrowsing({ locale, categories, counts = {} }: CategoryBr
   const duration = Math.max(categories.length * 3, 15)
 
   return (
-    <section className="py-12 bg-gray-50/50 -mx-4 px-4 md:-mx-6 md:px-6 overflow-hidden">
-      <div className="max-w-7xl mx-auto mb-8 px-4 md:px-0">
+    <section className="py-12 bg-gray-50/50 w-full rounded-3xl px-4 md:px-6 overflow-hidden">
+      <div className="max-w-7xl mx-auto mb-8 px-0">
         <h2 className="text-2xl md:text-3xl font-black text-gray-900 tracking-tight">
           Shop by Category
         </h2>

@@ -18,6 +18,7 @@ import {
 } from 'lucide-react'
 import Image from 'next/image'
 import { formatDistanceToNow, isPast } from 'date-fns'
+import { resolveMediaUrl } from '@/lib/media'
 
 interface CouponCardV2Props {
   id: string
@@ -187,12 +188,17 @@ export function CouponCardV2({
         {/* ── Store header ──────────────────────────────────── */}
         <div className="flex items-center gap-3">
           <div className="w-11 h-11 bg-secondary rounded-xl border border-border flex items-center justify-center shrink-0 overflow-hidden">
-            {store.logo_url ? (
+            {resolveMediaUrl(store.logo_url) ? (
               <img
-                src={store.logo_url}
+                src={resolveMediaUrl(store.logo_url)!}
                 alt={store.name}
                 className="w-9 h-9 object-contain"
-                onError={(e) => { e.currentTarget.src = '/placeholder-store.png' }}
+                onError={(e) => {
+                  const target = e.currentTarget as HTMLImageElement
+                  if (!target.src.endsWith('/placeholder-store.png')) {
+                    target.src = '/placeholder-store.png'
+                  }
+                }}
               />
             ) : (
               <Tag className="w-5 h-5 text-muted-foreground" />

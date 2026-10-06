@@ -101,7 +101,7 @@ export default async function RootLayout({
       className={`${outfit.variable} ${dmSans.variable} ${cairo.variable}`}
       suppressHydrationWarning
     >
-      <body className="min-h-screen bg-background text-foreground font-body antialiased" suppressHydrationWarning>
+      <body className="min-h-screen bg-background text-foreground font-body antialiased overflow-x-hidden" suppressHydrationWarning>
         {/* Google Analytics */}
         {gaId && (
           <>
@@ -132,7 +132,7 @@ export default async function RootLayout({
               countdown={settings?.banner_countdown ?? ''}
             />
             <Navbar locale={locale as Locale} />
-            <main className="flex min-h-screen flex-col items-center justify-between pb-16 md:pb-0">
+            <main className="flex min-h-screen flex-col items-center justify-between pb-16 md:pb-0 w-full overflow-x-hidden">
               {children}
             </main>
             <Footer locale={locale as Locale} />
