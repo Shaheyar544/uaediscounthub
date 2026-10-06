@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { resolveMediaUrl } from '@/lib/media'
 
 interface ProductGalleryProps {
   images: string[]
@@ -8,7 +9,9 @@ interface ProductGalleryProps {
 }
 
 export function ProductGallery({ images, productName }: ProductGalleryProps) {
-  const validImages = images.filter(Boolean)
+  const validImages = images
+    .map(img => resolveMediaUrl(img))
+    .filter(Boolean) as string[]
   const [selectedIndex, setSelectedIndex] = useState(0)
   const [isZoomed, setIsZoomed]           = useState(false)
   const [zoomPos, setZoomPos]             = useState({ x: 50, y: 50 })

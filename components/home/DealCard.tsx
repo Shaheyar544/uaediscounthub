@@ -6,6 +6,7 @@ import { Star, Heart, ShoppingCart, BarChart2 } from 'lucide-react'
 import { useHasMounted } from '@/hooks/use-has-mounted'
 import { useCompare } from '@/hooks/use-compare'
 import { useRouter } from 'next/navigation'
+import { resolveMediaUrl } from '@/lib/media'
 
 interface DealCardProps {
   id: string
@@ -86,20 +87,7 @@ export function DealCard({
 
       {/* Sanitized image URL resolver */}
       {(() => {
-        const getImageUrl = (url: string | null | undefined): string | null => {
-          if (!url) return null
-          const cleanUrl = url.trim()
-          if (cleanUrl.startsWith('http://') || cleanUrl.startsWith('https://') || cleanUrl.startsWith('/')) {
-            return cleanUrl
-          }
-          // If it's a relative filename from R2 bucket, prefix it
-          if (!cleanUrl.includes('/') && (cleanUrl.endsWith('.jpg') || cleanUrl.endsWith('.png') || cleanUrl.endsWith('.webp') || cleanUrl.endsWith('.jpeg'))) {
-            return `https://media.uaediscounthub.com/products/${cleanUrl}`
-          }
-          return null
-        }
-
-        const finalImageUrl = getImageUrl(image_url)
+        const finalImageUrl = resolveMediaUrl(image_url)
 
         return (
           <div className="relative aspect-[4/3] w-full bg-white flex items-center justify-center overflow-hidden p-4">

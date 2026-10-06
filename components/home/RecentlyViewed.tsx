@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { resolveMediaUrl } from '@/lib/media'
 
 interface RecentProduct {
   id: string
@@ -50,9 +51,9 @@ export function RecentlyViewed({ locale = 'en' }: { locale?: string }) {
             className="flex-shrink-0 w-[140px] bg-white rounded-2xl border border-gray-100 hover:border-blue-200 hover:shadow-md transition-all group"
           >
             <div className="w-full h-[110px] bg-gray-50 rounded-t-2xl flex items-center justify-center p-3 overflow-hidden">
-              {item.image_url ? (
+              {resolveMediaUrl(item.image_url) ? (
                 <img
-                  src={item.image_url}
+                  src={resolveMediaUrl(item.image_url)!}
                   alt={item.name}
                   className="w-full h-full object-contain group-hover:scale-105 transition-transform"
                 />

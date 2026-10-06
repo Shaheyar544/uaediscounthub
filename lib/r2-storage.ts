@@ -1,5 +1,6 @@
 import { S3Client, PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
 import sharp from 'sharp';
+import { getMediaBaseUrl } from '@/lib/media';
 
 if (typeof window !== 'undefined') {
   throw new Error('R2-Storage utility can only be used in Server-Side environments.');
@@ -14,8 +15,8 @@ const R2 = new S3Client({
   },
 });
 
-const BUCKET = process.env.R2_BUCKET_NAME!;
-const PUBLIC_URL = process.env.NEXT_PUBLIC_MEDIA_URL!;
+const BUCKET = process.env.R2_BUCKET_NAME || 'uaediscounthub-media';
+const getPublicMediaUrl = () => getMediaBaseUrl();
 
 export interface R2UploadResult {
   url: string;
@@ -49,7 +50,7 @@ export async function uploadImage(
   }));
 
   return {
-    url: `${PUBLIC_URL}/${key}`,
+    url: `${getPublicMediaUrl()}/${key}`,
     key,
     bucket: BUCKET
   };
@@ -63,7 +64,7 @@ export async function deleteByKey(key: string): Promise<void> {
 }
 
 export async function deleteImage(imageUrl: string): Promise<void> {
-  const key = imageUrl.replace(`${PUBLIC_URL}/`, '');
+  const key = imageUrl.replace(`${getPublicMediaUrl()}/`, '').replace(/^https?:\/\/[^\/]+\//, '');
   await deleteByKey(key);
 }
 
@@ -93,5 +94,5 @@ export async function uploadRemoteImage(
 }
 
 export function getPublicUrl(key: string): string {
-  return `${PUBLIC_URL}/${key}`;
+  return `${getPublicMediaUrl()}/${key}`;
 }

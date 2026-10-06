@@ -9,6 +9,7 @@ import { useRouter } from 'next/navigation'
 import { useCompare } from '@/hooks/use-compare'
 import { createClient } from '@/utils/supabase/client'
 import { Button } from '@/components/ui/button'
+import { resolveMediaUrl } from '@/lib/media'
 
 interface ComparisonProduct {
   id: string
@@ -101,12 +102,10 @@ export function CompareBar({ locale = 'en' }: { locale?: string }) {
                       key={product.id}
                       className="group relative flex-shrink-0 w-12 h-12 md:w-16 md:h-16 rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-950 flex items-center justify-center p-1"
                     >
-                      {product.image_url ? (
-                        <Image
-                          src={product.image_url}
+                      {resolveMediaUrl(product.image_url) ? (
+                        <img
+                          src={resolveMediaUrl(product.image_url)!}
                           alt={product.name_en}
-                          width={60}
-                          height={60}
                           className="object-contain max-h-full"
                         />
                       ) : (
