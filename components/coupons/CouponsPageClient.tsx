@@ -143,11 +143,11 @@ export function CouponsPageClient({
         list.sort((a, b) => (b.click_count ?? 0) - (a.click_count ?? 0))
         break
       case 'newest':
-        // Fast ISO string comparison replaces invalid `new Date(uuid)` evaluation
+        // Fast ISO string comparison replaces invalid `new Date(uuid)` evaluation (newest first)
         list.sort((a, b) => {
-          const bExp = b.expires_at ?? ''
           const aExp = a.expires_at ?? ''
-          return bExp > aExp ? -1 : bExp < aExp ? 1 : 0
+          const bExp = b.expires_at ?? ''
+          return aExp > bExp ? -1 : aExp < bExp ? 1 : 0
         })
         break
       case 'discount':

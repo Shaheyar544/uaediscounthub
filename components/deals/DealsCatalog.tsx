@@ -58,19 +58,34 @@ export function DealsCatalog({ locale, deals, errorMessage }: { locale: string; 
 
   const categories = useMemo(() => Array.from(new Map(deals.filter((deal) => deal.category).map((deal) => [deal.category!.id, deal.category!])).values()), [deals])
   const retailers = useMemo(() => Array.from(new Map(deals.filter((deal) => deal.retailer).map((deal) => [deal.retailer!.id, deal.retailer!])).values()).sort((a, b) => a.name.localeCompare(b.name)), [deals])
-  const endingSoonCount = deals.filter((deal) => isEndingSoon(deal.expiresAt)).length
+  const endingSoonCount = useMemo(() => deals.filter((deal) => isEndingSoon(deal.expiresAt)).length, [deals])
 
   const visibleDeals = useMemo(() => {
     const term = query.trim().toLocaleLowerCase()
     return deals.filter((deal) => {
-      const searchable = [deal.title, deal.retailer?.name, deal.category?.name].filter(Boolean).join(' ').toLocaleLowerCase()
       const price = deal.currentPrice
       const matchesPrice = priceRange === 'all' || (price !== null && ((priceRange === 'under-100' && price < 100) || (priceRange === '100-500' && price >= 100 && price <= 500) || (priceRange === '500-plus' && price > 500)))
-      return (!term || searchable.includes(term)) && (categoryId === 'all' || deal.category?.id === categoryId) && (retailerId === 'all' || deal.retailer?.id === retailerId) && matchesPrice
+      if (!matchesPrice || (categoryId !== 'all' && deal.category?.id !== categoryId) || (retailerId !== 'all' && deal.retailer?.id !== retailerId)) {
+        return false
+      }
+      if (!term) return true
+      return (
+        deal.title.toLocaleLowerCase().includes(term) ||
+        (deal.retailer?.name ? deal.retailer.name.toLocaleLowerCase().includes(term) : false) ||
+        (deal.category?.name ? deal.category.name.toLocaleLowerCase().includes(term) : false)
+      )
     }).sort((a, b) => {
       if (sort === 'saving') return (savings(b) ?? -1) - (savings(a) ?? -1)
-      if (sort === 'newest') return new Date(b.createdAt ?? 0).getTime() - new Date(a.createdAt ?? 0).getTime()
-      if (sort === 'ending') return new Date(a.expiresAt ?? '9999-12-31').getTime() - new Date(b.expiresAt ?? '9999-12-31').getTime()
+      if (sort === 'newest') {
+        const aCreated = a.createdAt ?? ''
+        const bCreated = b.createdAt ?? ''
+        return aCreated > bCreated ? -1 : aCreated < bCreated ? 1 : 0
+      }
+      if (sort === 'ending') {
+        const aExp = a.expiresAt ?? '9999-12-31'
+        const bExp = b.expiresAt ?? '9999-12-31'
+        return aExp < bExp ? -1 : aExp > bExp ? 1 : 0
+      }
       return (discount(b) ?? 0) - (discount(a) ?? 0) || (savings(b) ?? 0) - (savings(a) ?? 0)
     })
   }, [categoryId, deals, priceRange, query, retailerId, sort])
