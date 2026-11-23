@@ -28,7 +28,9 @@ jobs:
             echo "📂 Target directory: $SOURCE_DIR"
             cd "$SOURCE_DIR"
             
-            export PATH="/opt/alt/alt-nodejs20/root/usr/bin:$PATH"
+            export PATH="/opt/alt/alt-nodejs22/root/usr/bin:$PATH"
+            export RAYON_NUM_THREADS=1
+            export UV_THREADPOOL_SIZE=1
             export NEXT_CPU_NUM=1
             
             echo "⬇️ Pulling latest changes from GitHub..."
