@@ -55,6 +55,11 @@ const nextConfig = {
     minimumCacheTTL: 3600,
   },
   compress: true,
+  output: 'standalone',
+  experimental: {
+    cpus: 1,
+    workerThreads: false,
+  },
   // Security headers
   async headers() {
     return [
