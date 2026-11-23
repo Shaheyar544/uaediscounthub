@@ -1,0 +1,51 @@
+name: Deploy UAE Discount Hub to Hostinger
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to Hostinger via SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.HOSTINGER_HOST }}
+          port: ${{ secrets.HOSTINGER_PORT }}
+          username: ${{ secrets.HOSTINGER_USER }}
+          key: ${{ secrets.HOSTINGER_SSH_KEY }}
+          script_stop: true
+          script: |
+            echo "🚀 Starting automated deployment..."
+            
+            TARGET_DIR=$(find ~/domains -name "hbuilds" -type d 2>/dev/null | head -1)/source
+            if [ -z "$TARGET_DIR" ] || [ ! -d "$TARGET_DIR" ]; then
+              TARGET_DIR=~/domains/$(ls ~/domains | head -1)/hbuilds/source
+            fi
+            
+            echo "📂 Target directory: $TARGET_DIR"
+            cd "$TARGET_DIR"
+            
+            export PATH="/opt/alt/alt-nodejs20/root/usr/bin:$PATH"
+            export NEXT_CPU_NUM=1
+            
+            echo "⬇️ Pulling latest code from GitHub..."
+            git fetch origin main
+            git reset --hard origin/main
+            
+            echo "📦 Updating dependencies..."
+            chmod -R +x node_modules/.bin 2>/dev/null || true
+            npm install --production=false
+            chmod -R +x node_modules/.bin 2>/dev/null || true
+            
+            echo "⚙️ Building Next.js application..."
+            node ./node_modules/next/dist/bin/next build --webpack
+            
+            echo "🔄 Restarting application..."
+            touch ../../tmp/restart.txt 2>/dev/null || true
+            touch tmp/restart.txt 2>/dev/null || true
+            
+            echo "✅ Deployment completed successfully!"
