@@ -35,6 +35,11 @@ jobs:
             git fetch origin main
             git reset --hard origin/main
             
+            echo "📦 Updating dependencies..."
+            chmod -R +x node_modules/.bin 2>/dev/null || true
+            npm install --production=false
+            chmod -R +x node_modules/.bin 2>/dev/null || true
+            
             echo "⚙️ Building Next.js application..."
             chmod -R +x node_modules/.bin 2>/dev/null || true
             node ./node_modules/next/dist/bin/next build --webpack
