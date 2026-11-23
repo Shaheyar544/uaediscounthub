@@ -26,7 +26,7 @@ export async function proxy(request: NextRequest) {
 
 export const config = {
     matcher: [
-        // Skip all internal paths (_next)
-        '/((?!_next|api|favicon.ico).*)',
+        // Skip internal paths (_next), API routes, static files, robots.txt and sitemap.xml
+        '/((?!_next|api|favicon.ico|robots.txt|sitemap.xml|.*\\..*).*)',
     ],
 };
