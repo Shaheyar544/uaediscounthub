@@ -3,7 +3,7 @@ import type { NextRequest } from 'next/server';
 import { locales, defaultLocale } from './i18n/config';
 import { updateSession } from '@/utils/supabase/middleware'
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
     const supabaseResponse = await updateSession(request)
 
     const { pathname } = request.nextUrl;
