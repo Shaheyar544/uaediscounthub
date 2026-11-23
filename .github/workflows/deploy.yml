@@ -52,6 +52,10 @@ jobs:
             cp -r .next/static "$ACTIVE_NODEJS/.next/" 2>/dev/null || true
             mkdir -p "$ACTIVE_NODEJS/tmp"
             
+            # Sync config package.json for Hostinger dashboard scanner
+            cp package.json "$DOMAIN_DIR/hbuilds/config/" 2>/dev/null || true
+            cp package-lock.json "$DOMAIN_DIR/hbuilds/config/" 2>/dev/null || true
+            
             echo "🔄 Triggering LiteSpeed restart..."
             touch "$ACTIVE_NODEJS/tmp/restart.txt"
             
