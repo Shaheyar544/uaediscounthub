@@ -18,37 +18,36 @@ jobs:
           username: ${{ secrets.HOSTINGER_USER }}
           key: ${{ secrets.HOSTINGER_SSH_KEY }}
           script_stop: true
+          command_timeout: 15m
           script: |
             echo "🚀 Starting automated deployment..."
             
             DOMAIN_DIR=~/domains/polished-mistyrose-chinchilla-82.hostingersite.com
-            TARGET_DIR=$DOMAIN_DIR/hbuilds/source
+            SOURCE_DIR=$DOMAIN_DIR/hbuilds/last-source
             
-            echo "📂 Target directory: $TARGET_DIR"
-            cd "$TARGET_DIR"
+            echo "📂 Target directory: $SOURCE_DIR"
+            cd "$SOURCE_DIR"
             
             export PATH="/opt/alt/alt-nodejs20/root/usr/bin:$PATH"
             export NEXT_CPU_NUM=1
             
-            echo "⬇️ Pulling latest code from GitHub..."
+            echo "⬇️ Pulling latest changes from GitHub..."
             git fetch origin main
             git reset --hard origin/main
             
-            echo "📦 Updating dependencies..."
-            chmod -R +x node_modules/.bin 2>/dev/null || true
-            npm install --production=false
-            chmod -R +x node_modules/.bin 2>/dev/null || true
-            
             echo "⚙️ Building Next.js application..."
+            chmod -R +x node_modules/.bin 2>/dev/null || true
             node ./node_modules/next/dist/bin/next build --webpack
             
-            echo "📁 Copying assets to standalone..."
-            cp -r public .next/standalone/ 2>/dev/null || true
-            mkdir -p .next/standalone/.next
-            cp -r .next/static .next/standalone/.next/ 2>/dev/null || true
-            mkdir -p .next/standalone/tmp
+            echo "📁 Syncing to active server..."
+            ACTIVE_NODEJS=$(readlink -f $DOMAIN_DIR/hbuilds/current)/nodejs
+            cp -r .next/standalone/* "$ACTIVE_NODEJS/" 2>/dev/null || true
+            cp -r public "$ACTIVE_NODEJS/" 2>/dev/null || true
+            mkdir -p "$ACTIVE_NODEJS/.next"
+            cp -r .next/static "$ACTIVE_NODEJS/.next/" 2>/dev/null || true
+            mkdir -p "$ACTIVE_NODEJS/tmp"
             
-            echo "🔄 Restarting application..."
-            touch .next/standalone/tmp/restart.txt
+            echo "🔄 Triggering LiteSpeed restart..."
+            touch "$ACTIVE_NODEJS/tmp/restart.txt"
             
             echo "✅ Deployment completed successfully!"
