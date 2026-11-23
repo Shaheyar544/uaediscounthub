@@ -22,7 +22,7 @@ jobs:
           script: |
             echo "🚀 Starting automated deployment..."
             
-            DOMAIN_DIR=~/domains/polished-mistyrose-chinchilla-82.hostingersite.com
+            DOMAIN_DIR=~/domains/uaediscounthub.com
             SOURCE_DIR=$DOMAIN_DIR/hbuilds/last-source
             
             echo "📂 Target directory: $SOURCE_DIR"
