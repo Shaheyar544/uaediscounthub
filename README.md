@@ -84,3 +84,5 @@ To deploy on a Hostinger VPS:
 
 Copyright © 2024 UAEDiscountHub. All rights reserved.
 Built with ❤️ in Dubai, UAE.
+
+<!-- CI/CD deployment verified: 2026-11-23 15:34:58 -->
