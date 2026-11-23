@@ -3,10 +3,16 @@ import type { NextRequest } from 'next/server';
 import { locales, defaultLocale } from './i18n/config';
 import { updateSession } from '@/utils/supabase/middleware'
 
-export async function proxy(request: NextRequest) {
+export async function middleware(request: NextRequest) {
     const supabaseResponse = await updateSession(request)
 
     const { pathname } = request.nextUrl;
+
+    // Never redirect robots.txt or sitemap.xml
+    if (pathname === '/robots.txt' || pathname === '/sitemap.xml' || pathname.startsWith('/robots') || pathname.startsWith('/sitemap')) {
+        return NextResponse.next();
+    }
+
     const pathnameHasLocale = locales.some(
         (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
     );
