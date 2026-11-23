@@ -60,6 +60,33 @@ const nextConfig = {
     cpus: 1,
     workerThreads: false,
   },
+  async redirects() {
+    return [
+      {
+        source: '/:path*',
+        has: [
+          {
+            type: 'host',
+            value: '.*\\.hostingersite\\.com',
+          },
+        ],
+        destination: 'https://uaediscounthub.com/:path*',
+        permanent: true,
+      },
+      {
+        source: '/:path*',
+        has: [
+          {
+            type: 'header',
+            key: 'x-forwarded-host',
+            value: '.*\\.hostingersite\\.com',
+          },
+        ],
+        destination: 'https://uaediscounthub.com/:path*',
+        permanent: true,
+      },
+    ];
+  },
   // Security headers
   async headers() {
     return [
